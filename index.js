@@ -1,7 +1,7 @@
 import * as R from 'ramda'
-import { board, putPlayer, putWall } from './board'
-import { point } from './point'
-import { hwall } from './wall'
+import { board, putPlayer, putWall } from './core/board'
+import { point } from './core/point'
+import { hwall } from './core/wall'
 
 
 const gameDefinition = {
