@@ -43,16 +43,18 @@ test('wallPoints horizontal wall', () => {
   expect(actualPoints).toEqual([
     point(1, 1),
     point(1, 2),
+    point(1, 3),
   ])
 });
 
 test('wallPoints vertical wall', () => {
-  const wall = vwall(point(1, 1))
+  const wall = vwall(point(3, 1))
 
   const actualPoints = wallPoints(wall)
 
   expect(actualPoints).toEqual([
+    point(3, 1),
+    point(2, 1),
     point(1, 1),
-    point(0, 1),
   ])
 });

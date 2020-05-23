@@ -13,14 +13,28 @@ export const isVertical = R.compose(R.equals('v'), R.prop('orientation'))
 // Checks if the wall is horizontally orientated.
 export const isHorizontal = R.compose(R.equals('h'), R.prop('orientation'))
 
+// iterate :: Number -> (a -> a) -> a -> [a]
+// Creates a list of size N where the first item is calculated by
+// applying the function on the input value, and the second item is
+// calculated by applying the function on the first item and so on.
+const iterate = (n, f, v) => {
+  const _iterate = (n, f, v, vs) => {
+    if (n <= 0) {
+      return vs
+    } else {
+      return _iterate(n - 1, f, f(v), R.append(f(v), vs))
+    }
+  }
+
+  return _iterate(n - 1, f, v, [v])
+}
+
 // wallPoints :: Wall -> [Point]
 // Returns the points the provided wall occupies.
-export const wallPoints = (wall) => {
-  return R.reject(
+export const wallPoints = (wall) =>
+  R.reject(
     R.isNil,
-    [
-      wall.topLeft,
-      isHorizontal(wall) ? east(wall.topLeft) : null,
-      isVertical(wall) ? south(wall.topLeft) : null,
-    ])
-}
+    R.flatten([
+      isVertical(wall) ? iterate(3, south, wall.topLeft) : [],
+      isHorizontal(wall) ? iterate(3, east, wall.topLeft)  : [],
+    ]))
