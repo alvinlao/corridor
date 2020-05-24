@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import { updateBoard } from './game'
+import { updateBoard, playerLocationLens, playerWinLocationsLens } from './game'
 import { wallPoints, wallEdges } from './wall'
 import { north, south, east, west, nedge, sedge, eedge, wedge, } from './point'
 import { middle } from '../util'
@@ -39,22 +39,16 @@ export const isWallOverlapping =
 // isGameCompletable :: Game -> Boolean
 // Checks whether every player can reach a win location.
 export const isGameCompletable =
-  (game) => R.all(
-    R.identity,
-    R.map(
-      R.apply(hasPath(game)),
-      R.toPairs(game.board.players)))
+  (game) => R.all(R.apply(hasPath(game)), R.toPairs(game.board.players))
 
 // hasPath :: Game -> PlayerId -> Player -> Boolean
-// Checks whether the player can reach the other side.
-const hasPath = R.curry((game, playerId, player) => {
-  const start =
-    R.view(
-      R.lensPath(['board', 'players', playerId, 'location']),
-      game)
-  const stops = R.view(R.lensPath(['playerWinLocations', playerId]), game)
-  return isReachable(game, start, stops)
-})
+// Checks whether the player can reach a win location.
+const hasPath =
+  R.curry((game, playerId, player) => {
+    const start = R.view(playerLocationLens(playerId), game)
+    const stops = R.view(playerWinLocationsLens(playerId), game)
+    return isReachable(game, start, stops)
+  })
 
 // isReachable :: Game -> Point -> [Point] -> Boolean
 // Checks whether an unblocked path from the start point to any stop point exists.
@@ -69,9 +63,7 @@ const isReachable = R.curry((game, start, stops) => {
     }
 
     return _dfs(
-      R.concat(
-        unvisitedNeighbours(game, cur, visited),
-        R.tail(toVisit)),
+      R.concat(unvisitedNeighbours(game, cur, visited), R.tail(toVisit)),
       R.append(cur, visited))
   }
 
@@ -80,24 +72,27 @@ const isReachable = R.curry((game, start, stops) => {
 
 // unvisitedNeighbours :: Game -> Point -> [Point] -> [Point]
 // Returns a list of unvisited neighbours that are on the board.
-const unvisitedNeighbours = R.curry((game, point, visitedPoints) => {
-  const blockedEdges = wallEdges(game.board.walls)
-  const free = f => R.complement(R.compose(R.includes(R.__, blockedEdges), f))
-  const unblockedNeighbours = R.juxt([
-    R.when(free(nedge), north),
-    R.when(free(sedge), south),
-    R.when(free(eedge), east),
-    R.when(free(wedge), west),
-  ])
-    
-  return R.reject(
-    R.anyPass(
-      [
+const unvisitedNeighbours =
+  R.curry((game, point, visitedPoints) =>
+    R.reject(
+      R.anyPass([
         R.equals(point),
         R.complement(isPointInbounds(game)),
         R.includes(R.__, visitedPoints),
       ]),
-    unblockedNeighbours(point))
+      unblockedNeighbours(game, point)))
+
+// unblockedNeighbours :: Game -> Point -> [Point]
+// Returns the neighbouring points that are not blocked by a wall.
+const unblockedNeighbours = R.curry((game, point) => {
+  const free =
+    f => R.complement(R.compose(R.includes(R.__, wallEdges(game.board.walls)), f))
+  return R.juxt([
+    R.when(free(nedge), north),
+    R.when(free(sedge), south),
+    R.when(free(eedge), east),
+    R.when(free(wedge), west),
+  ])(point)
 })
 
 // isValidWall :: Game -> Wall -> Boolean

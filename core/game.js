@@ -47,3 +47,9 @@ export const col =
 const boardLens = R.lensProp('board')
 
 export const updateBoard = R.over(boardLens)
+
+export const playerLocationLens = (playerId) =>
+  R.lensPath(['board', 'players', playerId, 'location'])
+
+export const playerWinLocationsLens = (playerId) =>
+  R.lensPath(['playerWinLocations', playerId])
