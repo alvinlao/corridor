@@ -1,11 +1,12 @@
 import * as R from 'ramda'
-import { board, putWall } from './board'
+import { board, putWall, putPlayer } from './board'
 import { game, updateBoard } from './game'
 import {
   isWallInbounds,
   isWallSpaceOccupied,
   isWallOverlapping,
   isGameCompletable,
+  isGameOver,
 } from './logic'
 import { point } from './point'
 import { hwall, vwall } from './wall'
@@ -192,7 +193,6 @@ test('isGameCompletable empty board', () => {
 })
 
 test('isGameCompletable gap', () => {
-  const playerId = 0
   const testGame = updateBoard(
       R.pipe(
         putWall(hwall(point(7, 0))),
@@ -211,7 +211,6 @@ test('isGameCompletable gap', () => {
 })
 
 test('isGameCompletable top row blocked', () => {
-  const playerId = 0
   const testGame = updateBoard(
       R.pipe(
         putWall(hwall(point(7, 0))),
@@ -228,4 +227,24 @@ test('isGameCompletable top row blocked', () => {
   const actual = isGameCompletable(testGame)
 
   expect(actual).toBe(false)
+})
+
+test('isGameOver no', () => {
+  const testGame = game(4)
+
+  const actual = isGameOver(testGame)
+
+  expect(actual).toBe(false)
+})
+
+test('isGameOver yes', () => {
+  const playerId = 0
+  const testGame =
+    updateBoard(
+      putPlayer(playerId, point(8, 0)),
+      game(4))
+
+  const actual = isGameOver(testGame)
+
+  expect(actual).toBe(true)
 })

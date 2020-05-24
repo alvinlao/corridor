@@ -21,7 +21,7 @@ test('game 4 player', () => {
     0: player(point(0, 4)),
     1: player(point(8, 4)),
     2: player(point(4, 0)),
-    3: player(point(8, 0)),
+    3: player(point(4, 8)),
   })
   expect(actualGame.board.walls).toEqual([])
 });

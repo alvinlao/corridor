@@ -14,7 +14,7 @@ const initializePlayers = [
   putPlayer(0, point(0, 4)),
   putPlayer(1, point(8, 4)),
   putPlayer(2, point(4, 0)),
-  putPlayer(3, point(8, 0)),
+  putPlayer(3, point(4, 8)),
 ]
 
 // game :: Number -> Game
@@ -53,3 +53,7 @@ export const playerLocationLens = (playerId) =>
 
 export const playerWinLocationsLens = (playerId) =>
   R.lensPath(['playerWinLocations', playerId])
+
+// players :: Game -> [PlayerId]
+// Returns all the player ids.
+export const players = (game) => R.keys(game.board.players)
