@@ -1,11 +1,10 @@
 import * as R from 'ramda'
 import { player } from './player'
+import { point } from './point'
 
-// board :: BoardParams -> Board
+// board :: () -> Board
 // Creates an empty board.
-export const board = (params) => ({
-  rows: params.rows,
-  cols: params.cols,
+export const board = () => ({
   walls: [],
   players: {},
 })

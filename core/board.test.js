@@ -4,22 +4,18 @@ import { player } from './player'
 import { point } from './point'
 import { hwall } from './wall'
 
-const defaultParams = { rows: 9, cols: 9 }
-
 
 test('board created', () => {
-  const actualBoard = board({ rows: 1, cols: 1 })
+  const actualBoard = board()
 
   expect(actualBoard).toEqual({
-    rows: 1,
-    cols: 1,
     walls: [],
     players: {},
   })
 });
 
 test('wall placed', () => {
-  const initialBoard = board(defaultParams)
+  const initialBoard = board()
   const wall = hwall(point(0, 0))
 
   const actualBoard = putWall(wall, initialBoard)
@@ -28,7 +24,7 @@ test('wall placed', () => {
 });
 
 test('duplicate wall placed', () => {
-  const initialBoard = board(defaultParams)
+  const initialBoard = board()
   const wall = hwall(point(0, 0))
 
   const actualBoard =
@@ -41,7 +37,7 @@ test('duplicate wall placed', () => {
 });
 
 test('player placed', () => {
-  const initialBoard = board(defaultParams)
+  const initialBoard = board()
   const playerId = 0
   const location = point(0, 0)
 
@@ -51,7 +47,7 @@ test('player placed', () => {
 });
 
 test('existing player replaced', () => {
-  const initialBoard = board(defaultParams)
+  const initialBoard = board()
   const playerId = 0
 
   const actualBoard =
