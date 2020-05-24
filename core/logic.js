@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+import { putWall } from './board'
 import {
   updateBoard,
   playerLocationLens,

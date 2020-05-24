@@ -7,6 +7,7 @@ import {
   isWallOverlapping,
   isGameCompletable,
   isGameOver,
+  isValidWall,
 } from './logic'
 import { point } from './point'
 import { hwall, vwall } from './wall'
@@ -225,6 +226,47 @@ test('isGameCompletable top row blocked', () => {
       game(4))
 
   const actual = isGameCompletable(testGame)
+
+  expect(actual).toBe(false)
+})
+
+test('isValidWall yes', () => {
+  const testGame = game(4)
+  const wall = hwall(point(1, 1))
+
+  const actual = isValidWall(testGame, wall)
+
+  expect(actual).toBe(true)
+})
+
+test('isValidWall overlap', () => {
+  const testGame =
+    updateBoard(putWall(hwall(point(1, 0))), game(4))
+  const wall = hwall(point(1, 1))
+
+  const actual = isValidWall(testGame, wall)
+
+  expect(actual).toBe(false)
+})
+
+test('isValidWall cages player', () => {
+  const testGame = updateBoard(
+      R.pipe(
+        putWall(vwall(point(1, 4))),
+        putWall(vwall(point(1, 5)))),
+      game(4))
+  const wall = hwall(point(1, 4))
+
+  const actual = isValidWall(testGame, wall)
+
+  expect(actual).toBe(false)
+})
+
+test('isValidWall outside', () => {
+  const testGame = game(4)
+  const wall = hwall(point(-1, -1))
+
+  const actual = isValidWall(testGame, wall)
 
   expect(actual).toBe(false)
 })
