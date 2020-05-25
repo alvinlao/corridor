@@ -1,6 +1,11 @@
 import * as R from 'ramda'
 import { putWall } from './board'
-import { updateBoard, playerIds, playerLocation, playerWinLocations } from './game'
+import {
+  updateBoard,
+  playerIds,
+  playerLocation,
+  playerWinLocations,
+} from './game'
 import { moves } from './movementlogic'
 import {
   isWallInbounds,

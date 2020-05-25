@@ -23,8 +23,11 @@ const initializePlayers = [
 export const game = (numPlayers) => ({
   board: setupPlayers(numPlayers, board()),
   playerWinLocations: winLocations(),
+  numPlayers,
   rows,
   cols,
+  inventory: setupInventory(numPlayers),
+  activePlayerId: 0,
 })
 
 // setupPlayers :: Number -> Board -> Board
@@ -34,6 +37,16 @@ const setupPlayers = (numPlayers, board) =>
     R.applyTo,
     board,
     R.take(numPlayers, initializePlayers))
+
+// setupInventory :: Number -> Inventory
+// Gives each player a preset number of walls.
+const setupInventory = (numPlayers) => {
+  const numWalls = numPlayers == 2 ? 10 : 5
+  return R.pipe(
+    R.map((playerId) => [playerId, numWalls]),
+    R.fromPairs)
+  (R.range(0, numPlayers))
+}
 
 // row :: Number -> [Point]
 // Returns a list of points in the provided row number.
@@ -86,9 +99,9 @@ export const hasPlayer = R.curry((game, point) =>
     R.includes(point))
   (playerIds(game)))
 
-// hasWall :: Game -> [Point] -> Boolean
+// edgeOccupied :: Game -> [Point] -> Boolean
 // Checks if the edge is occupied by a wall
-export const hasWall = R.curry((game, edge) =>
+export const edgeOccupied = R.curry((game, edge) =>
   R.pipe(
     R.map(edges),
     R.unnest,
@@ -97,5 +110,23 @@ export const hasWall = R.curry((game, edge) =>
 
 // unblocked :: Game -> (Point -> [Point]) -> Point -> Boolean
 // Checks if the edge relative to the provided point is unblocked.
-export const unblocked =
-  R.curry((game, pointToEdge, point) => R.not(hasWall(game, pointToEdge(point))))
+export const unblocked = R.curry((game, pointToEdge, point) =>
+  R.not(edgeOccupied(game, pointToEdge(point))))
+
+// nextPlayersTurn :: Game -> Game
+// Updates the game to be the next player's turn.
+export const nextPlayersTurn = (game) =>
+  R.over(
+    R.lensProp('activePlayerId'),
+    (playerId) => R.inc(playerId) % game.numPlayers,
+    game)
+
+// wallsAvailable :: Game -> Boolean
+// Checks if the active player has walls available.
+export const wallsAvailable = (game) =>
+  R.view(R.lensPath(['inventory', game.activePlayerId]), game) > 0
+
+// consumeWall :: Game -> Game
+// Removes a wall from the active player's inventory.
+export const consumeWall = (game) =>
+  R.over(R.lensPath(['inventory', game.activePlayerId]), R.dec, game)
