@@ -14,7 +14,7 @@ test('moves no obstacles', () => {
       putPlayer(playerId, location),
       game(4))
 
-  const actual = moves(playerId, testGame)
+  const actual = moves(testGame, playerId)
 
   expect(actual).toEqual([
     north(location),
@@ -37,7 +37,7 @@ test('moves jumps', () => {
         putPlayer(4, west(location))),
       game(4))
 
-  const actual = moves(playerId, testGame)
+  const actual = moves(testGame, playerId)
 
   expect(actual).toEqual([
     north(north(location)),
@@ -64,7 +64,7 @@ test('moves diagonal only', () => {
         putWall(vwall(east(east(location))))),
       game(4))
 
-  const actual = moves(playerId, testGame)
+  const actual = moves(testGame, playerId)
 
   expect(actual).toContainEqual(north(west(location)))
   expect(actual).toContainEqual(north(east(location)))

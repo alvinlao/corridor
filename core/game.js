@@ -72,19 +72,19 @@ export const playerLocationLens = (playerId) =>
 export const playerWinLocationsLens = (playerId) =>
   R.lensPath(['playerWinLocations', playerId])
 
-// players :: Game -> [PlayerId]
+// playerIds :: Game -> [PlayerId]
 // Returns all the player ids.
-export const players = (game) => R.keys(game.board.players)
+export const playerIds = (game) => R.map(parseInt, R.keys(game.board.players))
+
+// playerLocation :: Game -> PlayerId -> Point
+// Returns the player's location.
+export const playerLocation =
+  R.curry((game, playerId) => R.view(playerLocationLens(playerId), game))
 
 // playerLocations :: Game -> [Point]
 // Returns the location of each player.
 export const playerLocations =
-  (game) => R.map(R.prop('location'), R.values(game.board.players))
-
-// playerLocation :: PlayerId -> Game -> Point
-// Returns the player's location.
-export const playerLocation =
-  R.curry((playerId, game) => R.view(playerLocationLens(playerId), game))
+  (game) => R.map(playerLocation(game), playerIds(game))
 
 // hasPlayer :: Game -> Point -> Boolean
 // Checks whether the space is occupied by a player.

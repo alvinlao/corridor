@@ -2,7 +2,6 @@ import * as R from 'ramda'
 import {
   playerWinLocationsLens,
   players,
-  playerLocations,
   playerLocation,
   isPointInbounds,
   unblocked,
@@ -54,7 +53,7 @@ export const isGameCompletable =
 // Checks whether the player can reach a win location.
 const hasPath =
   R.curry((game, playerId, player) => {
-    const start = playerLocation(playerId, game)
+    const start = playerLocation(game, playerId)
     const stops = R.view(playerWinLocationsLens(playerId), game)
     return isReachable(game, start, stops, playerId)
   })

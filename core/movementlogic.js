@@ -8,10 +8,10 @@ import {
 } from './game'
 import { ncompass, scompass, ecompass, wcompass } from './point'
 
-// moves :: PlayerId -> Game -> [Point]
+// moves :: Game -> PlayerId -> [Point]
 // Returns a list of locations the player can move to.
-export const moves = R.curry((playerId, game) => {
-  const point = playerLocation(playerId, game)
+export const moves = R.curry((game, playerId) => {
+  const point = playerLocation(game, playerId)
   return R.pipe(
     R.juxt([
       movesInFront(ncompass),
