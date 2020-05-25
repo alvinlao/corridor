@@ -1,6 +1,5 @@
 import * as R from 'ramda'
 import {
-  playerLocations,
   playerLocation,
   isPointInbounds,
   unblocked,

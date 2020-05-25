@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import {
-  playerWinLocationsLens,
+  playerWinLocations,
   players,
   playerLocation,
   isPointInbounds,
@@ -54,7 +54,7 @@ export const isGameCompletable =
 const hasPath =
   R.curry((game, playerId, player) => {
     const start = playerLocation(game, playerId)
-    const stops = R.view(playerWinLocationsLens(playerId), game)
+    const stops = playerWinLocations(game, playerId)
     return isReachable(game, start, stops, playerId)
   })
 

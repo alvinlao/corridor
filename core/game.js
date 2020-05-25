@@ -5,7 +5,7 @@ import { edges } from './wall'
 
 const rows = 9
 const cols = 9
-const playerWinLocations = () => ({
+const winLocations = () => ({
   0: row(8),
   1: row(0),
   2: col(8),
@@ -22,7 +22,7 @@ const initializePlayers = [
 // Creates a new game.
 export const game = (numPlayers) => ({
   board: setupPlayers(numPlayers, board()),
-  playerWinLocations: playerWinLocations(),
+  playerWinLocations: winLocations(),
   rows,
   cols,
 })
@@ -56,40 +56,35 @@ export const isPointInbounds =
       point.col < game.cols
     ))
 
-const boardLens = R.lensProp('board')
-
 // updateBoard :: (Board -> Board) -> Game -> Game
 // Updates the board in the game.
-export const updateBoard = R.over(boardLens)
-
-// playerLocationLens :: PlayerId -> Lens Game
-// Creates a lens that focus on the provided player's location.
-export const playerLocationLens = (playerId) =>
-  R.lensPath(['board', 'players', playerId, 'location'])
-
-// playerWinLocationsLens :: PlayerId -> Lens Game
-// Creates a lens that focus on the provided player's win locations.
-export const playerWinLocationsLens = (playerId) =>
-  R.lensPath(['playerWinLocations', playerId])
+export const updateBoard = R.over(R.lensProp('board'))
 
 // playerIds :: Game -> [PlayerId]
 // Returns all the player ids.
 export const playerIds = (game) => R.map(parseInt, R.keys(game.board.players))
 
+// playerWinLocations :: Game -> PlayerId -> [Point]
+// Returns the player's win locations.
+export const playerWinLocations = R.curry((game, playerId) =>
+  R.view(
+    R.lensPath(['playerWinLocations', playerId]),
+    game))
+
 // playerLocation :: Game -> PlayerId -> Point
 // Returns the player's location.
-export const playerLocation =
-  R.curry((game, playerId) => R.view(playerLocationLens(playerId), game))
-
-// playerLocations :: Game -> [Point]
-// Returns the location of each player.
-export const playerLocations =
-  (game) => R.map(playerLocation(game), playerIds(game))
+export const playerLocation = R.curry((game, playerId) =>
+  R.view(
+    R.lensPath(['board', 'players', playerId, 'location']),
+    game))
 
 // hasPlayer :: Game -> Point -> Boolean
 // Checks whether the space is occupied by a player.
-export const hasPlayer =
-  R.curry((game, point) => R.includes(point, playerLocations(game)))
+export const hasPlayer = R.curry((game, point) =>
+  R.pipe(
+    R.map(playerLocation(game)),
+    R.includes(point))
+  (playerIds(game)))
 
 // hasWall :: Game -> [Point] -> Boolean
 // Checks if the edge is occupied by a wall
