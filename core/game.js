@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 import { board, putPlayer } from './board'
 import { point } from './point'
+import { wallEdges } from './wall'
 
 const rows = 9
 const cols = 9
@@ -44,16 +45,58 @@ export const row =
 export const col =
   (n) => R.map(point(R.__, n), R.range(0, rows))
 
+// isPointInbounds :: Game -> Point -> Boolean
+// Checks whether the point is on the game.
+export const isPointInbounds =
+  R.curry((game, point) =>
+    (
+      point.row >= 0 &&
+      point.row < game.rows &&
+      point.col >= 0 &&
+      point.col < game.cols
+    ))
+
 const boardLens = R.lensProp('board')
 
+// updateBoard :: (Board -> Board) -> Game -> Game
+// Updates the board in the game.
 export const updateBoard = R.over(boardLens)
 
+// playerLocationLens :: PlayerId -> Lens Game
+// Creates a lens that focus on the provided player's location.
 export const playerLocationLens = (playerId) =>
   R.lensPath(['board', 'players', playerId, 'location'])
 
+// playerWinLocationsLens :: PlayerId -> Lens Game
+// Creates a lens that focus on the provided player's win locations.
 export const playerWinLocationsLens = (playerId) =>
   R.lensPath(['playerWinLocations', playerId])
 
 // players :: Game -> [PlayerId]
 // Returns all the player ids.
 export const players = (game) => R.keys(game.board.players)
+
+// playerLocations :: Game -> [Point]
+// Returns the location of each player.
+export const playerLocations =
+  (game) => R.map(R.prop('location'), R.values(game.board.players))
+
+// playerLocation :: PlayerId -> Game -> Point
+// Returns the player's location.
+export const playerLocation =
+  R.curry((playerId, game) => R.view(playerLocationLens(playerId), game))
+
+// hasPlayer :: Game -> Point -> Boolean
+// Checks whether the space is occupied by a player.
+export const hasPlayer =
+  R.curry((game, point) => R.includes(point, playerLocations(game)))
+
+// hasWall :: Game -> [Point] -> Boolean
+// Checks if the edge has a wall.
+export const hasWall =
+  R.curry((game, edge) => R.includes(edge, wallEdges(game.board.walls)))
+
+// unblocked :: Game -> (Point -> [Point]) -> Point -> Boolean
+// Checks if the edge relative to the provided point is unblocked.
+export const unblocked =
+  R.curry((game, pointToEdge, point) => R.not(hasWall(game, pointToEdge(point))))

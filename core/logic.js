@@ -4,27 +4,33 @@ import {
   updateBoard,
   playerLocationLens,
   playerWinLocationsLens,
-  players
+  players,
+  playerLocations,
+  playerLocation,
+  isPointInbounds,
+  unblocked,
 } from './game'
 import { wallPoints, wallEdges } from './wall'
-import { north, south, east, west, nedge, sedge, eedge, wedge, } from './point'
+import {
+  north,
+  south,
+  east,
+  west,
+  nedge,
+  sedge,
+  eedge,
+  wedge,
+  ncoord,
+  scoord,
+  ecoord,
+  wcoord,
+} from './point'
 import { middle } from '../util'
 
 // isWallInbounds :: Game -> Wall -> Boolean
 // Checks whether the entire wall is on the board.
 export const isWallInbounds =
   R.curry((game, wall) => R.all(isPointInbounds(game), wallPoints(wall)))
-
-// isPointInbounds :: Game -> Point -> Boolean
-// Checks whether the point is on the game.
-const isPointInbounds =
-  R.curry((game, point) =>
-    (
-      point.row >= 0 &&
-      point.row < game.rows &&
-      point.col >= 0 &&
-      point.col < game.cols
-    ))
 
 // isWallSpaceOccupied :: Game -> Wall -> Boolean
 // Checks if another wall already occupies the desired space.
@@ -51,14 +57,14 @@ export const isGameCompletable =
 // Checks whether the player can reach a win location.
 const hasPath =
   R.curry((game, playerId, player) => {
-    const start = R.view(playerLocationLens(playerId), game)
+    const start = playerLocation(playerId, game)
     const stops = R.view(playerWinLocationsLens(playerId), game)
-    return isReachable(game, start, stops)
+    return isReachable(game, start, stops, playerId)
   })
 
 // isReachable :: Game -> Point -> [Point] -> Boolean
 // Checks whether an unblocked path from the start point to any stop point exists.
-const isReachable = R.curry((game, start, stops) => {
+const isReachable = R.curry((game, start, stops, playerId) => {
   const _dfs = (toVisit, visited) => {
     if (R.isEmpty(toVisit)) {
       return false
@@ -91,13 +97,12 @@ const unvisitedNeighbours =
 // unblockedNeighbours :: Game -> Point -> [Point]
 // Returns the neighbouring points that are not blocked by a wall.
 const unblockedNeighbours = R.curry((game, point) => {
-  const free =
-    f => R.complement(R.compose(R.includes(R.__, wallEdges(game.board.walls)), f))
+  const _unblocked = unblocked(game)
   return R.juxt([
-    R.when(free(nedge), north),
-    R.when(free(sedge), south),
-    R.when(free(eedge), east),
-    R.when(free(wedge), west),
+    R.when(_unblocked(nedge), north),
+    R.when(_unblocked(sedge), south),
+    R.when(_unblocked(eedge), east),
+    R.when(_unblocked(wedge), west),
   ])(point)
 })
 

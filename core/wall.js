@@ -35,7 +35,7 @@ const wallDirection = R.cond([
 
 // wallEdges : [Wall] -> [[Point]]
 // Returns all edges that are blocked by walls.
-export const wallEdges = (walls) => R.unnest(R.map(edges, walls))
+export const wallEdges = (walls) => R.uniq(R.unnest(R.map(edges, walls)))
 
 // edges :: Wall -> [[Point]]
 // Returns a list of edges that are blocked by this wall.

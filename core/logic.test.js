@@ -8,9 +8,10 @@ import {
   isGameCompletable,
   isGameOver,
   isValidWall,
+  canUp,
 } from './logic'
-import { point } from './point'
-import { hwall, vwall } from './wall'
+import { point, north, south, east, west, ncoord } from './point'
+import { hwall, vwall, wallEdges } from './wall'
 import { middle } from '../util'
 
 const testGame = game(2)
@@ -221,8 +222,7 @@ test('isGameCompletable top row blocked', () => {
         putWall(hwall(point(7, 4))),
         putWall(hwall(point(7, 5))),
         putWall(hwall(point(7, 6))),
-        putWall(hwall(point(7, 7))),
-        putWall(hwall(point(7, 8)))),
+        putWall(hwall(point(7, 7)))),
       game(4))
 
   const actual = isGameCompletable(testGame)
