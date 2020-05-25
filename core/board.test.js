@@ -38,24 +38,26 @@ test('duplicate wall placed', () => {
 
 test('player placed', () => {
   const initialBoard = board()
-  const playerId = 0
   const location = point(0, 0)
 
-  const actualBoard = putPlayer(playerId, location, initialBoard)
+  const actualBoard = putPlayer(0, location, initialBoard)
 
-  expect(actualBoard.players).toEqual(R.objOf(playerId, player(location)))
+  expect(actualBoard.players).toEqual({
+    0: player(location)
+  })
 });
 
 test('existing player replaced', () => {
   const initialBoard = board()
-  const playerId = 0
 
   const actualBoard =
     R.pipe(
-      putPlayer(playerId, point(1, 1)),
-      putPlayer(playerId, point(2, 2)),
-      putPlayer(playerId, point(3, 3)))
+      putPlayer(0, point(1, 1)),
+      putPlayer(0, point(2, 2)),
+      putPlayer(0, point(3, 3)))
     (initialBoard)
 
-  expect(actualBoard.players).toEqual(R.objOf(playerId, player(point(3, 3))))
+  expect(actualBoard.players).toEqual({
+    0: player(point(3, 3))
+  })
 });
