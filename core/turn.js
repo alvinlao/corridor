@@ -10,13 +10,10 @@ import { isValidWall, isValidMove } from './logic'
 
 
 // useWall :: Game -> Wall -> Game
-// Place a wall in the game on behalf of the active player.
+// Places a wall in the game on behalf of the active player.
 export const useWall = R.curry((game, wall) =>
   R.when(
-    R.allPass([
-      isValidWall(R.__, wall),
-      wallsAvailable,
-    ]),
+    R.allPass([isValidWall(R.__, wall), wallsAvailable]),
     R.pipe(
       updateBoard(putWall(wall)),
       consumeWall,
@@ -26,10 +23,10 @@ export const useWall = R.curry((game, wall) =>
 
 // useMove :: Game -> Point -> Game
 // Moves the active player to the destination.
-export const useMove = R.curry((game, point) =>
+export const useMove = R.curry((game, destination) =>
   R.when(
-    isValidMove(R.__, game.activePlayerId, point),
+    isValidMove(R.__, game.activePlayerId, destination),
     R.pipe(
-      updateBoard(putPlayer(game.activePlayerId, point)),
+      updateBoard(putPlayer(game.activePlayerId, destination)),
       nextPlayersTurn))
   (game))
