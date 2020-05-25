@@ -15,7 +15,7 @@ export const sedge = R.juxt([south, R.compose(south, east)])
 export const eedge = R.juxt([east, R.compose(south, east)])
 export const wedge = R.juxt([R.identity, south])
 
-// compass :: (Point -> Point) -> ... -> Compass
+// compass :: (Point -> Point) -> ... (Point -> [Point]) -> ... -> Compass
 // A compass provides relative point transformation functions.
 const compass = (up, down, left, right, upedge, downedge, rightedge, leftedge) => ({
   up,
