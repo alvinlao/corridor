@@ -1,7 +1,7 @@
 import * as R from 'ramda'
-import { game } from './game'
-import { point } from './point'
-import { useWall } from './turn'
+import { game, playerLocation } from './game'
+import { point, north, south } from './point'
+import { useWall, useMove } from './turn'
 import { vwall } from './wall'
 
 
@@ -37,4 +37,26 @@ test('useWall no walls available', () => {
   expect(actualGame.activePlayerId).toEqual(playerId)
   expect(actualGame.inventory[0]).toEqual(0)
   expect(actualGame.board.walls).toEqual([])
+})
+
+test('useMove yes', () => {
+  const playerId = 0
+  const testGame = game(4)
+  const location = playerLocation(testGame, playerId)
+
+  const actualGame = useMove(testGame, north(location))
+
+  expect(actualGame.activePlayerId).toEqual(R.inc(playerId))
+  expect(playerLocation(actualGame, playerId)).toEqual(north(location))
+})
+
+test('useMove invalid move', () => {
+  const playerId = 0
+  const testGame = game(4)
+  const location = playerLocation(testGame, playerId)
+
+  const actualGame = useMove(testGame, south(location))
+
+  expect(actualGame.activePlayerId).toEqual(playerId)
+  expect(playerLocation(actualGame, playerId)).toEqual(location)
 })
