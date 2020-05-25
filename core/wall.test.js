@@ -1,60 +1,31 @@
 import * as R from 'ramda'
 import { point } from './point'
-import { hwall, vwall, wallPoints, isVertical, isHorizontal } from './wall'
+import { hwall, vwall, edges } from './wall'
 
 
-test('isVertical vertical wall', () => {
-  const wall = vwall(point(1, 1))
+test('vwall created', () => {
+  const actualWall = vwall(point(3, 0))
 
-  const actual = isVertical(wall)
+  expect(actualWall).toEqual({
+    points: [point(3, 0), point(2, 0), point(1, 0)],
+  })
+})
 
-  expect(actual).toBe(true)
-});
+test('hwall created', () => {
+  const actualWall = hwall(point(3, 0))
 
-test('isVertical horizontal wall', () => {
-  const wall = hwall(point(1, 1))
+  expect(actualWall).toEqual({
+    points: [point(3, 0), point(3, 1), point(3, 2)],
+  })
+})
 
-  const actual = isVertical(wall)
+test('edges returned', () => {
+  const wall = hwall(point(3, 0))
 
-  expect(actual).toBe(false)
-});
+  const actualEdges = edges(wall)
 
-test('isHorizontal vertical wall', () => {
-  const wall = vwall(point(1, 1))
-
-  const actual = isHorizontal(wall)
-
-  expect(actual).toBe(false)
-});
-
-test('isHorizontal horizontal wall', () => {
-  const wall = hwall(point(1, 1))
-
-  const actual = isHorizontal(wall)
-
-  expect(actual).toBe(true)
-});
-
-test('wallPoints horizontal wall', () => {
-  const wall = hwall(point(1, 1))
-
-  const actualPoints = wallPoints(wall)
-
-  expect(actualPoints).toEqual([
-    point(1, 1),
-    point(1, 2),
-    point(1, 3),
+  expect(actualEdges).toEqual([
+    [point(3, 0), point(3, 1)],
+    [point(3, 1), point(3, 2)],
   ])
-});
-
-test('wallPoints vertical wall', () => {
-  const wall = vwall(point(3, 1))
-
-  const actualPoints = wallPoints(wall)
-
-  expect(actualPoints).toEqual([
-    point(3, 1),
-    point(2, 1),
-    point(1, 1),
-  ])
-});
+})

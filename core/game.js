@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import { board, putPlayer } from './board'
 import { point } from './point'
-import { wallEdges } from './wall'
+import { edges } from './wall'
 
 const rows = 9
 const cols = 9
@@ -92,9 +92,13 @@ export const hasPlayer =
   R.curry((game, point) => R.includes(point, playerLocations(game)))
 
 // hasWall :: Game -> [Point] -> Boolean
-// Checks if the edge has a wall.
-export const hasWall =
-  R.curry((game, edge) => R.includes(edge, wallEdges(game.board.walls)))
+// Checks if the edge is occupied by a wall
+export const hasWall = R.curry((game, edge) =>
+  R.pipe(
+    R.map(edges),
+    R.unnest,
+    R.includes(edge))
+  (game.board.walls))
 
 // unblocked :: Game -> (Point -> [Point]) -> Point -> Boolean
 // Checks if the edge relative to the provided point is unblocked.

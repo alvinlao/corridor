@@ -6,7 +6,7 @@ import {
   isPointInbounds,
   unblocked,
 } from './game'
-import { wallPoints } from './wall'
+import { points } from './wall'
 import {
   north,
   south,
@@ -26,7 +26,7 @@ import { middle } from '../util'
 // isWallInbounds :: Game -> Wall -> Boolean
 // Checks whether the entire wall is on the board.
 export const isWallInbounds =
-  R.curry((game, wall) => R.all(isPointInbounds(game), wallPoints(wall)))
+  R.curry((game, wall) => R.all(isPointInbounds(game), points(wall)))
 
 // isWallSpaceOccupied :: Game -> Wall -> Boolean
 // Checks if another wall already occupies the desired space.
@@ -37,8 +37,8 @@ export const isWallSpaceOccupied =
 // Checks if the two walls overlap.
 export const isWallOverlapping =
   R.curry((w1, w2) => {
-    const p1 = wallPoints(w1)
-    const p2 = wallPoints(w2)
+    const p1 = points(w1)
+    const p2 = points(w2)
     return (
       R.not(R.isEmpty(R.intersection(middle(p1), middle(p2)))) ||
       R.length(R.intersection(p1, p2)) >= 2)
