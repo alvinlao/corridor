@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
-import { updateBoard, hasWall } from '../core/game'
+import { updateBoard, hasWall, wallsAvailable } from '../core/game'
 import { point } from '../core/point'
 import { isValidWall } from '../core/logic'
 import { useWall } from '../core/turn'
@@ -92,18 +92,23 @@ const update = R.curry((context, wall, shape, game) => {
 })
 
 const bind = R.curry((context, wall, shape, getGame, updateGame) => {
+  const hoverState = { isHover: false }
+
   shape.on(
     'click',
     () => updateGame(useWall(getGame(), wall)))
   shape.on(
     'mouseover',
-    draw(context, () =>
-      isValidWall(getGame(), wall)
-      ? shape.opacity(1)
-      : shape.opacity(0.5).fill(invalidWallColor).zIndex(127)))
+    () => {
+      hoverState.isHover = true
+      setTimeout(mouseover(hoverState, context, wall, shape, getGame), 15)
+    })
   shape.on(
     'mouseout',
-    draw(context, () => update(context, wall, shape, getGame())))
+    () => {
+      hoverState.isHover = false
+      draw(context, () => update(context, wall, shape, getGame()))
+    })
 })
 
 const updateOpacity = R.curry((wall, shape, game) => {
@@ -114,8 +119,25 @@ const updateOpacity = R.curry((wall, shape, game) => {
   }
 })
 
-const draw = (context, f) =>
-  () => {
-    f()
-    context.layer.draw()
+const mouseover = (hoverState, context, wall, shape, getGame) => () => {
+  if (!hoverState.isHover) {
+    return
   }
+  draw(
+    context,
+    () => {
+      if (!wallsAvailable(getGame())) {
+        return
+      }
+      if (isValidWall(getGame(), wall)) {
+        shape.opacity(1)
+      } else {
+        shape.opacity(0.5).fill(invalidWallColor).zIndex(127)
+      }
+    })
+}
+
+const draw = (context, f) => {
+  f()
+  context.layer.draw()
+}
