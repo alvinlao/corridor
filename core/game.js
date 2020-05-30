@@ -91,6 +91,14 @@ export const playerLocation = R.curry((game, playerId) =>
     R.lensPath(['board', 'players', playerId, 'location']),
     game))
 
+// getPlayer :: Game -> Point -> PlayerId
+// Gets the player id that is on this point.
+export const getPlayer = R.curry((game, point) =>
+  R.head(
+    R.filter(
+      (playerId) => R.equals(point, playerLocation(game, playerId)),
+      playerIds(game))))
+
 // hasPlayer :: Game -> Point -> Boolean
 // Checks whether the space is occupied by a player.
 export const hasPlayer = R.curry((game, point) =>
