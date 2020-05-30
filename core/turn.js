@@ -13,7 +13,7 @@ import { isValidWall, isValidMove } from './logic'
 // Places a wall in the game on behalf of the active player.
 export const useWall = R.curry((game, wall) =>
   R.when(
-    R.allPass([isValidWall(R.__, wall), wallsAvailable]),
+    R.allPass([wallsAvailable, isValidWall(R.__, wall)]),
     R.pipe(
       updateBoard(putWall(wall)),
       consumeWall,

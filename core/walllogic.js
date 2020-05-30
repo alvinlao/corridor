@@ -26,7 +26,7 @@ import { middle } from '../util'
 // isWallInbounds :: Game -> Wall -> Boolean
 // Checks whether the entire wall is on the board.
 export const isWallInbounds = R.curry((game, wall) =>
-  R.all(isPointInbounds(game), points(wall)))
+  R.all(isPointInbounds(game), R.init(points(wall))))
 
 // isWallSpaceOccupied :: Game -> Wall -> Boolean
 // Checks if another wall already occupies the desired space.

@@ -39,7 +39,7 @@ test('isWallInbounds hangs right edge', () => {
 })
 
 test('isWallInbounds on right edge', () => {
-  const wall = hwall(point(1, 6))
+  const wall = hwall(point(1, 7))
 
   const actual = isWallInbounds(testGame, wall)
 
@@ -71,7 +71,7 @@ test('isWallInbounds hangs bottom edge', () => {
 })
 
 test('isWallInbounds on bottom edge', () => {
-  const wall = vwall(point(2, 1))
+  const wall = vwall(point(1, 1))
 
   const actual = isWallInbounds(testGame, wall)
 
