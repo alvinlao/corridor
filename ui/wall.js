@@ -29,7 +29,11 @@ const hwallShape = (context, point) => {
   })
   r.hitFunc((cx) => {
     cx.beginPath()
-    cx.rect(0, 0, wallLength(context) / 2, cellMargin(context))
+    cx.rect(
+      0,
+      0,
+      (wallLength(context) / 2) - (cellMargin(context) / 2),
+      cellMargin(context))
     cx.closePath()
     cx.fillStrokeShape(r)
   })
@@ -49,7 +53,11 @@ const vwallShape = (context, point) => {
   })
   r.hitFunc((cx) => {
     cx.beginPath()
-    cx.rect(0, 0, cellMargin(context), wallLength(context) / 2)
+    cx.rect(
+      0,
+      0,
+      cellMargin(context),
+      (wallLength(context) / 2) - (cellMargin(context) / 2))
     cx.closePath()
     cx.fillStrokeShape(r)
   })
