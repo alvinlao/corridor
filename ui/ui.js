@@ -4,6 +4,7 @@ import { row, col } from '../core/game'
 import { point } from '../core/point'
 import { cell } from './cell'
 import { initBoard } from './board'
+import { initOverlay } from './overlay'
 
 // render :: Game -> ()
 export const render = (game) => {
@@ -36,8 +37,9 @@ const getGame = (gameState) =>
 const init = R.curry((context, game) => {
   const gameState = { game }
   const elements = R.unnest([
-      initBoard(context, game),
-    ])
+    initBoard(context, game),
+    initOverlay(context, game),
+  ])
   
   setUpBind(context, elements, gameState)
   updateGame(context, elements, gameState, game)

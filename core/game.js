@@ -130,10 +130,15 @@ export const nextPlayersTurn = (game) =>
     (playerId) => R.inc(playerId) % game.numPlayers,
     game)
 
+// numWallsAvailable :: Game -> PlayerId -> Number
+// Returns the number of walls the player has available.
+export const numWallsAvailable = R.curry((game, playerId) =>
+  R.view(R.lensPath(['inventory', playerId]), game))
+
 // wallsAvailable :: Game -> Boolean
 // Checks if the active player has walls available.
 export const wallsAvailable = (game) =>
-  R.view(R.lensPath(['inventory', game.activePlayerId]), game) > 0
+  numWallsAvailable(game, game.activePlayerId) > 0
 
 // consumeWall :: Game -> Game
 // Removes a wall from the active player's inventory.

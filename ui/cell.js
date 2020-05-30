@@ -10,16 +10,10 @@ import { point } from '../core/point'
 import { isValidMove } from '../core/logic'
 import { useMove } from '../core/turn'
 import { putPlayer } from '../core/board'
+import { playerColors, white } from './constants'
 
 
-const playerColors = {
-  0: "#599EB4",
-  1: "#508C40",
-  2: "#EEB428",
-  3: "#A71F91",
-}
 const backgroundColor = "#EBE1DA"
-const white = "#FFFFFF"
 const margin = 0.20
 
 export const cellSize = (context) => (1 - margin) * (context.boardSize / 9)
