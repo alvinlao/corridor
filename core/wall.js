@@ -25,3 +25,7 @@ export const edgeKey = (edge) => {
   const b = R.last(edge)
   return a.row + ',' + a.col + ',' + b.row + ',' + b.col
 }
+
+// wallKey :: Wall -> String
+// Converts a wall to a string.
+export const wallKey = R.compose(R.map(edgeKey), edges)

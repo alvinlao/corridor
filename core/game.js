@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import { board, putPlayer } from './board'
 import { point } from './point'
-import { edges, edgeKey } from './wall'
+import { edges, edgeKey, wallKey } from './wall'
 
 const rows = 9
 const cols = 9
@@ -143,7 +143,7 @@ export const consumeWall = (game) =>
 // gameWallEdges :: Game -> Set EdgeKey
 // Returns a list of wall edges in the game.
 const gameWallEdges = R.memoizeWith(
-  (game) => game.board.walls,
+  (game) => R.map(wallKey, game.board.walls),
   (game) =>
     new Set(
       R.pipe(

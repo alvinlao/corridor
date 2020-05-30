@@ -96,7 +96,11 @@ const bind = R.curry((context, wall, shape, getGame, updateGame) => {
 
   shape.on(
     'click',
-    () => updateGame(useWall(getGame(), wall)))
+    () => {
+      if (wallsAvailable(getGame()) && isValidWall(getGame(), wall)) {
+        updateGame(useWall(getGame(), wall))
+      }
+    })
   shape.on(
     'mouseover',
     () => {
