@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import { board, putPlayer } from './board'
 import { point } from './point'
-import { edges } from './wall'
+import { edges, edgeKey } from './wall'
 
 const rows = 9
 const cols = 9
@@ -115,11 +115,7 @@ export const hasWall = R.curry((game, wall) =>
 // edgeOccupied :: Game -> [Point] -> Boolean
 // Checks if the edge is occupied by a wall
 export const edgeOccupied = R.curry((game, edge) =>
-  R.pipe(
-    R.map(edges),
-    R.unnest,
-    R.includes(edge))
-  (game.board.walls))
+  gameWallEdges(game).has(edgeKey(edge)))
 
 // unblocked :: Game -> (Point -> [Point]) -> Point -> Boolean
 // Checks if the edge relative to the provided point is unblocked.
@@ -143,3 +139,16 @@ export const wallsAvailable = (game) =>
 // Removes a wall from the active player's inventory.
 export const consumeWall = (game) =>
   R.over(R.lensPath(['inventory', game.activePlayerId]), R.dec, game)
+
+// gameWallEdges :: Game -> Set EdgeKey
+// Returns a list of wall edges in the game.
+const gameWallEdges = R.memoizeWith(
+  (game) => game.board.walls,
+  (game) =>
+    new Set(
+      R.pipe(
+        R.path(['board', 'walls']),
+        R.map(edges),
+        R.unnest,
+        R.map(edgeKey))
+      (game)))
