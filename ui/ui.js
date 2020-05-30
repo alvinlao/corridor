@@ -63,4 +63,6 @@ const updateGame = R.curry((context, elements, gameState, game) => {
     R.map(R.prop('update'), elements))
 
   context.stage.draw()
+
+  return game
 })

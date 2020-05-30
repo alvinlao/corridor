@@ -107,6 +107,11 @@ export const hasPlayer = R.curry((game, point) =>
     R.includes(point))
   (playerIds(game)))
 
+// hasWall :: Game -> Wall -> Boolean
+// Checks whether the wall exists in the game.
+export const hasWall = R.curry((game, wall) =>
+  R.includes(wall, game.board.walls))
+
 // edgeOccupied :: Game -> [Point] -> Boolean
 // Checks if the edge is occupied by a wall
 export const edgeOccupied = R.curry((game, edge) =>

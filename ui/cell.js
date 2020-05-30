@@ -20,11 +20,20 @@ const playerColors = {
 }
 const backgroundColor = "#EBE1DA"
 const white = "#FFFFFF"
+const margin = 0.20
+
+export const cellSize = (context) => (1 - margin) * (context.boardSize / 9)
+export const cellMargin = (context) => margin * (context.boardSize / 9)
+
+export const cellX = (context, point) =>
+  ((cellSize(context) + cellMargin(context)) * point.col)
+export const cellY = (context, point) =>
+  ((cellSize(context) + cellMargin(context)) * (8 - point.row))
 
 const cell = (context, point) => (
   new Konva.Rect({
-    x: x(context, point),
-    y: y(context, point),
+    x: cellX(context, point),
+    y: cellY(context, point),
     width: cellSize(context),
     height: cellSize(context),
     fill: backgroundColor,
@@ -34,8 +43,8 @@ const cell = (context, point) => (
 
 const triangle = (context, point) => (
   new Konva.RegularPolygon({
-    x: x(context, point) + cellSize(context) / 2,
-    y: y(context, point) + cellSize(context) / 2,
+    x: cellX(context, point) + cellSize(context) / 2,
+    y: cellY(context, point) + cellSize(context) / 2,
     width: cellSize(context) * 0.5,
     height: cellSize(context) * 0.5,
     sides: 3,
@@ -126,17 +135,13 @@ const playerDirection = (playerId, game) => {
   return R.cond([
     [R.includes(point(8, 4)), R.always('up')],
     [R.includes(point(0, 4)), R.always('down')],
-    [R.includes(point(4, 8)), R.always('left')],
-    [R.includes(point(4, 0)), R.always('right')],
+    [R.includes(point(4, 0)), R.always('left')],
+    [R.includes(point(4, 8)), R.always('right')],
   ])(playerWinLocations(game, playerId))
 }
-
-const cellSize = (context) => (context.boardSize / 9) / 1.15
-const x = (context, point) => ((cellSize(context) * 1.15) * (8 - point.col))
-const y = (context, point) => ((cellSize(context) * 1.15) * (8 - point.row))
 
 const draw = (context, f) =>
   () => {
     f()
-    context.stage.draw()
+    context.layer.draw()
   }
