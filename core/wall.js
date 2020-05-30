@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import { east, south } from './point'
-import { iterate } from '../util'
+import { iterate } from '../util/util'
 
 // vwall :: Point -> Wall
 // Creates a vertical wall using the provided point as the top point.

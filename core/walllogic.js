@@ -21,7 +21,7 @@ import {
   ecoord,
   wcoord,
 } from './point'
-import { middle } from '../util'
+import { middle } from '../util/util'
 
 // isWallInbounds :: Game -> Wall -> Boolean
 // Checks whether the entire wall is on the board.
