@@ -17,3 +17,15 @@ export const points = R.prop('points')
 // edges :: Wall -> [[Point]]
 // Returns edges that are occupied by this wall.
 export const edges = (wall) => R.zip(wall.points, R.tail(wall.points)) 
+
+// edgeKey :: [Point] -> String
+// Converts an edge to a string.
+export const edgeKey = (edge) => {
+  const a = R.head(edge)
+  const b = R.last(edge)
+  return a.row + ',' + a.col + ',' + b.row + ',' + b.col
+}
+
+// wallKey :: Wall -> String
+// Converts a wall to a string.
+export const wallKey = R.compose(R.map(edgeKey), edges)
