@@ -9,18 +9,22 @@ import { ncompass, scompass, ecompass, wcompass } from './point'
 
 // moves :: Game -> PlayerId -> [Point]
 // Returns a list of locations the player can move to.
-export const moves = R.curry((game, playerId) => {
-  const point = playerLocation(game, playerId)
-  return R.pipe(
-    R.juxt([
-      movesInFront(ncompass),
-      movesInFront(scompass),
-      movesInFront(ecompass),
-      movesInFront(wcompass),
-    ]),
-    R.unnest,
-    R.uniq)(game, point)
-})
+export const moves =
+  R.memoizeWith(
+    (game, playerId) => R.toString(game) + R.toString(playerId),
+    ((game, playerId) => {
+      const point = playerLocation(game, playerId)
+      return R.pipe(
+        R.juxt([
+          movesInFront(ncompass),
+          movesInFront(scompass),
+          movesInFront(ecompass),
+          movesInFront(wcompass),
+        ]),
+        R.unnest,
+        R.uniq)
+      (game, point)
+    }))
 
 // movesInFront :: Compass -> Game -> Point -> [Point]
 // Returns a list of locations in front of the player they can move to.
