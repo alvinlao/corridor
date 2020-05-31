@@ -34,3 +34,22 @@ export const tweenOpacity =
     })
     tween.play()
   }
+
+// tweenFill :: Konva.Shape -> String -> Number -> Boolean -> ()
+// Animates a shape, changing its fill to the target value,
+// in the given duration (in milliseconds).
+export const tweenFill =
+  (shape, targetFill, durationInMs, shouldTween=true) => {
+    if (!shouldTween) {
+      shape.fill(targetFill)
+      return
+    }
+
+    const tween = new Konva.Tween({
+      node: shape,
+      fill: targetFill,
+      duration: (durationInMs / 1000),
+      easing: Konva.Easings.EaseInOut,
+    })
+    tween.play()
+  }

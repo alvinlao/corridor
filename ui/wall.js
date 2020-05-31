@@ -8,6 +8,7 @@ import { putWall } from '../core/board'
 import { hwall, vwall } from '../core/wall'
 import { cellSize, cellMargin, cellX, cellY } from './cell'
 import { wallColor } from './constants'
+import { tweenOpacity, tweenFill } from './util'
 
 
 const invalidWallColor = "#FB3640"
@@ -15,6 +16,7 @@ const margin = 0.15
 const wallMargin = (context) => margin * (2 * cellSize(context))
 const wallLength = (context) =>
   (1 - margin) * (2 * cellSize(context)) + cellMargin(context)
+const tweenDuration = 120
 
 const hwallShape = (context, point) => {
   const r = new Konva.Rect({
@@ -88,7 +90,8 @@ export const initVwall = R.curry((context, game, point) => {
 
 const update = R.curry((context, wall, shape, game) => {
   updateOpacity(wall, shape, game)
-  shape.fill(wallColor).zIndex(0)
+  tweenFill(shape, wallColor, tweenDuration)
+  shape.zIndex(0)
 })
 
 const bind = R.curry((context, wall, shape, getGame, updateGame) => {
@@ -117,9 +120,9 @@ const bind = R.curry((context, wall, shape, getGame, updateGame) => {
 
 const updateOpacity = R.curry((wall, shape, game) => {
   if (hasWall(game, wall)) {
-    shape.opacity(1)
+    tweenOpacity(shape, 1, tweenDuration)
   } else {
-    shape.opacity(0)
+    tweenOpacity(shape, 0, tweenDuration)
   }
 })
 
@@ -134,7 +137,7 @@ const mouseover = (hoverState, context, wall, shape, getGame) => () => {
         return
       }
       if (isValidWall(getGame(), wall)) {
-        shape.opacity(1)
+        tweenOpacity(shape, 1, tweenDuration)
       } else {
         shape.opacity(0.5).fill(invalidWallColor).zIndex(127)
       }

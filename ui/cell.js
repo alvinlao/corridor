@@ -90,7 +90,7 @@ const bind = R.curry((context, point, shapes, getGame, updateGame) => {
     'mouseover',
     draw(context, () => {
       if (isValidMove(getGame(), getGame().activePlayerId, point)) {
-        tweenOpacity(shapes.bg, 1, 100)
+        tweenOpacity(shapes.bg, 1, 120)
       }
     }))
   shapes.bg.on(
@@ -105,7 +105,7 @@ const updateColor = (point, cell, game, shouldTween=false) => {
     cell.opacity(1)
     cell.fill(playerColors[getPlayer(game, point)])
   } else if (isValidMove(game, game.activePlayerId, point)) {
-    tweenOpacity(cell, 0.3, 200, shouldTween)
+    tweenOpacity(cell, 0.3, 240, shouldTween)
     cell.fill(playerColors[game.activePlayerId])
   } else {
     cell.opacity(1)
