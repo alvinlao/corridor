@@ -50,11 +50,14 @@ export const isGameCompletable = (game) =>
 
 // hasPath :: Game -> PlayerId -> Player -> Boolean
 // Checks whether the player can reach a win location.
-const hasPath = R.curry((game, playerId, player) => {
-  const start = playerLocation(game, playerId)
-  const stops = playerWinLocations(game, playerId)
-  return isReachable(game, start, stops, playerId)
-})
+const hasPath = R.curry(R.memoizeWith(
+  (game, playerId, player) =>
+    (R.toString(game) + ',' + R.toString(playerId) + ',' + R.toString(player)),
+  (game, playerId, player) => {
+    const start = playerLocation(game, playerId)
+    const stops = playerWinLocations(game, playerId)
+    return isReachable(game, start, stops, playerId)
+  }))
 
 // isReachable :: Game -> Point -> [Point] -> Boolean
 // Checks whether an unblocked path from the start point to any stop point exists.
