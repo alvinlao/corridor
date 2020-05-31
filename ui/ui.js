@@ -30,44 +30,70 @@ export const render = (game) => {
   init(context, game)
 }
 
-// getGame :: GameState -> (() -> Game)
-const getGame = (gameState) =>
-  () => gameState.game 
+// gameStates :: Context -> [Element] -> [Game] -> {k: () => Game}
+// Creates dictionary of functions for updating the singleton game states.
+const gameStates = (context, elements, singletonGameStates) => ({
+  latest: () => R.last(singletonGameStates),
+  size: () => R.length(singletonGameStates),
+  push: (game) => {
+    pushGame(singletonGameStates, game)
+    update(context, elements, singletonGameStates)
+  },
+  pop: () => {
+    popGame(singletonGameStates)
+    update(context, elements, singletonGameStates)
+  },
+})
 
 // init :: Context -> Game -> [{k: (* -> *)}]
 // Initializes the ui and returns a list of the ui elements.
 const init = R.curry((context, game) => {
-  const gameState = { game }
+  const singletonGameStates = []
   const elements = R.unnest([
     initBoard(context, game),
     initOverlay(context, game),
     initOptions(context, game),
   ])
+  const _gameStates = gameStates(context, elements, singletonGameStates)
   
-  setUpBind(context, elements, gameState)
-  updateGame(context, elements, gameState, game)
+  setUpBind(context, elements, _gameStates)
+  _gameStates.push(game)
   return elements
 })
 
 // setUpBind :: Context -> [Element] -> GameState -> ()
 // Calls each element's bind function.
-const setUpBind = (context, elements, gameState) =>
+const setUpBind = (context, elements, gameStates) =>
   R.forEach(
-    (bind) => bind(getGame(gameState), updateGame(context, elements, gameState)),
+    (bind) => bind(gameStates),
     R.map(R.prop('bind'), elements))
 
-// updateGame :: Context -> [Element] -> GameState -> Game -> ()
-// Calls each element's update function with the provided Game.
-const updateGame = R.curry((context, elements, gameState, game) => {
-  // Update the singleton game state.
-  gameState.game = game
-
+// update :: Context -> [Element] -> [Game] -> ()
+// Calls each element's update function.
+const update = R.curry((context, elements, singletonGameStates) => {
+  const _gameStates = gameStates(context, elements, singletonGameStates)
   // Update all elements.
   R.forEach(
-    (f) => f(game),
+    (f) => f(_gameStates),
     R.map(R.prop('update'), elements))
 
   context.stage.draw()
-
-  return game
 })
+
+// pushGame :: [Game] -> Game -> ()
+// Pushes the provided game state onto the stack.
+const pushGame = R.curry((singletonGameStates, game) => {
+  // Update the game states singleton.
+  singletonGameStates.push(game)
+})
+
+// popGame :: [Game] -> ()
+// Drops the latest Game from the stack.
+const popGame = (singletonGameStates) => {
+  if (singletonGameStates.length <= 1) {
+    return R.last(singletonGameStates)
+  }
+
+  // Update the game states singleton.
+  singletonGameStates.pop()
+}

@@ -41,7 +41,8 @@ export const initHud = R.curry((context, game, playerId) => {
   }
 })
 
-const update = R.curry((context, playerId, shapes, game) => {
+const update = R.curry((context, playerId, shapes, gameStates) => {
+  const game = gameStates.latest()
   R.addIndex(R.map)(
     (shape, index) =>
       updateVisibility(shape, index, numWallsAvailable(game, playerId)),

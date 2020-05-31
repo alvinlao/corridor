@@ -1,10 +1,12 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
-import { addElements, attachLayer } from './util'
+import { addElements, attachLayer, tweenOpacity, tweenFill } from './util'
 
 const buttonRadius = 20
 const buttonMargin = 10
 const optionsMargin = 20
+const buttonFill = "#e0e0e0"
+const buttonHoverFill = "#c0c0c0"
 
 // initOptions :: Context -> Game -> [Element]
 // Initializes options ui elements.
@@ -37,13 +39,13 @@ const initButton = R.curry((context, game, info) => {
     x: ((buttonRadius * 2) + buttonMargin) * info.index + buttonRadius,
     y: 10,
     radius: buttonRadius,
-    fill: "#eeeeee",
+    fill: buttonFill,
   })
 
   return {
     shapes: [button, info.icon],
-    bind: info.bind,
-    update: info.update,
+    bind: info.bind(context, button),
+    update: info.update(context, button),
   }
 })
 
@@ -54,7 +56,7 @@ const initUndoButton = R.curry((context, game, index) => {
     width: (buttonRadius * 2) * 0.5,
     height: (buttonRadius * 2) * 0.5,
     stroke: "#000000",
-    opacity: 0.3,
+    opacity: 0.1,
     sceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
       const height = shape.getAttr('height')
@@ -67,15 +69,45 @@ const initUndoButton = R.curry((context, game, index) => {
       cx.fillStrokeShape(shape)
     },
   })
+  icon.listening(false)
 
-  const info = {
-    icon,
-    index,
-    bind: R.identity,
-    update: R.identity,
+  let isHover = false
+  const updateAvailability = (button, stackSize) => {
+    if (stackSize <= 1) {
+      tweenOpacity(icon, 0.1, 240)
+      tweenOpacity(button, 0.3, 240)
+      tweenFill(button, buttonFill, 240)
+    } else {
+      isHover ? null : tweenOpacity(icon, 0.3, 240)
+      isHover ? null : tweenFill(button, buttonFill, 240)
+      tweenOpacity(button, 1, 240)
+    }
   }
 
-  return initButton(context, game, info)
+  const update = R.curry((context, button, gameStates) => {
+    updateAvailability(button, gameStates.size())
+  })
+
+  const bind = R.curry((context, button, gameStates) => {
+    button.on('click', gameStates.pop)
+    button.on('mouseover', () => {
+      isHover = true
+      if (gameStates.size() > 1) {
+        tweenOpacity(icon, 1, 240)
+        tweenFill(button, buttonHoverFill, 240)
+      }
+    })
+    button.on('mouseout', () => {
+      isHover = false
+      updateAvailability(button, gameStates.size())
+        tweenFill(button, buttonFill, 240)
+    })
+  })
+
+  return initButton(
+    context,
+    game,
+    { icon, index, bind, update })
 })
 
 const initNewGame = R.curry((context, game, index) => {
@@ -98,13 +130,10 @@ const initNewGame = R.curry((context, game, index) => {
       cx.fillStrokeShape(shape)
     },
   })
+  icon.listening(false)
 
-  const info = {
-    icon,
-    index,
-    bind: R.identity,
-    update: R.identity,
-  }
-
-  return initButton(context, game, info)
+  return initButton(
+    context,
+    game,
+    { icon, index, bind: () => () => {}, update: () => () => {} })
 })

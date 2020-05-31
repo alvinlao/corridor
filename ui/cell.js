@@ -77,26 +77,28 @@ export const initCell = R.curry((context, game, point) => {
   }
 })
 
-const update = R.curry((context, point, shapes, game) => {
+const update = R.curry((context, point, shapes, gameStates) => {
+  const game = gameStates.latest()
   updateDirection(point, shapes, game)
   updateColor(point, shapes.bg, game)
 })
 
-const bind = R.curry((context, point, shapes, getGame, updateGame) => {
+const bind = R.curry((context, point, shapes, gameStates) => {
   shapes.bg.on(
     'click',
-    () => updateGame(useMove(getGame(), point)))
+    () => gameStates.push(useMove(gameStates.latest(), point)))
   shapes.bg.on(
     'mouseover',
     draw(context, () => {
-      if (isValidMove(getGame(), getGame().activePlayerId, point)) {
+      const game = gameStates.latest()
+      if (isValidMove(game, game.activePlayerId, point)) {
         tweenOpacity(shapes.bg, 1, 120)
       }
     }))
   shapes.bg.on(
     'mouseout',
     draw(context, () => {
-      updateColor(point, shapes.bg, getGame(), true)
+      updateColor(point, shapes.bg, gameStates.latest(), true)
     }))
 })
 
