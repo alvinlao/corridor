@@ -10,10 +10,9 @@ import { point } from '../core/point'
 import { isValidMove } from '../core/logic'
 import { useMove } from '../core/turn'
 import { putPlayer } from '../core/board'
-import { playerColors, white } from './constants'
+import { cellColor, playerColors, white } from './constants'
 
 
-const backgroundColor = "#EBE1DA"
 const margin = 0.20
 
 export const cellSize = (context) => (1 - margin) * (context.boardSize / 9)
@@ -30,33 +29,36 @@ const cell = (context, point) => (
     y: cellY(context, point),
     width: cellSize(context),
     height: cellSize(context),
-    fill: backgroundColor,
+    fill: cellColor,
     strokeWidth: 0,
     cornerRadius: 5,
   }))
 
-const triangle = (context, point) => (
-  new Konva.RegularPolygon({
+const arrow = (context, point) => (
+  new Konva.Shape({
     x: cellX(context, point) + cellSize(context) / 2,
     y: cellY(context, point) + cellSize(context) / 2,
-    width: cellSize(context) * 0.5,
-    height: cellSize(context) * 0.5,
-    sides: 3,
-    fill: "#000000",
-    strokeWidth: 0,
+    stroke: "#000000",
+    width: cellSize(context) * 0.45,
+    height: cellSize(context) * 0.225,
+    sceneFunc: (cx, shape) => {
+      const width = shape.getAttr('width') / 2
+      const height = shape.getAttr('height')
+      cx.beginPath()
+      cx.moveTo(-width, height / 2)
+      cx.lineTo(0, -height / 2)
+      cx.lineTo(width, height / 2)
+      cx.fillStrokeShape(shape)
+    },
   }))
 
 // initCell :: Context -> Game -> Point -> [Element]
 export const initCell = R.curry((context, game, point) => {
   const bg = cell(context, point)
-  const up = triangle(context, point).listening(false)
-  const down = triangle(context, point).rotate(180).listening(false)
-  const left = triangle(context, point).rotate(-90).listening(false)
-  const right = triangle(context, point).rotate(90).listening(false)
-  up.y(up.y() + 1)
-  down.y(down.y() - 1)
-  left.x(left.x() + 1)
-  right.x(right.x() - 1)
+  const up = arrow(context, point).listening(false)
+  const down = arrow(context, point).rotate(180).listening(false)
+  const left = arrow(context, point).rotate(-90).listening(false)
+  const right = arrow(context, point).rotate(90).listening(false)
 
   const shapes = {
     bg,
@@ -105,7 +107,7 @@ const updateColor = (point, cell, game) => {
     cell.fill(playerColors[game.activePlayerId])
   } else {
     cell.opacity(1)
-    cell.fill(backgroundColor)
+    cell.fill(cellColor)
   }
 }
 

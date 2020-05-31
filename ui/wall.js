@@ -7,9 +7,9 @@ import { useWall } from '../core/turn'
 import { putWall } from '../core/board'
 import { hwall, vwall } from '../core/wall'
 import { cellSize, cellMargin, cellX, cellY } from './cell'
+import { wallColor } from './constants'
 
 
-const wallColor = "#776f69"
 const invalidWallColor = "#FB3640"
 const margin = 0.15
 const wallMargin = (context) => margin * (2 * cellSize(context))
