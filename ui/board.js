@@ -23,7 +23,7 @@ export const initBoard = R.curry((context, game) => {
 const initLayer = R.curry((context) => {
   const layer = new Konva.Layer({
     x: (window.innerWidth - context.size) / 2,
-    y: (window.innerHeight - context.size) / 2 - (context.size / 2),
+    y: context.topMargin,
   })
   context.stage.add(layer)
   return layer

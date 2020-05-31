@@ -5,7 +5,7 @@ import { addElements, attachLayer } from './util'
 import { playerIds } from '../core/game'
 
 // initOverlay :: Context -> Game -> [Element]
-// Initializes an overlay ui element.
+// Initializes overlay ui elements.
 export const initOverlay = R.curry((context, game) => {
   const hudLayer = initLayer(context)
   const huds = initHuds(attachLayer(hudLayer, context), game)
@@ -17,7 +17,7 @@ export const initOverlay = R.curry((context, game) => {
 const initLayer = R.curry((context) => {
   const layer = new Konva.Layer({
     x: (window.innerWidth - context.size) / 2,
-    y: (window.innerHeight - context.size) / 2 - (context.size / 2),
+    y: context.topMargin,
   })
   context.stage.add(layer)
   return layer

@@ -5,6 +5,7 @@ import { point } from '../core/point'
 import { cell } from './cell'
 import { initBoard } from './board'
 import { initOverlay } from './overlay'
+import { initOptions } from './options'
 
 // render :: Game -> ()
 export const render = (game) => {
@@ -21,6 +22,7 @@ export const render = (game) => {
     stage,
     size: 500,
     margin: 0,
+    topMargin: 150,
     // The size of the board in pixels.
     boardSize: size - (2 * margin),
   }
@@ -39,6 +41,7 @@ const init = R.curry((context, game) => {
   const elements = R.unnest([
     initBoard(context, game),
     initOverlay(context, game),
+    initOptions(context, game),
   ])
   
   setUpBind(context, elements, gameState)
