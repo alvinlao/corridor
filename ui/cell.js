@@ -11,6 +11,7 @@ import { isValidMove } from '../core/logic'
 import { useMove } from '../core/turn'
 import { putPlayer } from '../core/board'
 import { cellColor, playerColors, white } from './constants'
+import { tweenOpacity } from './util'
 
 
 const margin = 0.20
@@ -32,6 +33,7 @@ const cell = (context, point) => (
     fill: cellColor,
     strokeWidth: 0,
     cornerRadius: 5,
+    opacity: 1,
   }))
 
 const arrow = (context, point) => (
@@ -88,22 +90,22 @@ const bind = R.curry((context, point, shapes, getGame, updateGame) => {
     'mouseover',
     draw(context, () => {
       if (isValidMove(getGame(), getGame().activePlayerId, point)) {
-        shapes.bg.opacity(shapes.bg.opacity() * 0.5)
+        tweenOpacity(shapes.bg, 1, 100)
       }
     }))
   shapes.bg.on(
     'mouseout',
     draw(context, () => {
-      updateColor(point, shapes.bg, getGame())
+      updateColor(point, shapes.bg, getGame(), true)
     }))
 })
 
-const updateColor = (point, cell, game) => {
+const updateColor = (point, cell, game, shouldTween=false) => {
   if (hasPlayer(game, point)) {
     cell.opacity(1)
     cell.fill(playerColors[getPlayer(game, point)])
   } else if (isValidMove(game, game.activePlayerId, point)) {
-    cell.opacity(0.3)
+    tweenOpacity(cell, 0.3, 200, shouldTween)
     cell.fill(playerColors[game.activePlayerId])
   } else {
     cell.opacity(1)
