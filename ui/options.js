@@ -132,8 +132,41 @@ const initNewGame = R.curry((context, game, index) => {
   })
   icon.listening(false)
 
+  let isHover = false
+  const updateAvailability = (button, stackSize) => {
+    if (stackSize == 1) {
+      tweenOpacity(icon, 0.1, 240)
+      tweenOpacity(button, 0.3, 240)
+      tweenFill(button, buttonFill, 240)
+    } else {
+      isHover ? null : tweenOpacity(icon, 0.3, 240)
+      isHover ? null : tweenFill(button, buttonFill, 240)
+      tweenOpacity(button, 1, 240)
+    }
+  }
+
+  const update = R.curry((context, button, gameStates) => {
+    updateAvailability(button, gameStates.size())
+  })
+
+  const bind = R.curry((context, button, gameStates) => {
+    button.on('click', gameStates.reset)
+    button.on('mouseover', () => {
+      isHover = true
+      if (gameStates.size() > 1) {
+        tweenOpacity(icon, 1, 240)
+        tweenFill(button, buttonHoverFill, 240)
+      }
+    })
+    button.on('mouseout', () => {
+      isHover = false
+      updateAvailability(button, gameStates.size())
+        tweenFill(button, buttonFill, 240)
+    })
+  })
+
   return initButton(
     context,
     game,
-    { icon, index, bind: () => () => {}, update: () => () => {} })
+    { icon, index, bind, update })
 })

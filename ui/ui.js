@@ -43,6 +43,10 @@ const gameStates = (context, elements, singletonGameStates) => ({
     popGame(singletonGameStates)
     update(context, elements, singletonGameStates)
   },
+  reset: () => {
+    resetGame(singletonGameStates)
+    update(context, elements, singletonGameStates)
+  },
 })
 
 // init :: Context -> Game -> [{k: (* -> *)}]
@@ -96,4 +100,10 @@ const popGame = (singletonGameStates) => {
 
   // Update the game states singleton.
   singletonGameStates.pop()
+}
+
+// resetGame :: [Game] -> ()
+// Clears everything but the first game state from the stack.
+const resetGame = (singletonGameStates) => {
+  singletonGameStates.splice(1, singletonGameStates.length)
 }
