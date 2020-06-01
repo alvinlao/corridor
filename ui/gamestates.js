@@ -69,3 +69,9 @@ export const olderGameStates = (gameStates) => {
 export const newerGameStates = (gameStates) => {
   return gameStates.history.length - gameStates.index - 1
 }
+
+// numGameStates :: GameStates -> ()
+// Returns the total number of game states.
+export const numGameStates = (gameStates) => {
+  return gameStates.history.length
+}
