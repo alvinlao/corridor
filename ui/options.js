@@ -6,8 +6,12 @@ import { addElements, attachLayer, tweenOpacity, tweenFill } from './util'
 const buttonRadius = 20
 const buttonMargin = 10
 const optionsMargin = 20
-const buttonFill = "#e0e0e0"
-const buttonHoverFill = "#c0c0c0"
+const buttonUnavailableFill = "#e0e0e0"
+const buttonFill = "#cccccc"
+const buttonHoverFill = "#a0a0a0"
+const buttonUnavailableOpacity = 0.3
+const iconUnavailableOpacity = 0.2
+const iconOpacity = 0.6
 
 // initOptions :: Context -> Game -> [Element]
 // Initializes options ui elements.
@@ -144,11 +148,11 @@ const buildButton = R.curry((context, index, params) => {
   let isHover = false
   const updateAvailability = (button, gameStateHelper) => {
     if (!params.isAvailable(gameStateHelper)) {
-      tweenOpacity(icon, 0.1, 240)
-      tweenOpacity(button, 0.3, 240)
-      tweenFill(button, buttonFill, 240)
+      tweenOpacity(icon, iconUnavailableOpacity, 240)
+      tweenOpacity(button, buttonUnavailableOpacity, 240)
+      tweenFill(button, buttonUnavailableFill, 240)
     } else {
-      isHover ? null : tweenOpacity(icon, 0.3, 240)
+      isHover ? null : tweenOpacity(icon, iconOpacity, 240)
       isHover ? null : tweenFill(button, buttonFill, 240)
       tweenOpacity(button, 1, 240)
     }
@@ -170,7 +174,6 @@ const buildButton = R.curry((context, index, params) => {
     button.on('mouseout', () => {
       isHover = false
       updateAvailability(button, gameStatesHelper)
-      tweenFill(button, buttonFill, 240)
     })
   })
 
@@ -185,7 +188,7 @@ const initButton = R.curry((context, info) => {
     y: 10,
     radius: buttonRadius,
     fill: buttonFill,
-    opacity: 0.3,
+    opacity: iconOpacity,
   })
 
   return {
