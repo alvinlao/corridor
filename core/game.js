@@ -17,8 +17,12 @@ const initializePlayers = [
   putPlayer(2, point(4, 0)),
   putPlayer(3, point(4, 8)),
 ]
+const _playerIds = [0, 1, 2, 3]
+export const turnOrder = [1, 3, 0, 2]
 
-export const ids = (numPlayers) => numPlayers == 2 ? [0, 1] : [0, 1, 2, 3]
+// ids :: Number -> [PlayerId]
+// Returns a list of player ids for the given number of players.
+export const ids = (numPlayers) => R.take(numPlayers, _playerIds)
 
 // game :: Number -> Game
 // Creates a new game.
@@ -29,7 +33,7 @@ export const game = (numPlayers) => ({
   rows,
   cols,
   inventory: setupInventory(numPlayers),
-  activePlayerId: 0,
+  activePlayerId: firstPlayerId(numPlayers),
   wallsPerPlayer: wallsPerPlayer(numPlayers),
 })
 
@@ -134,7 +138,12 @@ export const unblocked = R.curry((game, pointToEdge, point) =>
 export const nextPlayersTurn = (game) =>
   R.over(
     R.lensProp('activePlayerId'),
-    (playerId) => R.inc(playerId) % game.numPlayers,
+    (playerId) => {
+      const order = R.filter(R.includes(R.__, playerIds(game)), turnOrder)
+      const nextPlayerIndex =
+        R.inc(R.indexOf(playerId, order)) % game.numPlayers
+      return R.nth(nextPlayerIndex, order)
+    },
     game)
 
 // numWallsAvailable :: Game -> PlayerId -> Number
@@ -164,3 +173,6 @@ const gameWallEdges = R.memoizeWith(
         R.unnest,
         R.map(edgeKey))
       (game)))
+
+const firstPlayerId = (numPlayers) =>
+  R.head(R.filter(R.includes(R.__, R.take(numPlayers, _playerIds)), turnOrder))

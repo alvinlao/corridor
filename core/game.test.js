@@ -16,7 +16,7 @@ test('game 2 player', () => {
     0: 10,
     1: 10,
   })
-  expect(actualGame.activePlayerId).toEqual(0)
+  expect(actualGame.activePlayerId).toEqual(1)
 });
 
 test('game 4 player', () => {
@@ -35,38 +35,43 @@ test('game 4 player', () => {
     2: 5,
     3: 5,
   })
-  expect(actualGame.activePlayerId).toEqual(0)
-});
-
-test('nextPlayersTurn next player', () => {
-  const actualGame = R.pipe(
-    nextPlayersTurn,
-  )(game(4))
-
   expect(actualGame.activePlayerId).toEqual(1)
 });
 
-test('nextPlayersTurn back to player 1', () => {
-  const actualGame = R.pipe(
-    nextPlayersTurn,
-    nextPlayersTurn,
-    nextPlayersTurn,
-    nextPlayersTurn,
-  )(game(4))
+test('nextPlayersTurn next player', () => {
+  const testGame = game(4)
 
-  expect(actualGame.activePlayerId).toEqual(0)
+  const actualGame = R.pipe(
+      nextPlayersTurn,
+    )(testGame)
+
+  expect(actualGame.activePlayerId).toEqual(3)
+});
+
+test('nextPlayersTurn back to player 1', () => {
+  const testGame = game(4)
+  const initialPlayerId = testGame.activePlayerId
+
+  const actualGame = R.pipe(
+      nextPlayersTurn,
+      nextPlayersTurn,
+      nextPlayersTurn,
+      nextPlayersTurn,
+    )(testGame)
+
+  expect(actualGame.activePlayerId).toEqual(initialPlayerId)
 });
 
 test('wallsAvailable yes', () => {
-  const testgame = game(4)
+  const testGame = game(4)
 
-  const actual = wallsAvailable(testgame)
+  const actual = wallsAvailable(testGame)
 
   expect(actual).toEqual(true)
 });
 
 test('wallsAvailable no', () => {
-  const testgame = R.pipe(
+  const testGame = R.pipe(
     consumeWall,
     consumeWall,
     consumeWall,
@@ -74,17 +79,17 @@ test('wallsAvailable no', () => {
     consumeWall,
   )(game(4))
 
-  const actual = wallsAvailable(testgame)
+  const actual = wallsAvailable(testGame)
 
   expect(actual).toEqual(false)
 });
 
 test('consumeWall 1 wall consumed', () => {
-  const testgame = R.pipe(
-    consumeWall,
-  )(game(4))
+  let testGame = game(4)
+  const playerId = testGame.activePlayerId
+  testGame = consumeWall(testGame)
 
-  const actual = testgame.inventory[0]
+  const actual = testGame.inventory[playerId]
 
   expect(actual).toEqual(4)
 });

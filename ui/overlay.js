@@ -2,7 +2,7 @@ import * as R from 'ramda'
 import * as Konva from 'konva'
 import { initHud } from './hud'
 import { addElements, attachLayer } from './util'
-import { ids } from '../core/game'
+import { ids, turnOrder } from '../core/game'
 
 // initOverlay :: Context -> Number -> [Element]
 // Initializes overlay ui elements.
@@ -26,6 +26,6 @@ const initLayer = R.curry((context) => {
 // initHuds :: Context -> Number -> [Element]
 // Initializes hud ui elements.
 const initHuds = R.curry((context, numPlayers) =>
-  R.map(
+  R.addIndex(R.map)(
     initHud(context, numPlayers),
-    ids(numPlayers)))
+    R.filter(R.includes(R.__, ids(numPlayers)), turnOrder)))

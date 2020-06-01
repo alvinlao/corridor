@@ -9,30 +9,31 @@ const wallSymbolHeight = 14
 const wallSymbolMargin = 4
 const hudWidth = (context, numPlayers) => (context.size / numPlayers)
 
-const playerWall = R.curry((context, numPlayers, playerId, totalWalls, wallId) => (
-  new Konva.Rect({
-    x: (
-      (hudWidth(context, numPlayers) * playerId)
-      + (hudWidth(context, numPlayers) / 2)
-      - ((rowLimit * (wallSymbolWidth + wallSymbolMargin)) / 2)
-      + (wallId % rowLimit) * (wallSymbolMargin + wallSymbolWidth)),
-    y: (
-      context.size
-      + 25
-      + ((wallSymbolHeight + rowLimit) * Math.floor(wallId / rowLimit))),
-    width: wallSymbolWidth,
-    height: wallSymbolHeight,
-    fill: playerColors[playerId],
-    cornerRadius: 5,
-    opacity: 0,
-  })))
+const playerWall = R.curry(
+  (context, numPlayers, index, playerId, totalWalls, wallId) => (
+    new Konva.Rect({
+      x: (
+        (hudWidth(context, numPlayers) * index)
+        + (hudWidth(context, numPlayers) / 2)
+        - ((rowLimit * (wallSymbolWidth + wallSymbolMargin)) / 2)
+        + (wallId % rowLimit) * (wallSymbolMargin + wallSymbolWidth)),
+      y: (
+        context.size
+        + 25
+        + ((wallSymbolHeight + rowLimit) * Math.floor(wallId / rowLimit))),
+      width: wallSymbolWidth,
+      height: wallSymbolHeight,
+      fill: playerColors[playerId],
+      cornerRadius: 5,
+      opacity: 0,
+    })))
 
 // initHud :: Context -> Number -> [Element]
 // Initializes a hud ui element.
-export const initHud = R.curry((context, numPlayers, playerId) => {
+export const initHud = R.curry((context, numPlayers, playerId, index) => {
   const totalWalls = wallsPerPlayer(numPlayers)
   const walls = R.map(
-    playerWall(context, numPlayers, playerId, totalWalls),
+    playerWall(context, numPlayers, index, playerId, totalWalls),
     R.range(0, totalWalls))
 
   return {
