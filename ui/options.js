@@ -76,7 +76,7 @@ const initUndoButton = R.curry((context, index) => {
 
   let isHover = false
   const updateAvailability = (button, stackSize) => {
-    if (stackSize <= 1) {
+    if (stackSize < 1) {
       tweenOpacity(icon, 0.1, 240)
       tweenOpacity(button, 0.3, 240)
       tweenFill(button, buttonFill, 240)
@@ -87,22 +87,22 @@ const initUndoButton = R.curry((context, index) => {
     }
   }
 
-  const update = R.curry((context, button, gameStates) => {
-    updateAvailability(button, gameStates.size())
+  const update = R.curry((context, button, gameStatesHelper) => {
+    updateAvailability(button, gameStatesHelper.size())
   })
 
-  const bind = R.curry((context, button, gameStates) => {
-    button.on('click', gameStates.pop)
+  const bind = R.curry((context, button, gameStatesHelper) => {
+    button.on('click', gameStatesHelper.undo)
     button.on('mouseover', () => {
       isHover = true
-      if (gameStates.size() > 1) {
+      if (gameStatesHelper.size() > 1) {
         tweenOpacity(icon, 1, 240)
         tweenFill(button, buttonHoverFill, 240)
       }
     })
     button.on('mouseout', () => {
       isHover = false
-      updateAvailability(button, gameStates.size())
+      updateAvailability(button, gameStatesHelper.size())
         tweenFill(button, buttonFill, 240)
     })
   })
@@ -136,7 +136,7 @@ const initNewGame2P = R.curry((context, index) => {
   icon.listening(false)
 
   let isHover = false
-  const update = R.curry((context, button, gameStates) => {
+  const update = R.curry((context, button, gameStatesHelper) => {
     if (!isHover) {
       tweenOpacity(icon, 0.3, 240)
       tweenFill(button, buttonFill, 240)
@@ -144,8 +144,8 @@ const initNewGame2P = R.curry((context, index) => {
     }
   })
 
-  const bind = R.curry((context, button, gameStates) => {
-    button.on('click', () => gameStates.reset(game(2)))
+  const bind = R.curry((context, button, gameStatesHelper) => {
+    button.on('click', () => gameStatesHelper.reset(game(2)))
     button.on('mouseover', () => {
       isHover = true
       tweenOpacity(icon, 1, 240)
@@ -194,7 +194,7 @@ const initNewGame4P = R.curry((context, index) => {
   icon.listening(false)
 
   let isHover = false
-  const update = R.curry((context, button, gameStates) => {
+  const update = R.curry((context, button, gameStatesHelper) => {
     if (!isHover) {
       tweenOpacity(icon, 0.3, 240)
       tweenFill(button, buttonFill, 240)
@@ -202,8 +202,8 @@ const initNewGame4P = R.curry((context, index) => {
     }
   })
 
-  const bind = R.curry((context, button, gameStates) => {
-    button.on('click', () => gameStates.reset(game(4)))
+  const bind = R.curry((context, button, gameStatesHelper) => {
+    button.on('click', () => gameStatesHelper.reset(game(4)))
     button.on('mouseover', () => {
       isHover = true
       tweenOpacity(icon, 1, 240)

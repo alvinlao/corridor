@@ -56,41 +56,35 @@ const arrow = (context, point) => (
 
 // initCell :: Context -> Game -> Point -> [Element]
 export const initCell = R.curry((context, game, point) => {
-  const bg = cell(context, point)
-  const up = arrow(context, point).listening(false)
-  const down = arrow(context, point).rotate(180).listening(false)
-  const left = arrow(context, point).rotate(-90).listening(false)
-  const right = arrow(context, point).rotate(90).listening(false)
-
   const shapes = {
-    bg,
-    up,
-    down,
-    left,
-    right,
+    bg: cell(context, point),
+    up: arrow(context, point).listening(false),
+    down: arrow(context, point).rotate(180).listening(false),
+    left: arrow(context, point).rotate(-90).listening(false),
+    right: arrow(context, point).rotate(90).listening(false),
   }
 
   return {
-    shapes: [bg, up, down, left, right],
+    shapes: R.values(shapes),
     bind: bind(context, point, shapes),
     update: update(context, point, shapes),
   }
 })
 
-const update = R.curry((context, point, shapes, gameStates) => {
-  const game = gameStates.latest()
+const update = R.curry((context, point, shapes, gameStatesHelper) => {
+  const game = gameStatesHelper.current()
   updateDirection(point, shapes, game)
   updateColor(point, shapes.bg, game)
 })
 
-const bind = R.curry((context, point, shapes, gameStates) => {
+const bind = R.curry((context, point, shapes, gameStatesHelper) => {
   shapes.bg.on(
     'click',
-    () => gameStates.push(useMove(gameStates.latest(), point)))
+    () => gameStatesHelper.push(useMove(gameStatesHelper.current(), point)))
   shapes.bg.on(
     'mouseover',
     draw(context, () => {
-      const game = gameStates.latest()
+      const game = gameStatesHelper.current()
       if (isValidMove(game, game.activePlayerId, point)) {
         tweenOpacity(shapes.bg, 1, 120)
       }
@@ -98,7 +92,7 @@ const bind = R.curry((context, point, shapes, gameStates) => {
   shapes.bg.on(
     'mouseout',
     draw(context, () => {
-      updateColor(point, shapes.bg, gameStates.latest(), true)
+      updateColor(point, shapes.bg, gameStatesHelper.current(), true)
     }))
 })
 

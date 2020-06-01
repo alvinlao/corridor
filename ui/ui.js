@@ -6,6 +6,15 @@ import { cell } from './cell'
 import { initBoard } from './board'
 import { initOverlay } from './overlay'
 import { initOptions } from './options'
+import {
+  initGameStates,
+  resetGameStates,
+  pushGameState,
+  undoGameState,
+  redoGameState,
+  currentGameState,
+  olderGameStates,
+} from './gamestates'
 
 // render :: Game -> ()
 export const render = (game) => {
@@ -30,82 +39,71 @@ export const render = (game) => {
   init(context, game)
 }
 
-// gameStates :: Context -> [Element] -> [Game] -> {k: () => Game}
-// Creates dictionary of functions for updating the singleton game states.
-const gameStates = (context, elements, singletonGameStates) => ({
-  latest: () => R.last(singletonGameStates),
-  size: () => R.length(singletonGameStates),
-  push: (game) => {
-    pushGame(singletonGameStates, game)
-    update(context, elements, singletonGameStates)
-  },
-  pop: () => {
-    popGame(singletonGameStates)
-    update(context, elements, singletonGameStates)
-  },
-  reset: (game) => {
-    resetGame(singletonGameStates, game)
-    update(context, elements, singletonGameStates)
-  },
-})
 
 // init :: Context -> Game -> [{k: (* -> *)}]
 // Initializes the ui and returns a list of the ui elements.
 const init = R.curry((context, game) => {
-  const singletonGameStates = []
   const elements = R.unnest([
     initBoard(context, game),
     initOverlay(context, 2),
     initOverlay(context, 4),
     initOptions(context),
   ])
-  const _gameStates = gameStates(context, elements, singletonGameStates)
   
-  setUpBind(context, elements, _gameStates)
-  _gameStates.push(game)
+  // Create a GameStatesHelper.
+  const singleton = initGameStates()
+  const gameStatesHelper = setUpGameStatesHelper(context, elements, singleton)
+
+  // Bind every ui element.
+  setUpBind(context, elements, gameStatesHelper)
+
+  // Trigger an update call on every ui element with
+  // the first Game.
+  gameStatesHelper.push(game)
+
   return elements
 })
 
-// setUpBind :: Context -> [Element] -> GameState -> ()
-// Calls each element's bind function.
-const setUpBind = (context, elements, gameStates) =>
-  R.forEach(
-    (bind) => bind(gameStates),
-    R.map(R.prop('bind'), elements))
-
-// update :: Context -> [Element] -> [Game] -> ()
+// update :: Context -> [Element] -> GameStates -> ()
 // Calls each element's update function.
-const update = R.curry((context, elements, singletonGameStates) => {
-  const _gameStates = gameStates(context, elements, singletonGameStates)
-  // Update all elements.
+const update = R.curry((context, elements, gameStatesSingleton) => {
+  const gameStatesHelper =
+    setUpGameStatesHelper(context, elements, gameStatesSingleton)
   R.forEach(
-    (f) => f(_gameStates),
+    (f) => f(gameStatesHelper),
     R.map(R.prop('update'), elements))
-
   context.stage.draw()
 })
 
-// pushGame :: [Game] -> Game -> ()
-// Pushes the provided game state onto the stack.
-const pushGame = R.curry((singletonGameStates, game) => {
-  // Update the game states singleton.
-  singletonGameStates.push(game)
-})
+// setUpBind :: Context -> [Element] -> GameStatesHelper -> ()
+// Calls each element's bind function.
+const setUpBind = (context, elements, gameStatesHelper) => {
+  R.forEach(
+    (bind) => bind(gameStatesHelper),
+    R.map(R.prop('bind'), elements))
+}
 
-// popGame :: [Game] -> ()
-// Drops the latest Game from the stack.
-const popGame = (singletonGameStates) => {
-  if (singletonGameStates.length <= 1) {
-    return R.last(singletonGameStates)
+// setUpGameStatesHelper :: Context -> [Element] -> GameStates -> GameStatesHelper
+// Creates a dictionary with methods that view and mutate a single GameStates.
+const setUpGameStatesHelper = R.curry((context, elements, singleton) => {
+  return {
+    reset: (game) => {
+      resetGameStates(singleton, game)
+      update(context, elements, singleton)
+    },
+    push: (game) => {
+      pushGameState(singleton, game)
+      update(context, elements, singleton)
+    },
+    undo: () => {
+      undoGameState(singleton)
+      update(context, elements, singleton)
+    },
+    redo: () => {
+      redoGameState(singleton)
+      update(context, elements, singleton)
+    },
+    current: () => currentGameState(singleton),
+    size: () => olderGameStates(singleton),
   }
-
-  // Update the game states singleton.
-  singletonGameStates.pop()
-}
-
-// resetGame :: [Game] -> Game -> ()
-// Clears the stack, then adds the provided Game.
-const resetGame = (singletonGameStates, game) => {
-  singletonGameStates.splice(0, singletonGameStates.length)
-  singletonGameStates.push(game)
-}
+})

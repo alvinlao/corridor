@@ -88,35 +88,35 @@ export const initVwall = R.curry((context, game, point) => {
   }
 })
 
-const update = R.curry((context, wall, shape, gameStates) => {
-  const game = gameStates.latest()
+const update = R.curry((context, wall, shape, gameStatesHelper) => {
+  const game = gameStatesHelper.current()
   updateOpacity(wall, shape, game)
   tweenFill(shape, wallColor, tweenDuration)
   shape.zIndex(0)
 })
 
-const bind = R.curry((context, wall, shape, gameStates) => {
+const bind = R.curry((context, wall, shape, gameStatesHelper) => {
   const hoverState = { isHover: false }
 
   shape.on(
     'click',
     () => {
-      const game = gameStates.latest()
+      const game = gameStatesHelper.current()
       if (wallsAvailable(game) && isValidWall(game, wall)) {
-        gameStates.push(useWall(game, wall))
+        gameStatesHelper.push(useWall(game, wall))
       }
     })
   shape.on(
     'mouseover',
     () => {
       hoverState.isHover = true
-      setTimeout(mouseover(hoverState, context, wall, shape, gameStates), 15)
+      setTimeout(mouseover(hoverState, context, wall, shape, gameStatesHelper), 15)
     })
   shape.on(
     'mouseout',
     () => {
       hoverState.isHover = false
-      draw(context, () => update(context, wall, shape, gameStates))
+      draw(context, () => update(context, wall, shape, gameStatesHelper))
     })
 })
 
@@ -128,14 +128,14 @@ const updateOpacity = R.curry((wall, shape, game) => {
   }
 })
 
-const mouseover = (hoverState, context, wall, shape, gameStates) => () => {
+const mouseover = (hoverState, context, wall, shape, gameStatesHelper) => () => {
   if (!hoverState.isHover) {
     return
   }
   draw(
     context,
     () => {
-      const game = gameStates.latest()
+      const game = gameStatesHelper.current()
       if (!wallsAvailable(game)) {
         return
       }

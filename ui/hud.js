@@ -43,18 +43,19 @@ export const initHud = R.curry((context, numPlayers, playerId, index) => {
   }
 })
 
-const update = R.curry((context, numPlayers, playerId, shapes, gameStates) => {
-  const game = gameStates.latest()
-  R.addIndex(R.map)(
-    (shape, index) => {
-      if (numPlayers != game.numPlayers) {
-        hide(shape)
-      } else {
-        updateVisibility(shape, index, numWallsAvailable(game, playerId))
-      }
-    },
-    shapes.walls)
-})
+const update = R.curry(
+  (context, numPlayers, playerId, shapes, gameStatesHelper) => {
+    const game = gameStatesHelper.current()
+    R.addIndex(R.map)(
+      (shape, index) => {
+        if (numPlayers != game.numPlayers) {
+          hide(shape)
+        } else {
+          updateVisibility(shape, index, numWallsAvailable(game, playerId))
+        }
+      },
+      shapes.walls)
+  })
 
 const updateVisibility = (shape, index, wallsAvailable) => {
   if (index < wallsAvailable) {
