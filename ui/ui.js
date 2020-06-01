@@ -14,6 +14,7 @@ import {
   redoGameState,
   currentGameState,
   olderGameStates,
+  newerGameStates,
 } from './gamestates'
 
 // render :: Game -> ()
@@ -104,6 +105,7 @@ const setUpGameStatesHelper = R.curry((context, elements, singleton) => {
       update(context, elements, singleton)
     },
     current: () => currentGameState(singleton),
-    size: () => olderGameStates(singleton),
+    older: () => olderGameStates(singleton),
+    newer: () => newerGameStates(singleton),
   }
 })

@@ -27,7 +27,7 @@ export const resetGameStates = (gameStates, game) => {
 // destroys the history after the current game state.
 export const pushGameState = (gameStates, game) => {
   if (gameStates.cur != -1) {
-    gameStates.history.splice(gameStates.index + 1, gameStates.length)
+    gameStates.history.splice(gameStates.index + 1)
   }
   gameStates.history.push(game)
   gameStates.index += 1
@@ -62,4 +62,10 @@ export const currentGameState = (gameStates) => {
 // Returns the number of older game states than the current one.
 export const olderGameStates = (gameStates) => {
   return gameStates.index
+}
+
+// newerGameStates :: GameStates -> ()
+// Returns the number of newer game states than the current one.
+export const newerGameStates = (gameStates) => {
+  return gameStates.history.length - gameStates.index - 1
 }

@@ -17,6 +17,7 @@ export const initOptions = R.curry((context) => {
     R.call,
     [
       initUndoButton(attachLayer(optionsLayer, context)),
+      initRedoButton(attachLayer(optionsLayer, context)),
       initNewGame2P(attachLayer(optionsLayer, context)),
       initNewGame4P(attachLayer(optionsLayer, context)),
     ])
@@ -75,8 +76,8 @@ const initUndoButton = R.curry((context, index) => {
   icon.listening(false)
 
   let isHover = false
-  const updateAvailability = (button, stackSize) => {
-    if (stackSize < 1) {
+  const updateAvailability = (button, states) => {
+    if (states < 1) {
       tweenOpacity(icon, 0.1, 240)
       tweenOpacity(button, 0.3, 240)
       tweenFill(button, buttonFill, 240)
@@ -88,21 +89,81 @@ const initUndoButton = R.curry((context, index) => {
   }
 
   const update = R.curry((context, button, gameStatesHelper) => {
-    updateAvailability(button, gameStatesHelper.size())
+    updateAvailability(button, gameStatesHelper.older())
   })
 
   const bind = R.curry((context, button, gameStatesHelper) => {
     button.on('click', gameStatesHelper.undo)
     button.on('mouseover', () => {
       isHover = true
-      if (gameStatesHelper.size() > 1) {
+      if (gameStatesHelper.older() >= 1) {
         tweenOpacity(icon, 1, 240)
         tweenFill(button, buttonHoverFill, 240)
       }
     })
     button.on('mouseout', () => {
       isHover = false
-      updateAvailability(button, gameStatesHelper.size())
+      updateAvailability(button, gameStatesHelper.older())
+        tweenFill(button, buttonFill, 240)
+    })
+  })
+
+  return initButton(
+    context,
+    { icon, index, bind, update })
+})
+
+const initRedoButton = R.curry((context, index) => {
+  const icon = new Konva.Shape({
+    x: ((buttonRadius * 2) + buttonMargin) * index + buttonRadius,
+    y: 10,
+    width: (buttonRadius * 2) * 0.5,
+    height: (buttonRadius * 2) * 0.5,
+    stroke: "#000000",
+    opacity: 0.1,
+    sceneFunc: (cx, shape) => {
+      const width = shape.getAttr('width')
+      const height = shape.getAttr('height')
+      cx.beginPath()
+      cx.moveTo(-width / 2, 0)
+      cx.lineTo(width / 2, 0)
+      cx.moveTo(0, height / 2)
+      cx.lineTo(width / 2, 0)
+      cx.lineTo(0, -height / 2)
+      cx.fillStrokeShape(shape)
+    },
+  })
+  icon.listening(false)
+
+  let isHover = false
+  const updateAvailability = (button, states) => {
+    if (states < 1) {
+      tweenOpacity(icon, 0.1, 240)
+      tweenOpacity(button, 0.3, 240)
+      tweenFill(button, buttonFill, 240)
+    } else {
+      isHover ? null : tweenOpacity(icon, 0.3, 240)
+      isHover ? null : tweenFill(button, buttonFill, 240)
+      tweenOpacity(button, 1, 240)
+    }
+  }
+
+  const update = R.curry((context, button, gameStatesHelper) => {
+    updateAvailability(button, gameStatesHelper.newer())
+  })
+
+  const bind = R.curry((context, button, gameStatesHelper) => {
+    button.on('click', gameStatesHelper.redo)
+    button.on('mouseover', () => {
+      isHover = true
+      if (gameStatesHelper.newer() >= 1) {
+        tweenOpacity(icon, 1, 240)
+        tweenFill(button, buttonHoverFill, 240)
+      }
+    })
+    button.on('mouseout', () => {
+      isHover = false
+      updateAvailability(button, gameStatesHelper.newer())
         tweenFill(button, buttonFill, 240)
     })
   })
