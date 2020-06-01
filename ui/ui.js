@@ -43,8 +43,8 @@ const gameStates = (context, elements, singletonGameStates) => ({
     popGame(singletonGameStates)
     update(context, elements, singletonGameStates)
   },
-  reset: () => {
-    resetGame(singletonGameStates)
+  reset: (game) => {
+    resetGame(singletonGameStates, game)
     update(context, elements, singletonGameStates)
   },
 })
@@ -55,8 +55,9 @@ const init = R.curry((context, game) => {
   const singletonGameStates = []
   const elements = R.unnest([
     initBoard(context, game),
-    initOverlay(context, game),
-    initOptions(context, game),
+    initOverlay(context, 2),
+    initOverlay(context, 4),
+    initOptions(context),
   ])
   const _gameStates = gameStates(context, elements, singletonGameStates)
   
@@ -102,8 +103,9 @@ const popGame = (singletonGameStates) => {
   singletonGameStates.pop()
 }
 
-// resetGame :: [Game] -> ()
-// Clears everything but the first game state from the stack.
-const resetGame = (singletonGameStates) => {
-  singletonGameStates.splice(1, singletonGameStates.length)
+// resetGame :: [Game] -> Game -> ()
+// Clears the stack, then adds the provided Game.
+const resetGame = (singletonGameStates, game) => {
+  singletonGameStates.splice(0, singletonGameStates.length)
+  singletonGameStates.push(game)
 }

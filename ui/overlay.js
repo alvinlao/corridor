@@ -2,13 +2,13 @@ import * as R from 'ramda'
 import * as Konva from 'konva'
 import { initHud } from './hud'
 import { addElements, attachLayer } from './util'
-import { playerIds } from '../core/game'
+import { ids } from '../core/game'
 
-// initOverlay :: Context -> Game -> [Element]
+// initOverlay :: Context -> Number -> [Element]
 // Initializes overlay ui elements.
-export const initOverlay = R.curry((context, game) => {
+export const initOverlay = R.curry((context, numPlayers) => {
   const hudLayer = initLayer(context)
-  const huds = initHuds(attachLayer(hudLayer, context), game)
+  const huds = initHuds(attachLayer(hudLayer, context), numPlayers)
   addElements(huds, hudLayer)
 
   return huds
@@ -23,9 +23,9 @@ const initLayer = R.curry((context) => {
   return layer
 })
 
-// initHuds :: Context -> Game -> [Element]
+// initHuds :: Context -> Number -> [Element]
 // Initializes hud ui elements.
-const initHuds = R.curry((context, game) =>
+const initHuds = R.curry((context, numPlayers) =>
   R.map(
-    initHud(context, game),
-    playerIds(game)))
+    initHud(context, numPlayers),
+    ids(numPlayers)))

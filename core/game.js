@@ -18,6 +18,8 @@ const initializePlayers = [
   putPlayer(3, point(4, 8)),
 ]
 
+export const ids = (numPlayers) => numPlayers == 2 ? [0, 1] : [0, 1, 2, 3]
+
 // game :: Number -> Game
 // Creates a new game.
 export const game = (numPlayers) => ({
@@ -28,7 +30,12 @@ export const game = (numPlayers) => ({
   cols,
   inventory: setupInventory(numPlayers),
   activePlayerId: 0,
+  wallsPerPlayer: wallsPerPlayer(numPlayers),
 })
+
+// wallsPerPlayer :: Number -> Number
+// Returns the number of walls each player starts with.
+export const wallsPerPlayer = (numPlayers) => numPlayers == 2 ? 10 : 5
 
 // setupPlayers :: Number -> Board -> Board
 // Places all the players on the board in their staring positions.
@@ -41,7 +48,7 @@ const setupPlayers = (numPlayers, board) =>
 // setupInventory :: Number -> Inventory
 // Gives each player a preset number of walls.
 const setupInventory = (numPlayers) => {
-  const numWalls = numPlayers == 2 ? 10 : 5
+  const numWalls = wallsPerPlayer(numPlayers)
   return R.pipe(
     R.map((playerId) => [playerId, numWalls]),
     R.fromPairs)
