@@ -76,6 +76,9 @@ const canJumpLeft = R.curry((compass, game, point) =>
     R.anyPass([
       R.compose(hasPlayer(game), R.compose(compass.up, compass.up)),
       R.complement(R.compose(unblocked(game, compass.upedge), compass.up)),
+      R.compose(
+        R.complement(isPointInbounds(game)),
+        R.compose(compass.up, compass.up)),
     ]),
   ])(point))
 
@@ -91,5 +94,8 @@ const canJumpRight = R.curry((compass, game, point) =>
     R.anyPass([
       R.compose(hasPlayer(game), R.compose(compass.up, compass.up)),
       R.complement(R.compose(unblocked(game, compass.upedge), compass.up)),
+      R.compose(
+        R.complement(isPointInbounds(game)),
+        R.compose(compass.up, compass.up)),
     ]),
   ])(point))

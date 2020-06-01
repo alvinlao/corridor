@@ -39,12 +39,10 @@ test('moves jumps', () => {
 
   const actual = moves(testGame, playerId)
 
-  expect(actual).toEqual([
-    north(north(location)),
-    south(south(location)),
-    east(east(location)),
-    west(west(location)),
-  ])
+  expect(actual).toContainEqual(north(north((location))))
+  expect(actual).toContainEqual(south(south((location))))
+  expect(actual).toContainEqual(east(east((location))))
+  expect(actual).toContainEqual(west(west((location))))
 })
 
 test('moves diagonal only', () => {
@@ -70,4 +68,30 @@ test('moves diagonal only', () => {
   expect(actual).toContainEqual(north(east(location)))
   expect(actual).toContainEqual(south(west(location)))
   expect(actual).toContainEqual(south(east(location)))
+})
+
+// ========
+//  ------ (top edge)
+//  o 2 o
+//  o 1 o
+//  x o x
+//  x x x
+// ========
+test('moves diagonals enabled at the edge', () => {
+  const playerId = 0
+  const location = point(7, 4)
+  const testGame =
+    updateBoard(
+      R.pipe(
+        putPlayer(playerId, location),
+        putPlayer(2, north(location))),
+      game(4))
+
+  const actual = moves(testGame, playerId)
+
+  expect(actual).toContainEqual(north(west(location)))
+  expect(actual).toContainEqual(north(east(location)))
+  expect(actual).toContainEqual(west(location))
+  expect(actual).toContainEqual(east(location))
+  expect(actual).toContainEqual(south(location))
 })
