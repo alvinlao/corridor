@@ -11,7 +11,7 @@ const buttonFill = "#cccccc"
 const buttonHoverFill = "#a0a0a0"
 const buttonUnavailableOpacity = 0.3
 const iconUnavailableOpacity = 0.2
-const iconOpacity = 0.6
+const iconOpacity = 0.8
 
 // initOptions :: Context -> Game -> [Element]
 // Initializes options ui elements.
@@ -140,6 +140,7 @@ const buildButton = R.curry((context, index, params) => {
     width: (buttonRadius * 2) * 0.5,
     height: (buttonRadius * 2) * 0.5,
     stroke: "#000000",
+    strokeWidth: 1.2,
     opacity: 0.1,
     sceneFunc: params.iconSceneFunc,
   })
