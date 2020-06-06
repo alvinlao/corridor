@@ -80,7 +80,12 @@ const update = R.curry((context, point, shapes, gameStatesHelper) => {
 const bind = R.curry((context, point, shapes, gameStatesHelper) => {
   shapes.bg.on(
     'click',
-    () => gameStatesHelper.push(useMove(gameStatesHelper.current(), point)))
+    () => {
+      const game = gameStatesHelper.current()
+      if (isValidMove(game, game.activePlayerId, point)) {
+        gameStatesHelper.push(useMove(game, point))()
+      }
+    })
   shapes.bg.on(
     'mouseover',
     draw(context, () => {
