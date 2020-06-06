@@ -2,7 +2,7 @@ import { combineReducers } from 'redux'
 import { PUSH } from './actions'
 import { undoable } from './undoable'
 
-// game :: State -> Action -> State
+// game :: State Game -> Action -> State Game
 const game = (state, action) => {
   switch (action.type) {
     case PUSH:
@@ -11,7 +11,6 @@ const game = (state, action) => {
       return state
   }
 }
-
 
 export const app = combineReducers({
   game: undoable(game),
