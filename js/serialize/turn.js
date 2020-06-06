@@ -73,3 +73,21 @@ export const decodeTurn = (notation) => {
     }
   }
 }
+
+// decodeChar :: Char -> Number
+export const decodeChar = (char) => char.charCodeAt()
+
+// notationLength :: TurnType -> Number
+// Given a turn type, returns the length of its corresponding notation.
+export const notationLength = (turnType) => {
+  switch (turnType) {
+    case RESET:
+      return 2
+    case MOVE:
+      return 2
+    case WALL:
+      return 3
+    default:
+      return 1000
+  }
+}

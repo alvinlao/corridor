@@ -1,10 +1,11 @@
 import * as R from 'ramda'
 import { createStore } from 'redux'
 import { app } from './reducers'
+import { hydrate } from './hydrate'
 
 // store :: Store
 // A singleton redux store that represents the state of the app.
-export const store = createStore(app)
+export const store = createStore(app, hydrate())
 
 // observeStore :: Store -> Lens a Store -> (a -> ()) -> Unsubscribe
 // Registers a handler that's called when the store changes.

@@ -7,6 +7,8 @@ import { point } from '../core/point'
 import { store, observeStore } from '../store/store'
 import { reset } from '../store/actions'
 
+import { replaceHistory } from '../serialize/url'
+
 import { cell } from './cell'
 import { stageWidth, stageHeight } from './constants'
 import { initBoard } from './board'
@@ -34,8 +36,10 @@ const initUi = R.curry((context, game) => {
     initOverlay(context),
   ])
 
-  // Trigger an update call on every ui element with the first Game.
-  store.dispatch(reset(game))
+  if (R.isNil(store.getState().game.present)) {
+    // Start a new game.
+    store.dispatch(reset(game))
+  }
 
   // Set up store listener that triggers ui redraws.
   observeStore(store, R.lensPath([]), update(context, elements))
@@ -48,4 +52,5 @@ const update = R.curry((context, elements, state) => {
     (f) => f(state),
     R.map(R.prop('update'), elements))
   context.stage.batchDraw()
+  replaceHistory(state)
 })
