@@ -68,14 +68,15 @@ const init = R.curry((context, game) => {
 
 // update :: Context -> [Element] -> GameStates -> ()
 // Calls each element's update function.
-const update = R.curry((context, elements, gameStatesSingleton) => {
-  const gameStatesHelper =
-    setUpGameStatesHelper(context, elements, gameStatesSingleton)
-  R.forEach(
-    (f) => f(gameStatesHelper),
-    R.map(R.prop('update'), elements))
-  context.stage.draw()
-})
+const update =
+  R.curry((context, elements, gameStatesSingleton, shouldTween=true) => {
+    const gameStatesHelper =
+      setUpGameStatesHelper(context, elements, gameStatesSingleton)
+    R.forEach(
+      (f) => f(gameStatesHelper, shouldTween),
+      R.map(R.prop('update'), elements))
+    context.stage.batchDraw()
+  })
 
 // setUpBind :: Context -> [Element] -> GameStatesHelper -> ()
 // Calls each element's bind function.
@@ -99,11 +100,11 @@ const setUpGameStatesHelper = R.curry((context, elements, singleton) => {
     },
     undo: () => {
       undoGameState(singleton)
-      update(context, elements, singleton)
+      update(context, elements, singleton, false)
     },
     redo: () => {
       redoGameState(singleton)
-      update(context, elements, singleton)
+      update(context, elements, singleton, false)
     },
     current: () => currentGameState(singleton),
     older: () => olderGameStates(singleton),

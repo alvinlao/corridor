@@ -88,12 +88,13 @@ export const initVwall = R.curry((context, game, point) => {
   }
 })
 
-const update = R.curry((context, wall, shape, gameStatesHelper) => {
-  const game = gameStatesHelper.current()
-  updateOpacity(wall, shape, game)
-  tweenFill(shape, wallColor, tweenDuration)
-  shape.zIndex(0)
-})
+const update =
+  R.curry((context, wall, shape, gameStatesHelper, shouldTween=true) => {
+    const game = gameStatesHelper.current()
+    updateOpacity(wall, shape, game, shouldTween)
+    tweenFill(shape, wallColor, tweenDuration, shouldTween)
+    shape.zIndex(0)
+  })
 
 const bind = R.curry((context, wall, shape, gameStatesHelper) => {
   const hoverState = { isHover: false }
@@ -119,11 +120,11 @@ const bind = R.curry((context, wall, shape, gameStatesHelper) => {
     })
 })
 
-const updateOpacity = R.curry((wall, shape, game) => {
+const updateOpacity = R.curry((wall, shape, game, shouldTween) => {
   if (hasWall(game, wall)) {
-    tweenOpacity(shape, 1, tweenDuration)
+    tweenOpacity(shape, 1, tweenDuration, shouldTween)
   } else {
-    tweenOpacity(shape, 0, tweenDuration)
+    tweenOpacity(shape, 0, tweenDuration, shouldTween)
   }
 })
 
