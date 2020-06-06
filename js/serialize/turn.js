@@ -10,55 +10,55 @@ const RESET = 0
 const MOVE = 1
 const WALL = 2
 
-// encodeReset :: Point -> SerializedTurn
-// Encodes the reset into a single ASCII character.
-export const encodeReset = (numPlayers) => encodeTurn(RESET, numPlayers)
+// encodeReset :: Point -> Notation
+// Encodes the reset into a binary representation.
+export const encodeReset = (numPlayers) => encodeTurn(RESET, [numPlayers])
 
-// encodeUseMove :: Point -> SerializedTurn
-// Encodes the move into a single ASCII character.
-export const encodeUseMove = (point) => encodeTurn(MOVE, encodePoint(point))
+// encodeUseMove :: Point -> Notation
+// Encodes the move into a binary representation.
+export const encodeUseMove = (point) => encodeTurn(MOVE, [encodePoint(point)])
 
-// encodeUseWall :: Wall -> SerializedTurn
-// Encodes the wall into a single ASCII character.
+// encodeUseWall :: Wall -> Notation
+// Encodes the wall into a binary representation.
 export const encodeUseWall = (wall) => encodeTurn(WALL, encodeWall(wall))
 
 // encodePoint :: Point -> Number
-// Converts a point to 6 bits.
-export const encodePoint = (point) => point.row | point.col << 3
+// Converts a point to a byte.
+export const encodePoint = (point) => point.col + (point.row * 9)
 
 // decodePoint :: Number -> Point
-// Converts the provided 6 bits to a point.
+// Converts the provided byte to a Point.
 export const decodePoint = (n) => {
-  const row = n & 7
-  const col = (n >> 3) & 7
+  const row = Math.floor(n / 9)
+  const col = n - (row * 9)
   return point(row, col)
 }
 
-// encodeWall :: Wall -> Number
-// Converts a wall to 7 bits.
-export const encodeWall = (wall) =>
-  encodePoint(R.head(wall.points)) << 1 | (isVertical(wall) ? 1 : 0)
+// encodeWall :: Wall -> [Number]
+// Converts a wall to two bytes.
+export const encodeWall = (wall) => ([
+  encodePoint(R.head(wall.points)),
+  (isVertical(wall) ? 1 : 0)
+])
 
-// decodeWall :: Number -> Point
+// decodeWall :: [Number] -> Point
 // Converts the provided 7 bits to a wall.
-export const decodeWall = (n) => {
-  const isVertical = n & 1
-  const topLeft = decodePoint(n >> 1)
+export const decodeWall = (ns) => {
+  const topLeft = decodePoint(ns[0])
+  const isVertical = ns[1] & 1
   return isVertical ? vwall(topLeft) : hwall(topLeft)
 }
 
-// encodeTurn :: TurnType -> Number -> SerializedTurn
-// Encodes the payload and turn type into a single ASCII character.
-const encodeTurn = (type, payload) =>
-  String.fromCharCode(payload << 2 | type)
+// encodeTurn :: TurnType -> [Number] -> Notation
+// Encodes the payload and turn type into a binary representation
+const encodeTurn = (type, payload) => String.fromCharCode(type, ...payload)
 
-// decodeTurn :: SerializedTurn -> (Game -> Game)
-// Decodes the ASCII character into a function that applies
+// decodeTurn :: Notation -> (Game -> Game)
+// Decodes the binary representation into a function that applies
 // the encoded move to the given Game.
-export const decodeTurn = (serializedTurn) => {
-  const n = serializedTurn.charCodeAt()
-  const type = n & 3
-  const payload = n >> 2
+export const decodeTurn = (notation) => {
+  const type = notation.charCodeAt(0)
+  const payload = notation.charCodeAt(1)
 
   return (currentGame) => {
     switch (type) {
@@ -67,7 +67,7 @@ export const decodeTurn = (serializedTurn) => {
       case MOVE:
         return useMove(currentGame, decodePoint(payload))
       case WALL:
-        return useWall(currentGame, decodeWall(payload))
+        return useWall(currentGame, decodeWall([payload, notation.charCodeAt(2)]))
       default:
         return currentGame
     }
