@@ -1,15 +1,16 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
 import { game } from '../core/game'
-import { addElements, attachLayer, tweenOpacity, tweenFill } from './util'
+import { addElements, attachLayer, tweenOpacity } from './util'
 
 const buttonRadius = 20
 const buttonMargin = 10
 const optionsMargin = 20
-const buttonUnavailableFill = "#e0e0e0"
-const buttonFill = "#cccccc"
-const buttonHoverFill = "#a0a0a0"
-const buttonUnavailableOpacity = 0.3
+const buttonFill = "#000000"
+const buttonOpacity = 0.1
+const buttonHoverOpacity = 0.3
+const buttonClickOpacity = 0.5
+const buttonUnavailableOpacity = 0.0
 const iconUnavailableOpacity = 0.2
 const iconOpacity = 0.8
 
@@ -54,6 +55,7 @@ const initUndoButton = R.curry((context, index) => {
       cx.lineTo(0, -height / 2)
       cx.fillStrokeShape(shape)
     },
+    fill: null,
     isAvailable: (gameStatesHelper) => gameStatesHelper.older() >= 1,
     onClick: (gameStatesHelper) => gameStatesHelper.undo,
   }
@@ -75,6 +77,7 @@ const initRedoButton = R.curry((context, index) => {
       cx.lineTo(0, -height / 2)
       cx.fillStrokeShape(shape)
     },
+    fill: null,
     isAvailable: (gameStatesHelper) => gameStatesHelper.newer() >= 1,
     onClick: (gameStatesHelper) => gameStatesHelper.redo,
   }
@@ -96,6 +99,7 @@ const initNewGame2P = R.curry((context, index) => {
       cx.rect(-size/2, height/3 - size/2, size, size)
       cx.fillStrokeShape(shape)
     },
+    fill: "#000000",
     isAvailable: (gameStatesHelper) =>
       (gameStatesHelper.size() > 1 || gameStatesHelper.current().numPlayers != 2),
     onClick: (gameStatesHelper) => () => gameStatesHelper.reset(game(2))
@@ -124,6 +128,7 @@ const initNewGame4P = R.curry((context, index) => {
       cx.rect(-size/2 + width/3, -size/2, size, size)
       cx.fillStrokeShape(shape)
     },
+    fill: "#000000",
     isAvailable: (gameStatesHelper) =>
       (gameStatesHelper.size() > 1 || gameStatesHelper.current().numPlayers != 4),
     onClick: (gameStatesHelper) => () => gameStatesHelper.reset(game(4))
@@ -140,8 +145,9 @@ const buildButton = R.curry((context, index, params) => {
     width: (buttonRadius * 2) * 0.5,
     height: (buttonRadius * 2) * 0.5,
     stroke: "#000000",
-    strokeWidth: 1.2,
-    opacity: 0.1,
+    strokeWidth: 2,
+    opacity: iconUnavailableOpacity,
+    fill: params.fill,
     sceneFunc: params.iconSceneFunc,
   })
   icon.listening(false)
@@ -151,11 +157,9 @@ const buildButton = R.curry((context, index, params) => {
     if (!params.isAvailable(gameStateHelper)) {
       tweenOpacity(icon, iconUnavailableOpacity, 240)
       tweenOpacity(button, buttonUnavailableOpacity, 240)
-      tweenFill(button, buttonUnavailableFill, 240)
     } else {
       isHover ? null : tweenOpacity(icon, iconOpacity, 240)
-      isHover ? null : tweenFill(button, buttonFill, 240)
-      tweenOpacity(button, 1, 240)
+      isHover ? null : tweenOpacity(button, buttonOpacity, 240)
     }
   }
 
@@ -164,17 +168,30 @@ const buildButton = R.curry((context, index, params) => {
   })
 
   const bind = R.curry((context, button, gameStatesHelper) => {
-    button.on('click', params.onClick(gameStatesHelper))
     button.on('mouseover', () => {
       isHover = true
       if (params.isAvailable(gameStatesHelper)) {
-        tweenOpacity(icon, 1, 240)
-        tweenFill(button, buttonHoverFill, 240)
+        tweenOpacity(icon, iconOpacity, 240)
+        tweenOpacity(button, buttonHoverOpacity, 240)
       }
     })
     button.on('mouseout', () => {
       isHover = false
       updateAvailability(button, gameStatesHelper)
+    })
+    button.on('mousedown', () => {
+      if (params.isAvailable(gameStatesHelper)) {
+        tweenOpacity(button, buttonClickOpacity, 0)
+      }
+    })
+    button.on('mouseup', () => {
+      if (params.isAvailable(gameStatesHelper)) {
+        params.onClick(gameStatesHelper)()
+
+        if (params.isAvailable(gameStatesHelper)) {
+          tweenOpacity(button, buttonHoverOpacity, 0)
+        }
+      }
     })
   })
 
@@ -189,7 +206,7 @@ const initButton = R.curry((context, info) => {
     y: 10,
     radius: buttonRadius,
     fill: buttonFill,
-    opacity: iconOpacity,
+    opacity: buttonUnavailableOpacity,
   })
 
   return {
