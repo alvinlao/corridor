@@ -5,22 +5,35 @@ import { ids, turnOrder } from '../core/game'
 
 import { topMargin } from './constants'
 import { initHud } from './hud'
+import {
+  buttonRadius,
+  initUndoButton,
+  initRedoButton,
+  initNewGame2P,
+  initNewGame4P,
+} from './options'
 import { addElements, attachLayer } from './util'
 
-// initOverlay :: Context -> Number -> [Element]
+// initOverlay :: Context -> [Element]
 // Initializes overlay ui elements.
-export const initOverlay = R.curry((context, numPlayers) => {
+export const initOverlay = R.curry((context) => {
   const overlayLayer = initLayer(context)
-  const huds = initHuds(attachLayer(overlayLayer, context), numPlayers)
-  addElements(huds, overlayLayer)
+  
+  const hud2Player = initHuds(attachLayer(overlayLayer, context), 2)
+  const hud4Player = initHuds(attachLayer(overlayLayer, context), 4)
+  addElements(hud2Player, overlayLayer)
+  addElements(hud4Player, overlayLayer)
 
-  return huds
+  const options = initOptions(attachLayer(overlayLayer, context))
+  addElements(options, overlayLayer)
+
+  return R.unnest([hud2Player, hud4Player, options])
 })
 
 const initLayer = R.curry((context) => {
   const layer = new Konva.Layer({
     x: 0,
-    y: topMargin,
+    y: topMargin - (buttonRadius * 3),
   })
   context.stage.add(layer)
   return layer
@@ -32,3 +45,10 @@ const initHuds = R.curry((context, numPlayers) =>
   R.addIndex(R.map)(
     initHud(context, numPlayers),
     R.filter(R.includes(R.__, ids(numPlayers)), turnOrder)))
+
+const initOptions = (context) => [
+  initUndoButton(context, 'right', 1),
+  initRedoButton(context, 'right', 0),
+  initNewGame4P(context, 'left', 1),
+  initNewGame2P(context, 'left', 0),
+]

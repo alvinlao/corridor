@@ -11,13 +11,13 @@ import { topMargin } from './constants'
 // initBoard :: Context -> Game -> [Element]
 // Initializes a board ui element.
 export const initBoard = R.curry((context, game) => {
-  const cellLayer = initLayer(context)
-  const cells = initCells(attachLayer(cellLayer, context), game)
-  addElements(cells, cellLayer)
+  const boardLayer = initLayer(context)
 
-  const wallLayer = initLayer(context)
-  const walls = initWalls(attachLayer(wallLayer, context), game)
-  addElements(walls, wallLayer)
+  const cells = initCells(attachLayer(boardLayer, context), game)
+  addElements(cells, boardLayer)
+
+  const walls = initWalls(attachLayer(boardLayer, context), game)
+  addElements(walls, boardLayer)
 
   return R.concat(cells, walls)
 })

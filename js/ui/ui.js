@@ -31,9 +31,7 @@ const initStage = () => (
 const initUi = R.curry((context, game) => {
   const elements = R.unnest([
     initBoard(context, game),
-    initOverlay(context, 2),
-    initOverlay(context, 4),
-    initOptions(context),
+    initOverlay(context),
   ])
 
   // Trigger an update call on every ui element with the first Game.

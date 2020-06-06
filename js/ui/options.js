@@ -9,9 +9,8 @@ import { store } from '../store/store'
 import { addElements, attachLayer, tweenOpacity } from './util'
 import { topMargin } from './constants'
 
-const buttonRadius = 20
+export const buttonRadius = 20
 const buttonMargin = 10
-const optionsMargin = 20
 const buttonFill = "#000000"
 const buttonOpacity = 0.1
 const buttonHoverOpacity = 0.3
@@ -20,33 +19,9 @@ const buttonUnavailableOpacity = 0.0
 const iconUnavailableOpacity = 0.2
 const iconOpacity = 0.8
 
-// initOptions :: Context -> Game -> [Element]
-// Initializes options ui elements.
-export const initOptions = R.curry((context) => {
-  const optionsLayer = initLayer(context)
-  const options = [
-      initUndoButton(attachLayer(optionsLayer, context), 'right', 1),
-      initRedoButton(attachLayer(optionsLayer, context), 'right', 0),
-      initNewGame4P(attachLayer(optionsLayer, context), 'left', 1),
-      initNewGame2P(attachLayer(optionsLayer, context), 'left', 0),
-  ]
-  addElements(options, optionsLayer)
-
-  return options
-})
-
-const initLayer = R.curry((context) => {
-  const layer = new Konva.Layer({
-    x: 0,
-    y: topMargin - (buttonRadius * 2) - optionsMargin,
-  })
-  context.stage.add(layer)
-  return layer
-})
-
 // initUndoButton :: Context -> Align -> Number -> [Element]
 // Creates a button that reverts the game to the previous the game state.
-const initUndoButton = R.curry((context, align, index) => {
+export const initUndoButton = R.curry((context, align, index) => {
   const params = {
     iconSceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
@@ -69,7 +44,7 @@ const initUndoButton = R.curry((context, align, index) => {
 
 // initRedoButton :: Context -> Align -> Number -> [Element]
 // Creates a button that advances the game to the next the game state.
-const initRedoButton = R.curry((context, align, index) => {
+export const initRedoButton = R.curry((context, align, index) => {
   const params = {
     iconSceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
@@ -92,7 +67,7 @@ const initRedoButton = R.curry((context, align, index) => {
 
 // initNewGame2P :: Context -> Align -> Number -> [Element]
 // Creates a button that starts a new 2 player game.
-const initNewGame2P = R.curry((context, align, index) => {
+export const initNewGame2P = R.curry((context, align, index) => {
   const params = {
     iconSceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
@@ -116,7 +91,7 @@ const initNewGame2P = R.curry((context, align, index) => {
 
 // initNewGame4P :: Context -> Align -> Number -> [Element]
 // Creates a button that starts a new 4 player game.
-const initNewGame4P = R.curry((context, align, index) => {
+export const initNewGame4P = R.curry((context, align, index) => {
   const params = {
     iconSceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
