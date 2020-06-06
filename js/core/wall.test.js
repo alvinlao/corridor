@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import { point } from './point'
-import { hwall, vwall, edges } from './wall'
+import { hwall, vwall, edges, isVertical } from './wall'
 
 
 test('vwall created', () => {
@@ -28,4 +28,20 @@ test('edges returned', () => {
     [point(3, 0), point(3, 1)],
     [point(3, 1), point(3, 2)],
   ])
+})
+
+test('isVertical true', () => {
+  const wall = vwall(point(3, 0))
+
+  const actual = isVertical(wall)
+
+  expect(actual).toEqual(true)
+})
+
+test('isVertical false', () => {
+  const wall = hwall(point(3, 0))
+
+  const actual = isVertical(wall)
+
+  expect(actual).toEqual(false)
 })

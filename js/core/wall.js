@@ -30,3 +30,7 @@ export const edgeKey = (edge) => {
 // wallKey :: Wall -> String
 // Converts a wall to a string.
 export const wallKey = R.compose(R.map(edgeKey), edges)
+
+// isVertical :: Wall -> Boolean
+// Checks if the provided wall is vertically orientated.
+export const isVertical = (wall) => R.equals(wall, vwall(R.head(wall.points)))
