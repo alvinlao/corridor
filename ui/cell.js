@@ -83,7 +83,7 @@ const bind = R.curry((context, point, shapes, gameStatesHelper) => {
     () => {
       const game = gameStatesHelper.current()
       if (isValidMove(game, game.activePlayerId, point)) {
-        gameStatesHelper.push(useMove(game, point))()
+        gameStatesHelper.push(useMove(game, point))
       }
     })
   shapes.bg.on(
