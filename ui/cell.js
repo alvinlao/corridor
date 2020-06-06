@@ -11,7 +11,7 @@ import { isValidMove } from '../core/logic'
 import { useMove } from '../core/turn'
 import { putPlayer } from '../core/board'
 import { cellColor, playerColors, white } from './constants'
-import { tweenOpacity } from './util'
+import { tweenOpacity, tweenFill } from './util'
 
 
 const margin = 0.20
@@ -88,25 +88,28 @@ const bind = R.curry((context, point, shapes, gameStatesHelper) => {
     })
   shapes.bg.on(
     'mouseover',
-    draw(context, () => {
+    () => {
       const game = gameStatesHelper.current()
       if (isValidMove(game, game.activePlayerId, point)) {
         tweenOpacity(shapes.bg, 1, 120)
       }
-    }))
+    })
   shapes.bg.on(
     'mouseout',
-    draw(context, () => {
-      updateColor(point, shapes.bg, gameStatesHelper.current(), true)
-    }))
+    () => {
+      const game = gameStatesHelper.current()
+      if (isValidMove(game, game.activePlayerId, point)) {
+        tweenOpacity(shapes.bg, 0.3, 240)
+      }
+    })
 })
 
-const updateColor = (point, cell, game, shouldTween=false) => {
+const updateColor = (point, cell, game) => {
   if (hasPlayer(game, point)) {
     cell.opacity(1)
     cell.fill(playerColors[getPlayer(game, point)])
   } else if (isValidMove(game, game.activePlayerId, point)) {
-    tweenOpacity(cell, 0.3, 240, shouldTween)
+    cell.opacity(0.3)
     cell.fill(playerColors[game.activePlayerId])
   } else {
     cell.opacity(1)
@@ -138,9 +141,3 @@ const playerDirection = (playerId, game) => {
     [R.includes(point(4, 8)), R.always('right')],
   ])(playerWinLocations(game, playerId))
 }
-
-const draw = (context, f) =>
-  () => {
-    f()
-    context.layer.draw()
-  }

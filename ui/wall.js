@@ -97,7 +97,6 @@ const update = R.curry((context, wall, shape, gameStatesHelper) => {
 
 const bind = R.curry((context, wall, shape, gameStatesHelper) => {
   const hoverState = { isHover: false }
-
   shape.on(
     'click',
     () => {
@@ -116,7 +115,7 @@ const bind = R.curry((context, wall, shape, gameStatesHelper) => {
     'mouseout',
     () => {
       hoverState.isHover = false
-      draw(context, () => update(context, wall, shape, gameStatesHelper))
+      update(context, wall, shape, gameStatesHelper)
     })
 })
 
@@ -132,22 +131,14 @@ const mouseover = (hoverState, context, wall, shape, gameStatesHelper) => () => 
   if (!hoverState.isHover) {
     return
   }
-  draw(
-    context,
-    () => {
-      const game = gameStatesHelper.current()
-      if (!wallsAvailable(game)) {
-        return
-      }
-      if (isValidWall(game, wall)) {
-        tweenOpacity(shape, 1, tweenDuration)
-      } else {
-        shape.opacity(0.5).fill(invalidWallColor).zIndex(127)
-      }
-    })
-}
-
-const draw = (context, f) => {
-  f()
-  context.layer.draw()
+  const game = gameStatesHelper.current()
+  if (!wallsAvailable(game)) {
+    return
+  }
+  if (isValidWall(game, wall)) {
+    tweenOpacity(shape, 1, tweenDuration)
+  } else {
+    shape.opacity(0.5).fill(invalidWallColor).zIndex(127)
+    context.layer.draw()
+  }
 }
