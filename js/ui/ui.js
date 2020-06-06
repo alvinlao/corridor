@@ -5,7 +5,7 @@ import { row, col } from '../core/game'
 import { point } from '../core/point'
 
 import { store, observeStore } from '../store/store'
-import { init } from '../store/actions'
+import { reset } from '../store/actions'
 
 import { cell } from './cell'
 import { stageWidth, stageHeight } from './constants'
@@ -35,7 +35,7 @@ const initUi = R.curry((context, game) => {
   ])
 
   // Trigger an update call on every ui element with the first Game.
-  store.dispatch(init(game))
+  store.dispatch(reset(game))
 
   // Set up store listener that triggers ui redraws.
   observeStore(store, R.lensPath([]), update(context, elements))

@@ -1,19 +1,20 @@
-import { store } from './store'
+import * as R from 'ramda'
 import { useMove, useWall } from '../core/turn'
-import { encodeUseMove, encodeUseWall } from '../serialize/turn'
+import { encodeReset, encodeUseMove, encodeUseWall } from '../serialize/turn'
+
+import { store } from './store'
+import { reset as _reset } from './timetravel'
 
 
-// INIT, MOVE, WALL :: String
+// MOVE, WALL :: String
 // Action type.
-export const INIT = 'INIT'
 export const MOVE = 'MOVE'
 export const WALL = 'WALL'
 
-// init :: Game -> Action
-export const init = (game) => ({
-  type: INIT,
-  game,
-})
+// reset :: Game -> Action
+// Adds a reset notation to the time travel reset action.
+export const reset = (game) =>
+  R.set(R.lensProp('notation'), encodeReset(game.numPlayers), _reset(game))
 
 // move :: Game -> Point -> Action
 // Creates an action that moves the active player to the provided
