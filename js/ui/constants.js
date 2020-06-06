@@ -1,3 +1,7 @@
+export const stageWidth = 500;
+export const stageHeight = 750;
+export const topMargin = 150;
+
 export const cellColor = "#E8E3E1"
 export const playerColors = {
   0: "#45BA71",

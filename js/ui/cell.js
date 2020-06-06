@@ -21,8 +21,8 @@ import { tweenOpacity, tweenFill } from './util'
 
 const margin = 0.20
 
-export const cellSize = (context) => (1 - margin) * (context.size / 9)
-export const cellMargin = (context) => margin * (context.size / 9)
+export const cellSize = (context) => (1 - margin) * (context.stage.width() / 9)
+export const cellMargin = (context) => margin * (context.stage.width() / 9)
 
 export const cellX = (context, point) =>
   ((cellSize(context) + cellMargin(context)) * point.col)

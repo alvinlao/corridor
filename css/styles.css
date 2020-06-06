@@ -1,4 +1,16 @@
 body {
   background-color: #fff7f2;
   margin: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+#stage-parent {
+  width: 100%;
+}
+
+#container {
+  -webkit-box-align:center;
+  -webkit-box-pack:center;
+  display:-webkit-box;
 }

@@ -1,23 +1,26 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
+
+import { ids, turnOrder } from '../core/game'
+
+import { topMargin } from './constants'
 import { initHud } from './hud'
 import { addElements, attachLayer } from './util'
-import { ids, turnOrder } from '../core/game'
 
 // initOverlay :: Context -> Number -> [Element]
 // Initializes overlay ui elements.
 export const initOverlay = R.curry((context, numPlayers) => {
-  const hudLayer = initLayer(context)
-  const huds = initHuds(attachLayer(hudLayer, context), numPlayers)
-  addElements(huds, hudLayer)
+  const overlayLayer = initLayer(context)
+  const huds = initHuds(attachLayer(overlayLayer, context), numPlayers)
+  addElements(huds, overlayLayer)
 
   return huds
 })
 
 const initLayer = R.curry((context) => {
   const layer = new Konva.Layer({
-    x: (window.innerWidth - context.size) / 2,
-    y: context.topMargin,
+    x: 0,
+    y: topMargin,
   })
   context.stage.add(layer)
   return layer

@@ -8,30 +8,27 @@ import { store, observeStore } from '../store/store'
 import { push } from '../store/actions'
 
 import { cell } from './cell'
+import { stageWidth, stageHeight } from './constants'
 import { initBoard } from './board'
 import { initOverlay } from './overlay'
 import { initOptions } from './options'
 
 // render :: Game -> ()
 export const render = (game) => {
-  const stage = new Konva.Stage({
-      container: 'container',
-      width: window.innerWidth,
-      height: window.innerHeight
-  });
-
-  const context = {
-    stage,
-    size: 500,
-    topMargin: 150,
-  }
-
-  init(context, game)
+  const stage = initStage()
+  initUi({ stage }, game)
 }
 
-// init :: Context -> Game -> ()
-// Initializes the ui.
-const init = R.curry((context, game) => {
+// initStage :: () -> Stage
+const initStage = () => (
+  new Konva.Stage({
+    container: 'container',
+    width: stageWidth,
+    height: stageHeight,
+  }))
+
+// initUi :: Context -> Game -> ()
+const initUi = R.curry((context, game) => {
   const elements = R.unnest([
     initBoard(context, game),
     initOverlay(context, 2),

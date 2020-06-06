@@ -7,6 +7,7 @@ import { reset, undo, redo } from '../store/actions'
 import { store } from '../store/store'
 
 import { addElements, attachLayer, tweenOpacity } from './util'
+import { topMargin } from './constants'
 
 const buttonRadius = 20
 const buttonMargin = 10
@@ -36,8 +37,8 @@ export const initOptions = R.curry((context) => {
 
 const initLayer = R.curry((context) => {
   const layer = new Konva.Layer({
-    x: (window.innerWidth - context.size) / 2,
-    y: context.topMargin - (buttonRadius * 2) - optionsMargin,
+    x: 0,
+    y: topMargin - (buttonRadius * 2) - optionsMargin,
   })
   context.stage.add(layer)
   return layer
@@ -148,7 +149,7 @@ const x = (context, index, align) => {
   if (align === 'left') {
     return position
   } else {
-    return (context.size + 8 - buttonRadius) - position
+    return (context.stage.width() + 8 - buttonRadius) - position
   }
 }
 

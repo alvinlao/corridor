@@ -4,7 +4,9 @@ import { initCell } from './cell'
 import { initHwall, initVwall } from './wall'
 import { point } from '../core/point'
 import { row, playerIds, playerLocation } from '../core/game'
+
 import { addElements, attachLayer } from './util'
+import { topMargin } from './constants'
 
 // initBoard :: Context -> Game -> [Element]
 // Initializes a board ui element.
@@ -22,8 +24,8 @@ export const initBoard = R.curry((context, game) => {
 
 const initLayer = R.curry((context) => {
   const layer = new Konva.Layer({
-    x: (window.innerWidth - context.size) / 2,
-    y: context.topMargin,
+    x: 0,
+    y: topMargin,
   })
   context.stage.add(layer)
   return layer

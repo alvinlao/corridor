@@ -9,7 +9,7 @@ const rowLimit = 5
 const wallSymbolWidth = 5
 const wallSymbolHeight = 14
 const wallSymbolMargin = 4
-const hudWidth = (context, numPlayers) => (context.size / numPlayers)
+const hudWidth = (context, numPlayers) => (context.stage.width() / numPlayers)
 
 const playerWall = R.curry(
   (context, numPlayers, index, playerId, totalWalls, wallId) => (
@@ -20,7 +20,7 @@ const playerWall = R.curry(
         - ((rowLimit * (wallSymbolWidth + wallSymbolMargin)) / 2)
         + (wallId % rowLimit) * (wallSymbolMargin + wallSymbolWidth)),
       y: (
-        context.size
+        context.stage.width()
         + 25
         + ((wallSymbolHeight + rowLimit) * Math.floor(wallId / rowLimit))),
       width: wallSymbolWidth,
