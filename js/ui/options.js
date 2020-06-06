@@ -3,7 +3,7 @@ import * as Konva from 'konva'
 
 import { game } from '../core/game'
 
-import { reset, undo, redo } from '../store/actions'
+import { reset, undo, redo } from '../store/timetravel'
 import { store } from '../store/store'
 
 import { addElements, attachLayer, tweenOpacity } from './util'

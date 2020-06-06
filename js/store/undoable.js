@@ -1,4 +1,4 @@
-import { RESET, UNDO, REDO } from './actions'
+import { RESET, UNDO, REDO } from './timetravel'
 
 
 export const undoable = (reducer) => {
