@@ -9,7 +9,7 @@ import {
 } from './walllogic'
 import { point, north, south, east, west, ncoord } from './point'
 import { hwall, vwall, wallEdges } from './wall'
-import { middle } from '../util/util'
+import { middle } from '../util/iterables'
 
 const testGame = game(2)
 

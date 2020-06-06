@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import { iterate, middle } from './util'
+import { iterate, middle } from './iterables'
 
 test('iterate 0', () => {
   const actual = iterate(0, R.inc, 0)
