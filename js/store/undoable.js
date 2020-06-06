@@ -15,7 +15,7 @@ export const undoable = (reducer) => {
       case RESET:
         return {
           past: [],
-          present: action.state,
+          present: reducer(present, action),
           future: [],
         }
       case UNDO:

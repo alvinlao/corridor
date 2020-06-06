@@ -3,7 +3,7 @@ import { useMove, useWall } from '../core/turn'
 import { encodeReset, encodeUseMove, encodeUseWall } from '../serialize/turn'
 
 import { store } from './store'
-import { reset as _reset } from './timetravel'
+import { RESET } from './timetravel'
 
 
 // MOVE, WALL :: String
@@ -13,27 +13,26 @@ export const WALL = 'WALL'
 
 // reset :: Game -> Action
 // Adds a reset notation to the time travel reset action.
-export const reset = (game) =>
-  R.set(R.lensProp('notation'), encodeReset(game.numPlayers), _reset(game))
+export const reset = (game) => ({
+  type: RESET,
+  game,
+  notation: encodeReset(game.numPlayers),
+})
 
 // move :: Game -> Point -> Action
 // Creates an action that moves the active player to the provided
 // location.
-export const move = (game, point) => {
-  return {
-    type: MOVE,
-    game: useMove(game, point),
-    notation: encodeUseMove(point),
-  }
-}
+export const move = (game, point) => ({
+  type: MOVE,
+  game: useMove(game, point),
+  notation: encodeUseMove(point),
+})
 
 // placeWall :: Game -> Wall -> Action
 // Creates an action that places a wall for the active player
 // at the provided location.
-export const placeWall = (game, wall) => {
-  return {
-    type: WALL,
-    game: useWall(game, wall),
-    notation: encodeUseWall(wall),
-  }
-}
+export const placeWall = (game, wall) => ({
+  type: WALL,
+  game: useWall(game, wall),
+  notation: encodeUseWall(wall),
+})
