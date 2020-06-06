@@ -28,14 +28,14 @@ export const isValidWall =
     (game, wall) => isGameCompletable(updateBoard(putWall(wall), game)),
   ])
 
-// winners :: Game -> [PlayerId]
-// Returns players that are in their win locations.
-export const winners = (game) => 
-  R.filter(isPlayerInWinLocation(game), playerIds(game))
-
 // isGameOver :: Game -> Boolean
 // Checks whether the game is over.
 export const isGameOver = (game) => R.not(R.isEmpty(winners(game)))
+
+// winners :: Game -> [PlayerId]
+// Returns the players that are in their win locations.
+export const winners = (game) => 
+  R.filter(isPlayerInWinLocation(game), playerIds(game))
 
 // isPlayerInWinLocation :: Game -> PlayerId -> Boolean
 // Checks whether the player is in a win location.

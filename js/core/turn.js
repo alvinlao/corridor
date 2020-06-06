@@ -20,7 +20,6 @@ export const useWall = R.curry((game, wall) =>
       nextPlayersTurn))
   (game))
 
-
 // useMove :: Game -> Point -> Game
 // Moves the active player to the destination.
 export const useMove = R.curry((game, destination) =>

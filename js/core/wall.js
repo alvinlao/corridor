@@ -14,7 +14,8 @@ export const hwall = (point) => ({ points: iterate(3, east, point) })
 // Returns the points the provided wall occupies.
 export const points = R.prop('points')
 
-// edges :: Wall -> [[Point]]
+// edges :: Wall -> [Edge]
+// Edge :: [Point]
 // Returns edges that are occupied by this wall.
 export const edges = (wall) => R.zip(wall.points, R.tail(wall.points)) 
 
