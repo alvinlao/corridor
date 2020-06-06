@@ -1,7 +1,9 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
-import { playerColors, white } from './constants'
+
 import { wallsPerPlayer, numWallsAvailable } from '../core/game'
+
+import { playerColors, white } from './constants'
 
 const rowLimit = 5
 const wallSymbolWidth = 5
@@ -38,14 +40,13 @@ export const initHud = R.curry((context, numPlayers, playerId, index) => {
 
   return {
     shapes: walls,
-    bind: R.identity,
     update: update(context, numPlayers, playerId, { walls }),
   }
 })
 
 const update = R.curry(
-  (context, numPlayers, playerId, shapes, gameStatesHelper) => {
-    const game = gameStatesHelper.current()
+  (context, numPlayers, playerId, shapes, state) => {
+    const game = state.game.present
     R.addIndex(R.map)(
       (shape, index) => {
         if (numPlayers != game.numPlayers) {

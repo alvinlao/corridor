@@ -1,22 +1,16 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
+
 import { row, col } from '../core/game'
 import { point } from '../core/point'
+
+import { store, observeStore } from '../store/store'
+import { push } from '../store/actions'
+
 import { cell } from './cell'
 import { initBoard } from './board'
 import { initOverlay } from './overlay'
 import { initOptions } from './options'
-import {
-  initGameStates,
-  resetGameStates,
-  pushGameState,
-  undoGameState,
-  redoGameState,
-  currentGameState,
-  olderGameStates,
-  newerGameStates,
-  numGameStates,
-} from './gamestates'
 
 // render :: Game -> ()
 export const render = (game) => {
@@ -26,7 +20,6 @@ export const render = (game) => {
       height: window.innerHeight
   });
 
-  // const size = R.max(R.min(window.innerWidth, window.innerHeight), 500)
   const size = 500
   const margin = 0
   const context = {
@@ -42,7 +35,7 @@ export const render = (game) => {
 }
 
 
-// init :: Context -> Game -> [{k: (* -> *)}]
+// init :: Context -> Game -> [Element]
 // Initializes the ui and returns a list of the ui elements.
 const init = R.curry((context, game) => {
   const elements = R.unnest([
@@ -51,64 +44,22 @@ const init = R.curry((context, game) => {
     initOverlay(context, 4),
     initOptions(context),
   ])
-  
-  // Create a GameStatesHelper.
-  const singleton = initGameStates()
-  const gameStatesHelper = setUpGameStatesHelper(context, elements, singleton)
 
-  // Bind every ui element.
-  setUpBind(context, elements, gameStatesHelper)
+  // Trigger an update call on every ui element with the first Game.
+  store.dispatch(push(game))
 
-  // Trigger an update call on every ui element with
-  // the first Game.
-  gameStatesHelper.push(game)
+  // Set up store listener that triggers ui redraws.
+  observeStore(store, R.lensPath([]), update(context, elements))
 
   return elements
 })
 
-// update :: Context -> [Element] -> GameStates -> ()
+// update :: Context -> [Element] -> State -> ()
 // Calls each element's update function.
 const update =
-  R.curry((context, elements, gameStatesSingleton, shouldTween=true) => {
-    const gameStatesHelper =
-      setUpGameStatesHelper(context, elements, gameStatesSingleton)
+  R.curry((context, elements, state) => {
     R.forEach(
-      (f) => f(gameStatesHelper, shouldTween),
+      (f) => f(state, true),
       R.map(R.prop('update'), elements))
     context.stage.batchDraw()
   })
-
-// setUpBind :: Context -> [Element] -> GameStatesHelper -> ()
-// Calls each element's bind function.
-const setUpBind = (context, elements, gameStatesHelper) => {
-  R.forEach(
-    (bind) => bind(gameStatesHelper),
-    R.map(R.prop('bind'), elements))
-}
-
-// setUpGameStatesHelper :: Context -> [Element] -> GameStates -> GameStatesHelper
-// Creates a dictionary with methods that view and mutate a single GameStates.
-const setUpGameStatesHelper = R.curry((context, elements, singleton) => {
-  return {
-    reset: (game) => {
-      resetGameStates(singleton, game)
-      update(context, elements, singleton)
-    },
-    push: (game) => {
-      pushGameState(singleton, game)
-      update(context, elements, singleton)
-    },
-    undo: () => {
-      undoGameState(singleton)
-      update(context, elements, singleton, false)
-    },
-    redo: () => {
-      redoGameState(singleton)
-      update(context, elements, singleton, false)
-    },
-    current: () => currentGameState(singleton),
-    older: () => olderGameStates(singleton),
-    newer: () => newerGameStates(singleton),
-    size: () => numGameStates(singleton),
-  }
-})

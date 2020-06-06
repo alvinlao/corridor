@@ -1,11 +1,16 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
+
 import { updateBoard, hasWall, wallsAvailable } from '../core/game'
 import { point } from '../core/point'
 import { isValidWall } from '../core/logic'
 import { useWall } from '../core/turn'
 import { putWall } from '../core/board'
 import { hwall, vwall } from '../core/wall'
+
+import { push } from '../store/actions'
+import { store } from '../store/store'
+
 import { cellSize, cellMargin, cellX, cellY } from './cell'
 import { wallColor } from './constants'
 import { tweenOpacity, tweenFill } from './util'
@@ -81,58 +86,59 @@ export const initHwall = R.curry((context, game, point) => {
 export const initVwall = R.curry((context, game, point) => {
   const wall = vwall(point)
   const shape = vwallShape(context, point)
+  bind(context, wall, shape)
+
   return {
     shapes: [shape],
-    bind: bind(context, wall, shape),
     update: update(context, wall, shape),
   }
 })
 
 const update =
-  R.curry((context, wall, shape, gameStatesHelper, shouldTween=true) => {
-    const game = gameStatesHelper.current()
-    updateOpacity(wall, shape, game, shouldTween)
-    tweenFill(shape, wallColor, tweenDuration, shouldTween)
+  R.curry((context, wall, shape, state) => {
+    const game = state.game.present
+    updateOpacity(wall, shape, game)
+    tweenFill(shape, wallColor, tweenDuration)
     shape.zIndex(0)
   })
 
-const bind = R.curry((context, wall, shape, gameStatesHelper) => {
+const bind = R.curry((context, wall, shape) => {
   const hoverState = { isHover: false }
   shape.on(
     'click',
     () => {
-      const game = gameStatesHelper.current()
+      const game = store.getState().game.present
       if (wallsAvailable(game) && isValidWall(game, wall)) {
-        gameStatesHelper.push(useWall(game, wall))
+        store.dispatch(push(useWall(game, wall)))
       }
     })
   shape.on(
     'mouseover',
     () => {
       hoverState.isHover = true
-      setTimeout(mouseover(hoverState, context, wall, shape, gameStatesHelper), 15)
+      setTimeout(mouseover(hoverState, context, wall, shape), 15)
     })
   shape.on(
     'mouseout',
     () => {
       hoverState.isHover = false
-      update(context, wall, shape, gameStatesHelper)
+      update(context, wall, shape, store.getState())
     })
 })
 
-const updateOpacity = R.curry((wall, shape, game, shouldTween) => {
+const updateOpacity = R.curry((wall, shape, game) => {
   if (hasWall(game, wall)) {
-    tweenOpacity(shape, 1, tweenDuration, shouldTween)
+    tweenOpacity(shape, 1, tweenDuration)
   } else {
-    tweenOpacity(shape, 0, tweenDuration, shouldTween)
+    tweenOpacity(shape, 0, tweenDuration)
   }
 })
 
-const mouseover = (hoverState, context, wall, shape, gameStatesHelper) => () => {
+const mouseover = (hoverState, context, wall, shape) => () => {
   if (!hoverState.isHover) {
     return
   }
-  const game = gameStatesHelper.current()
+  const game = store.getState().game.present
   if (!wallsAvailable(game)) {
     return
   }

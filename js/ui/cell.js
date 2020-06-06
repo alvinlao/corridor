@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
+
 import {
   updateBoard,
   hasPlayer,
@@ -10,6 +11,10 @@ import { point } from '../core/point'
 import { isValidMove } from '../core/logic'
 import { useMove } from '../core/turn'
 import { putPlayer } from '../core/board'
+
+import { push } from '../store/actions'
+import { store } from '../store/store'
+
 import { cellColor, playerColors, white } from './constants'
 import { tweenOpacity, tweenFill } from './util'
 
@@ -63,33 +68,33 @@ export const initCell = R.curry((context, game, point) => {
     left: arrow(context, point).rotate(-90).listening(false),
     right: arrow(context, point).rotate(90).listening(false),
   }
+  bind(context, point, shapes)
 
   return {
     shapes: R.values(shapes),
-    bind: bind(context, point, shapes),
     update: update(context, point, shapes),
   }
 })
 
-const update = R.curry((context, point, shapes, gameStatesHelper) => {
-  const game = gameStatesHelper.current()
+const update = R.curry((context, point, shapes, state) => {
+  const game = state.game.present
   updateDirection(point, shapes, game)
   updateColor(point, shapes.bg, game)
 })
 
-const bind = R.curry((context, point, shapes, gameStatesHelper) => {
+const bind = R.curry((context, point, shapes) => {
   shapes.bg.on(
     'click',
     () => {
-      const game = gameStatesHelper.current()
+      const game = store.getState().game.present
       if (isValidMove(game, game.activePlayerId, point)) {
-        gameStatesHelper.push(useMove(game, point))
+        store.dispatch(push(useMove(game, point)))
       }
     })
   shapes.bg.on(
     'mouseover',
     () => {
-      const game = gameStatesHelper.current()
+      const game = store.getState().game.present
       if (isValidMove(game, game.activePlayerId, point)) {
         tweenOpacity(shapes.bg, 1, 120)
       }
@@ -97,7 +102,7 @@ const bind = R.curry((context, point, shapes, gameStatesHelper) => {
   shapes.bg.on(
     'mouseout',
     () => {
-      const game = gameStatesHelper.current()
+      const game = store.getState().game.present
       if (isValidMove(game, game.activePlayerId, point)) {
         tweenOpacity(shapes.bg, 0.3, 240)
       }
