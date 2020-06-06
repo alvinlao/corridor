@@ -15,8 +15,8 @@ const game = (state, action) => {
   }
 }
 
-// history :: State Notation -> Action -> State Notation
-const history = (state, action) => {
+// notation :: State Notation -> Action -> State Notation
+const notation = (state, action) => {
   switch (action.type) {
     case RESET:
     case MOVE:
@@ -29,5 +29,5 @@ const history = (state, action) => {
 
 export const app = combineReducers({
   game: undoable(game),
-  history: undoable(history),
+  notation: undoable(notation),
 })
