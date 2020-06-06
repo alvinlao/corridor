@@ -18,14 +18,12 @@ const iconOpacity = 0.8
 // Initializes options ui elements.
 export const initOptions = R.curry((context) => {
   const optionsLayer = initLayer(context)
-  const options = R.addIndex(R.map)(
-    R.call,
-    [
-      initUndoButton(attachLayer(optionsLayer, context)),
-      initRedoButton(attachLayer(optionsLayer, context)),
-      initNewGame2P(attachLayer(optionsLayer, context)),
-      initNewGame4P(attachLayer(optionsLayer, context)),
-    ])
+  const options = [
+      initUndoButton(attachLayer(optionsLayer, context), 'right', 1),
+      initRedoButton(attachLayer(optionsLayer, context), 'right', 0),
+      initNewGame4P(attachLayer(optionsLayer, context), 'left', 1),
+      initNewGame2P(attachLayer(optionsLayer, context), 'left', 0),
+  ]
   addElements(options, optionsLayer)
 
   return options
@@ -40,9 +38,9 @@ const initLayer = R.curry((context) => {
   return layer
 })
 
-// initUndoButton :: Context -> Number -> [Element]
+// initUndoButton :: Context -> Align -> Number -> [Element]
 // Creates a button that reverts the game to the previous the game state.
-const initUndoButton = R.curry((context, index) => {
+const initUndoButton = R.curry((context, align, index) => {
   const params = {
     iconSceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
@@ -55,6 +53,7 @@ const initUndoButton = R.curry((context, index) => {
       cx.lineTo(0, -height / 2)
       cx.fillStrokeShape(shape)
     },
+    align,
     fill: null,
     isAvailable: (gameStatesHelper) => gameStatesHelper.older() >= 1,
     onClick: (gameStatesHelper) => gameStatesHelper.undo,
@@ -62,9 +61,9 @@ const initUndoButton = R.curry((context, index) => {
   return buildButton(context, index, params)
 })
 
-// initRedoButton :: Context -> Number -> [Element]
+// initRedoButton :: Context -> Align -> Number -> [Element]
 // Creates a button that advances the game to the next the game state.
-const initRedoButton = R.curry((context, index) => {
+const initRedoButton = R.curry((context, align, index) => {
   const params = {
     iconSceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
@@ -77,6 +76,7 @@ const initRedoButton = R.curry((context, index) => {
       cx.lineTo(0, -height / 2)
       cx.fillStrokeShape(shape)
     },
+    align,
     fill: null,
     isAvailable: (gameStatesHelper) => gameStatesHelper.newer() >= 1,
     onClick: (gameStatesHelper) => gameStatesHelper.redo,
@@ -84,9 +84,9 @@ const initRedoButton = R.curry((context, index) => {
   return buildButton(context, index, params)
 })
 
-// initNewGame2P :: Context -> Number -> [Element]
+// initNewGame2P :: Context -> Align -> Number -> [Element]
 // Creates a button that starts a new 2 player game.
-const initNewGame2P = R.curry((context, index) => {
+const initNewGame2P = R.curry((context, align, index) => {
   const params = {
     iconSceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
@@ -99,6 +99,7 @@ const initNewGame2P = R.curry((context, index) => {
       cx.rect(-size/2, height/3 - size/2, size, size)
       cx.fillStrokeShape(shape)
     },
+    align,
     fill: "#000000",
     isAvailable: (gameStatesHelper) =>
       (gameStatesHelper.size() > 1 || gameStatesHelper.current().numPlayers != 2),
@@ -107,9 +108,9 @@ const initNewGame2P = R.curry((context, index) => {
   return buildButton(context, index, params)
 })
 
-// initNewGame4P :: Context -> Number -> [Element]
+// initNewGame4P :: Context -> Align -> Number -> [Element]
 // Creates a button that starts a new 4 player game.
-const initNewGame4P = R.curry((context, index) => {
+const initNewGame4P = R.curry((context, align, index) => {
   const params = {
     iconSceneFunc: (cx, shape) => {
       const width = shape.getAttr('width')
@@ -128,6 +129,7 @@ const initNewGame4P = R.curry((context, index) => {
       cx.rect(-size/2 + width/3, -size/2, size, size)
       cx.fillStrokeShape(shape)
     },
+    align,
     fill: "#000000",
     isAvailable: (gameStatesHelper) =>
       (gameStatesHelper.size() > 1 || gameStatesHelper.current().numPlayers != 4),
@@ -136,11 +138,20 @@ const initNewGame4P = R.curry((context, index) => {
   return buildButton(context, index, params)
 })
 
+const x = (context, index, align) => {
+  const position = (((buttonRadius * 2) + buttonMargin) * index + buttonRadius)
+  if (align === 'left') {
+    return position
+  } else {
+    return (context.size + 8 - buttonRadius) - position
+  }
+}
+
 // buildButton :: Context -> Number -> BuildButtonParams -> [Element]
 // Builds a button using the provided BuildButtonParams.
 const buildButton = R.curry((context, index, params) => {
   const icon = new Konva.Shape({
-    x: ((buttonRadius * 2) + buttonMargin) * index + buttonRadius,
+    x: x(context, index, params.align),
     y: 10,
     width: (buttonRadius * 2) * 0.5,
     height: (buttonRadius * 2) * 0.5,
@@ -195,14 +206,14 @@ const buildButton = R.curry((context, index, params) => {
     })
   })
 
-  return initButton(context, { icon, index, bind, update })
+  return initButton(context, { icon, index, bind, update }, params.align)
 })
 
-// initButton :: Context -> ButtonInfo -> [Element]
+// initButton :: Context -> ButtonInfo -> Align -> [Element]
 // Initializes a button ui.
-const initButton = R.curry((context, info) => {
+const initButton = R.curry((context, info, align) => {
   const button = new Konva.Circle({
-    x: ((buttonRadius * 2) + buttonMargin) * info.index + buttonRadius,
+    x: x(context, info.index, align),
     y: 10,
     radius: buttonRadius,
     fill: buttonFill,
