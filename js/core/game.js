@@ -3,21 +3,38 @@ import { board, putPlayer } from './board'
 import { point } from './point'
 import { edges, edgeKey, wallKey } from './wall'
 
+
 const rows = 9
 const cols = 9
-const winLocations = () => ({
+
+// row :: Number -> [Point]
+// Returns a list of points in the provided row number.
+const row = (n) => R.map(point(n), R.range(0, cols))
+
+// col :: Number -> [Point]
+// Returns a list of points in the provided col number.
+const col = (n) => R.map(point(R.__, n), R.range(0, rows))
+
+// winLocations :: {PlayerId: [Point]}
+const winLocations = {
   0: row(8),
   1: row(0),
   2: col(8),
   3: col(0),
-})
+}
+
+// initializePlayers :: [(Board -> Board)]
 const initializePlayers = [
   putPlayer(0, point(0, 4)),
   putPlayer(1, point(8, 4)),
   putPlayer(2, point(4, 0)),
   putPlayer(3, point(4, 8)),
 ]
+
+// _playerIds :: [PlayerId]
 const _playerIds = [0, 1, 2, 3]
+
+// turnOrder :: [PlayerId]
 export const turnOrder = [1, 3, 0, 2]
 
 // ids :: Number -> [PlayerId]
@@ -28,7 +45,6 @@ export const ids = (numPlayers) => R.take(numPlayers, _playerIds)
 // Creates a new game.
 export const game = (numPlayers) => ({
   board: setupPlayers(numPlayers, board()),
-  playerWinLocations: winLocations(),
   numPlayers,
   rows,
   cols,
@@ -59,16 +75,6 @@ const setupInventory = (numPlayers) => {
   (R.range(0, numPlayers))
 }
 
-// row :: Number -> [Point]
-// Returns a list of points in the provided row number.
-export const row =
-  (n) => R.map(point(n), R.range(0, cols))
-
-// col :: Number -> [Point]
-// Returns a list of points in the provided col number.
-export const col =
-  (n) => R.map(point(R.__, n), R.range(0, rows))
-
 // isPointInbounds :: Game -> Point -> Boolean
 // Checks whether the point is on the game.
 export const isPointInbounds =
@@ -88,12 +94,9 @@ export const updateBoard = R.over(R.lensProp('board'))
 // Returns all the player ids.
 export const playerIds = (game) => R.map(parseInt, R.keys(game.board.players))
 
-// playerWinLocations :: Game -> PlayerId -> [Point]
+// playerWinLocations :: PlayerId -> [Point]
 // Returns the player's win locations.
-export const playerWinLocations = R.curry((game, playerId) =>
-  R.view(
-    R.lensPath(['playerWinLocations', playerId]),
-    game))
+export const playerWinLocations = (playerId) => winLocations[playerId]
 
 // playerLocation :: Game -> PlayerId -> Point
 // Returns the player's location.

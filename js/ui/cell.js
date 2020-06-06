@@ -144,5 +144,5 @@ const playerDirection = (playerId, game) => {
     [R.includes(point(0, 4)), R.always('down')],
     [R.includes(point(4, 0)), R.always('left')],
     [R.includes(point(4, 8)), R.always('right')],
-  ])(playerWinLocations(game, playerId))
+  ])(playerWinLocations(playerId))
 }

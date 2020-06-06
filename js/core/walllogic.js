@@ -55,7 +55,7 @@ const hasPath = R.curry(R.memoizeWith(
     (R.toString(game) + ',' + R.toString(playerId) + ',' + R.toString(player)),
   (game, playerId, player) => {
     const start = playerLocation(game, playerId)
-    const stops = playerWinLocations(game, playerId)
+    const stops = playerWinLocations(playerId)
     return isReachable(game, start, stops, playerId)
   }))
 
