@@ -23,6 +23,10 @@ import { tweenOpacity, tweenFill } from './util'
 // Percentage of the cell allocated for right margin.
 const margin = 0.20
 
+// arrowOpacity :: Number
+// Opacity of the arrows.
+const arrowOpacity = 0.5
+
 // cellSize, cellMargin :: Context -> Number
 // Calculates the cell's size/margin.
 export const cellSize = (context) => (1 - margin) * (context.stage.width() / 9)
@@ -141,17 +145,16 @@ const updateColor = (point, background, game) => {
 
 // updateDirection :: Point -> Shape -> Game -> ()
 const updateDirection = (point, shapes, game) => {
-  const onOpacity = 0.3
   shapes.up.opacity(0)
   shapes.down.opacity(0)
   shapes.left.opacity(0)
   shapes.right.opacity(0)
   if (hasPlayer(game, point)) {
     R.cond([
-      [R.equals('up'), () => shapes.up.opacity(onOpacity)],
-      [R.equals('down'), () => shapes.down.opacity(onOpacity)],
-      [R.equals('left'), () => shapes.left.opacity(onOpacity)],
-      [R.equals('right'), () => shapes.right.opacity(onOpacity)],
+      [R.equals('up'), () => shapes.up.opacity(arrowOpacity)],
+      [R.equals('down'), () => shapes.down.opacity(arrowOpacity)],
+      [R.equals('left'), () => shapes.left.opacity(arrowOpacity)],
+      [R.equals('right'), () => shapes.right.opacity(arrowOpacity)],
     ])(playerDirection(getPlayer(game, point), game))
   }
 }
