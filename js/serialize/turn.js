@@ -1,12 +1,18 @@
 import * as R from 'ramda'
+import { game } from '../core/game'
 import { point } from '../core/point'
 import { vwall, hwall, isVertical } from '../core/wall'
 import { useMove, useWall } from '../core/turn'
 
-// MOVE, WALL :: TurnType
-// TurnType is a single bit.
-const MOVE = 0
-const WALL = 1
+// RESET, MOVE, WALL :: TurnType
+// TurnType is 2 bits.
+const RESET = 0
+const MOVE = 1
+const WALL = 2
+
+// encodeReset :: Point -> SerializedTurn
+// Encodes the reset into a single ASCII character.
+export const encodeReset = (numPlayers) => encodeTurn(RESET, numPlayers)
 
 // encodeUseMove :: Point -> SerializedTurn
 // Encodes the move into a single ASCII character.
@@ -44,23 +50,26 @@ export const decodeWall = (n) => {
 // encodeTurn :: TurnType -> Number -> SerializedTurn
 // Encodes the payload and turn type into a single ASCII character.
 const encodeTurn = (type, payload) =>
-  String.fromCharCode(payload << 1 | type)
+  String.fromCharCode(payload << 2 | type)
 
 // decodeTurn :: SerializedTurn -> (Game -> Game)
 // Decodes the ASCII character into a function that applies
 // the encoded move to the given Game.
 export const decodeTurn = (serializedTurn) => {
   const n = serializedTurn.charCodeAt()
-  const type = n & 1
-  const payload = n >> 1
+  const type = n & 3
+  const payload = n >> 2
 
-  return (game) => {
-    if (type === MOVE) {
-      return useMove(game, decodePoint(payload))
-    } else if (type == WALL) {
-      return useWall(game, decodeWall(payload))
-    } else {
-      return game
+  return (currentGame) => {
+    switch (type) {
+      case RESET:
+        return game(payload)
+      case MOVE:
+        return useMove(currentGame, decodePoint(payload))
+      case WALL:
+        return useWall(currentGame, decodeWall(payload))
+      default:
+        return currentGame
     }
   }
 }

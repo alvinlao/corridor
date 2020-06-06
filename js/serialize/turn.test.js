@@ -6,6 +6,7 @@ import { game, playerLocation } from '../core/game'
 import { useMove, useWall } from '../core/turn'
 
 import {
+  encodeReset,
   encodeUseMove,
   encodeUseWall,
   encodePoint,
@@ -15,6 +16,14 @@ import {
   decodeTurn,
 } from './turn'
 
+
+test.each(
+  [0, 1, 2, 3]
+)('encodeReset singleCharacter', (numPlayers) => {
+  const actual = encodeReset(numPlayers)
+
+  expect(actual.charCodeAt() <= 127)
+});
 
 test.each(
   R.map(R.call(point), R.xprod(R.range(0, 9), R.range(0, 9)))
@@ -63,6 +72,15 @@ test('lossless encodeWall horizontal', () => {
 
   expect(actualWall).toEqual(testWall)
 });
+
+test('decodeTurn useReset', () => {
+  const testGame = game(2)
+  const notation = encodeReset(testGame.numPlayers)
+
+  const actualGame = decodeTurn(notation)(null)
+
+  expect(actualGame).toEqual(testGame)
+})
 
 test('decodeTurn useMove', () => {
   const testGame = game(2)
