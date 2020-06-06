@@ -15,32 +15,43 @@ import { putPlayer } from '../core/board'
 import { push } from '../store/actions'
 import { store } from '../store/store'
 
-import { cellColor, playerColors, white } from './constants'
+import { cellBackgroundColor, playerColors, white } from './constants'
 import { tweenOpacity, tweenFill } from './util'
 
 
+// margin :: Number
+// Percentage of the cell allocated for right margin.
 const margin = 0.20
 
+// cellSize, cellMargin :: Context -> Number
+// Calculates the cell's size/margin.
 export const cellSize = (context) => (1 - margin) * (context.stage.width() / 9)
 export const cellMargin = (context) => margin * (context.stage.width() / 9)
 
+// cellX, cellY :: Context -> Point -> Number
+// Calculates the cell's x/y positions.
 export const cellX = (context, point) =>
   ((cellSize(context) + cellMargin(context)) * point.col)
 export const cellY = (context, point) =>
   ((cellSize(context) + cellMargin(context)) * (8 - point.row))
 
-const cell = (context, point) => (
+// background :: Context -> Point -> Konva.Shape
+// Creates the cell's background shape.
+const background = (context, point) => (
   new Konva.Rect({
     x: cellX(context, point),
     y: cellY(context, point),
     width: cellSize(context),
     height: cellSize(context),
-    fill: cellColor,
+    fill: cellBackgroundColor,
     strokeWidth: 0,
     cornerRadius: 5,
     opacity: 1,
   }))
 
+// arrow :: Context -> Point -> Konva.Shape
+// Creates an arrow shape used to indicate a player's
+// travel direction.
 const arrow = (context, point) => (
   new Konva.Shape({
     x: cellX(context, point) + cellSize(context) / 2,
@@ -60,9 +71,10 @@ const arrow = (context, point) => (
   }))
 
 // initCell :: Context -> Game -> Point -> [Element]
+// A cell represents a space on the game board.
 export const initCell = R.curry((context, game, point) => {
   const shapes = {
-    bg: cell(context, point),
+    bg: background(context, point),
     up: arrow(context, point).listening(false),
     down: arrow(context, point).rotate(180).listening(false),
     left: arrow(context, point).rotate(-90).listening(false),
@@ -76,12 +88,16 @@ export const initCell = R.curry((context, game, point) => {
   }
 })
 
+// update :: Context -> Point -> [Shape] -> State -> ()
+// Updates the provided shapes to reflect the given state.
 const update = R.curry((context, point, shapes, state) => {
   const game = state.game.present
   updateDirection(point, shapes, game)
   updateColor(point, shapes.bg, game)
 })
 
+// bind :: Context -> Point -> [Shape] -> ()
+// Binds event listeners to the shapes.
 const bind = R.curry((context, point, shapes) => {
   shapes.bg.on(
     'click',
@@ -109,19 +125,21 @@ const bind = R.curry((context, point, shapes) => {
     })
 })
 
-const updateColor = (point, cell, game) => {
+// updateColor :: Point -> Shape -> Game -> ()
+const updateColor = (point, background, game) => {
   if (hasPlayer(game, point)) {
-    cell.opacity(1)
-    cell.fill(playerColors[getPlayer(game, point)])
+    background.opacity(1)
+    background.fill(playerColors[getPlayer(game, point)])
   } else if (isValidMove(game, game.activePlayerId, point)) {
-    cell.opacity(0.3)
-    cell.fill(playerColors[game.activePlayerId])
+    background.opacity(0.3)
+    background.fill(playerColors[game.activePlayerId])
   } else {
-    cell.opacity(1)
-    cell.fill(cellColor)
+    background.opacity(1)
+    background.fill(cellBackgroundColor)
   }
 }
 
+// updateDirection :: Point -> Shape -> Game -> ()
 const updateDirection = (point, shapes, game) => {
   const onOpacity = 0.3
   shapes.up.opacity(0)
@@ -138,6 +156,8 @@ const updateDirection = (point, shapes, game) => {
   }
 }
 
+// playerDirection :: PlayerId -> Game -> Direction
+// Direction :: String
 const playerDirection = (playerId, game) => {
   return R.cond([
     [R.includes(point(8, 4)), R.always('up')],
