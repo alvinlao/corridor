@@ -4,11 +4,10 @@ import * as Konva from 'konva'
 import { updateBoard, hasWall, wallsAvailable } from '../core/game'
 import { point } from '../core/point'
 import { isValidWall } from '../core/logic'
-import { useWall } from '../core/turn'
 import { putWall } from '../core/board'
 import { hwall, vwall } from '../core/wall'
 
-import { push } from '../store/actions'
+import { placeWall } from '../store/actions'
 import { store } from '../store/store'
 
 import { cellSize, cellMargin, cellX, cellY } from './cell'
@@ -109,7 +108,7 @@ const bind = R.curry((context, wall, shape) => {
     () => {
       const game = store.getState().game.present
       if (wallsAvailable(game) && isValidWall(game, wall)) {
-        store.dispatch(push(useWall(game, wall)))
+        store.dispatch(placeWall(game, wall))
       }
     })
   shape.on(

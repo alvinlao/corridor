@@ -9,10 +9,9 @@ import {
 } from '../core/game'
 import { point } from '../core/point'
 import { isValidMove } from '../core/logic'
-import { useMove } from '../core/turn'
 import { putPlayer } from '../core/board'
 
-import { push } from '../store/actions'
+import { move } from '../store/actions'
 import { store } from '../store/store'
 
 import { cellBackgroundColor, playerColors, white } from './constants'
@@ -108,7 +107,7 @@ const bind = R.curry((context, point, shapes) => {
     () => {
       const game = store.getState().game.present
       if (isValidMove(game, game.activePlayerId, point)) {
-        store.dispatch(push(useMove(game, point)))
+        store.dispatch(move(game, point))
       }
     })
   shapes.bg.on(
