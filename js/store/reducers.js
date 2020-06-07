@@ -21,7 +21,7 @@ const notation = (state, action) => {
     case RESET:
     case MOVE:
     case WALL:
-      return action.notation
+      return { notation: action.notation }
     default:
       return state
   }

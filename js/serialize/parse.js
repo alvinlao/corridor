@@ -36,7 +36,7 @@ export const historyToNotations = (history) => {
     const length = notationLength(decodeChar(R.head(history)))
     return _historyToNotations(
       R.drop(length, history),
-      R.append(R.take(length, history), notations))
+      R.append({ notation: R.take(length, history) }, notations))
   }
 
   return _historyToNotations(history, [])

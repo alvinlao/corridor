@@ -22,6 +22,6 @@ export const replaceHistory = (state) => {
   const notations = R.concat(
     R.concat(state.notation.past, [state.notation.present]),
     state.notation.future)
-  const n = R.join('', notations)
+  const n = R.join('', R.map(R.prop('notation'), notations))
   history.replaceState({}, '', '?history=' + btoa(n))
 }
