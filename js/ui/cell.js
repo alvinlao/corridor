@@ -142,6 +142,7 @@ const bind = R.curry((context, point, shapes) => {
     () => {
       const game = store.getState().game.present
       if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
+        document.body.style.cursor = 'pointer';
         tweenOpacity(shapes.bg, 1, 120)
       }
     })
@@ -150,6 +151,7 @@ const bind = R.curry((context, point, shapes) => {
     () => {
       const game = store.getState().game.present
       if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
+        document.body.style.cursor = 'default';
         tweenOpacity(shapes.bg, 0.3, 240)
       }
     })

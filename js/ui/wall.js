@@ -121,6 +121,7 @@ const bind = R.curry((context, wall, shape) => {
     'mouseout',
     () => {
       hoverState.isHover = false
+      document.body.style.cursor = 'default';
       update(context, wall, shape, store.getState())
     })
 })
@@ -141,6 +142,8 @@ const mouseover = (hoverState, context, wall, shape) => () => {
   if (!wallsAvailable(game) || isGameOver(game)) {
     return
   }
+
+  document.body.style.cursor = 'pointer';
   if (isValidWall(game, wall)) {
     tweenOpacity(shape, 1, tweenDuration)
   } else {

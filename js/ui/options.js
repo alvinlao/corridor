@@ -165,12 +165,14 @@ const buildButton = R.curry((context, index, params) => {
     button.on('mouseover', () => {
       isHover = true
       if (params.isAvailable(store.getState())) {
+        document.body.style.cursor = 'pointer';
         tweenOpacity(icon, iconOpacity, 240)
         tweenOpacity(button, buttonHoverOpacity, 240)
       }
     })
     button.on('mouseout', () => {
       isHover = false
+      document.body.style.cursor = 'default';
       updateAvailability(button, store.getState())
     })
     button.on('mousedown', () => {
@@ -184,6 +186,8 @@ const buildButton = R.curry((context, index, params) => {
 
         if (params.isAvailable(store.getState())) {
           tweenOpacity(button, buttonHoverOpacity, 0)
+        } else {
+          document.body.style.cursor = 'default';
         }
       }
     })
