@@ -25,10 +25,20 @@ test('historyToGames reset and move', () => {
   expect(actualGames).toEqual([testGame, useMove(testGame, destination)])
 })
 
-test('historyToGames reset and wall', () => {
-  const history = atob('CAIoAA==')
+test('historyToGames reset and horizontal wall', () => {
+  const history = atob('CAIo')
   const testGame = game(2)
   const wall = hwall(point(4, 4))
+
+  const actualGames = historyToGames(history)
+
+  expect(actualGames).toEqual([testGame, useWall(testGame, wall)])
+})
+
+test('historyToGames reset and vertical wall', () => {
+  const history = atob('CAYo')
+  const testGame = game(2)
+  const wall = vwall(point(4, 4))
 
   const actualGames = historyToGames(history)
 

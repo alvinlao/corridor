@@ -15,8 +15,8 @@ const WALL = 2
 const turnTypeFieldMask = 3
 
 // encodeReset :: Number -> Notation Reset
-// Notation :: String (all ASCII characters)
-// Encodes the reset into a single byte.
+// Notation a :: String (all ASCII characters)
+// Encodes the reset into 1 byte.
 export const encodeReset = (numPlayers) =>
   String.fromCharCode(RESET | (numPlayers << 2))
 
@@ -24,12 +24,23 @@ export const encodeReset = (numPlayers) =>
 const decodeReset = (notation) => (notation.charCodeAt() >> 2)
 
 // encodeUseMove :: Point -> Notation Point
-// Encodes the move into a binary representation.
-export const encodeUseMove = (point) => encodeTurn(MOVE, [encodePoint(point)])
+// Encodes the move into 2 bytes.
+export const encodeUseMove = (point) =>
+  String.fromCharCode(MOVE, encodePoint(point))
 
 // encodeUseWall :: Wall -> Notation Wall
-// Encodes the wall into a binary representation.
-export const encodeUseWall = (wall) => encodeTurn(WALL, encodeWall(wall))
+// Encodes the wall into 2 bytes.
+export const encodeUseWall = (wall) =>
+  String.fromCharCode(
+    WALL | (isVertical(wall) ? 1 : 0) << 2,
+    encodePoint(R.head(wall.points)))
+
+// decodeUseWall :: Notation Wall -> Wall
+export const decodeUseWall = (notation) => {
+  const isVertical = notation.charCodeAt() >> 2
+  const topLeft = decodePoint(notation.charCodeAt(1))
+  return isVertical ? vwall(topLeft) : hwall(topLeft)
+}
 
 // encodePoint :: Point -> Number
 // Converts a point to a byte.
@@ -42,25 +53,6 @@ export const decodePoint = (n) => {
   const col = n - (row * 9)
   return point(row, col)
 }
-
-// encodeWall :: Wall -> [Number]
-// Converts a wall to two bytes.
-export const encodeWall = (wall) => ([
-  encodePoint(R.head(wall.points)),
-  (isVertical(wall) ? 1 : 0)
-])
-
-// decodeWall :: [Number] -> Point
-// Converts the provided 7 bits to a wall.
-export const decodeWall = (ns) => {
-  const topLeft = decodePoint(ns[0])
-  const isVertical = ns[1] & 1
-  return isVertical ? vwall(topLeft) : hwall(topLeft)
-}
-
-// encodeTurn :: TurnType -> [Number] -> Notation
-// Encodes the payload and turn type into a binary representation
-const encodeTurn = (type, payload) => String.fromCharCode(type, ...payload)
 
 // decodeTurn :: Notation -> (Game -> Game)
 // Decodes the binary representation into a function that applies
@@ -76,7 +68,7 @@ export const decodeTurn = (notation) => {
       case MOVE:
         return useMove(currentGame, decodePoint(payload))
       case WALL:
-        return useWall(currentGame, decodeWall([payload, notation.charCodeAt(2)]))
+        return useWall(currentGame, decodeUseWall(notation))
       default:
         return currentGame
     }

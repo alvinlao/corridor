@@ -9,10 +9,9 @@ import {
   encodeReset,
   encodeUseMove,
   encodeUseWall,
+  decodeUseWall,
   encodePoint,
   decodePoint,
-  encodeWall,
-  decodeWall,
   decodeTurn,
 } from './turn'
 
@@ -41,10 +40,9 @@ test.each(
 )('encodeUseWall vertical singleCharacter', (testPoint) => {
   const actual = encodeUseWall(vwall(testPoint))
 
-  expect(actual.length).toEqual(3)
+  expect(actual.length).toEqual(2)
   expect(actual.charCodeAt(0) <= 127).toEqual(true)
   expect(actual.charCodeAt(1) <= 127).toEqual(true)
-  expect(actual.charCodeAt(2) <= 127).toEqual(true)
 });
 
 test.each(
@@ -52,10 +50,9 @@ test.each(
 )('encodeUseWall horizontal singleCharacter', (testPoint) => {
   const actual = encodeUseWall(hwall(testPoint))
 
-  expect(actual.length).toEqual(3)
+  expect(actual.length).toEqual(2)
   expect(actual.charCodeAt(0) <= 127).toEqual(true)
   expect(actual.charCodeAt(1) <= 127).toEqual(true)
-  expect(actual.charCodeAt(2) <= 127).toEqual(true)
 });
 
 test.each(
@@ -68,20 +65,20 @@ test.each(
 
 test.each(
   R.map(([r, c]) => point(r, c), R.xprod(R.range(0, 9), R.range(0, 9)))
-)('lossless encodeWall vertical', (testPoint) => {
+)('lossless encodeUseWall vertical', (testPoint) => {
   const testWall = vwall(testPoint)
 
-  const actualWall = decodeWall(encodeWall(testWall))
+  const actualWall = decodeUseWall(encodeUseWall(testWall))
 
   expect(actualWall).toEqual(testWall)
 });
 
 test.each(
   R.map(([r, c]) => point(r, c), R.xprod(R.range(0, 9), R.range(0, 9)))
-)('lossless encodeWall horizontal', (testPoint) => {
+)('lossless encodeUseWall horizontal', (testPoint) => {
   const testWall = hwall(testPoint)
 
-  const actualWall = decodeWall(encodeWall(testWall))
+  const actualWall = decodeUseWall(encodeUseWall(testWall))
 
   expect(actualWall).toEqual(testWall)
 });
