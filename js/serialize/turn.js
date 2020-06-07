@@ -1,6 +1,6 @@
 import * as R from 'ramda'
-import { game } from '../core/game'
-import { point } from '../core/point'
+import { game, playerLocation } from '../core/game'
+import { point, north, south, east, west } from '../core/point'
 import { vwall, hwall, isVertical } from '../core/wall'
 import { useMove, useWall } from '../core/turn'
 
@@ -23,10 +23,45 @@ export const encodeReset = (numPlayers) =>
 // decodeReset :: Notation Reset -> Number
 const decodeReset = (notation) => (notation.charCodeAt() >> 2)
 
-// encodeUseMove :: Point -> Notation Point
-// Encodes the move into 2 bytes.
-export const encodeUseMove = (point) =>
-  String.fromCharCode(MOVE, encodePoint(point))
+// encodeUseMove :: Game -> Point -> Notation Point
+// Encodes the move into 1 byte.
+export const encodeUseMove = (game, point) =>
+  String.fromCharCode(MOVE | moveDirection(game, point) << 2)
+
+// moveMap :: {Number: (Point -> Point)}
+// Map of number to direction.
+const moveMap = {
+  0: north,
+  1: south,
+  2: east,
+  3: west,
+  4: R.compose(north, north),
+  5: R.compose(south, south),
+  6: R.compose(east, east),
+  7: R.compose(west, west),
+  8: R.compose(north, west),
+  9: R.compose(north, east),
+  10: R.compose(south, west),
+  11: R.compose(south, east),
+}
+
+// moveDirection :: Game -> Point -> Number
+// Maps the move to a number between 0 and 12.
+export const moveDirection = (game, point) => {
+  const location = playerLocation(game, game.activePlayerId)
+  return R.head(
+    R.reject(
+      R.isNil,
+        R.map(
+          ([k, f]) => R.equals(point, f(location)) ? parseInt(k) : null,
+          R.toPairs(moveMap))))
+}
+
+// decodeUseMove :: Game -> Notation Move -> Point
+export const decodeUseMove = (game, notation) => {
+  const location = playerLocation(game, game.activePlayerId)
+  return moveMap[notation.charCodeAt() >> 2](location)
+}
 
 // encodeUseWall :: Wall -> Notation Wall
 // Encodes the wall into 2 bytes.
@@ -58,15 +93,13 @@ export const decodePoint = (n) => {
 // Decodes the binary representation into a function that applies
 // the encoded move to the given Game.
 export const decodeTurn = (notation) => {
-  const turnType = decodeTurnType(notation.charCodeAt(0))
-  const payload = notation.charCodeAt(1)
-
+  const turnType = decodeTurnType(notation.charCodeAt())
   return (currentGame) => {
     switch (turnType) {
       case RESET:
         return game(decodeReset(notation))
       case MOVE:
-        return useMove(currentGame, decodePoint(payload))
+        return useMove(currentGame, decodeUseMove(currentGame, notation))
       case WALL:
         return useWall(currentGame, decodeUseWall(notation))
       default:
@@ -86,11 +119,11 @@ export const notationLength = (byte) => {
     case RESET:
       return 1
     case MOVE:
-      return 2
+      return 1
     case WALL:
-      return 3
+      return 2
     default:
-      return 1000
+      throw "Encountered invalid turn type: " + turnType
   }
 }
 

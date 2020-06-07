@@ -25,7 +25,7 @@ export const reset = (game) => ({
 export const move = (game, point) => ({
   type: MOVE,
   game: useMove(game, point),
-  notation: encodeUseMove(point),
+  notation: encodeUseMove(game, point),
 })
 
 // placeWall :: Game -> Wall -> Action

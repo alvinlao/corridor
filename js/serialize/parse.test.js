@@ -16,7 +16,7 @@ test('historyToGames empty history', () => {
 })
 
 test('historyToGames reset and move', () => {
-  const history = atob('CAFD')
+  const history = atob('CAU=')
   const testGame = game(2)
   const destination = south(playerLocation(testGame, testGame.activePlayerId))
 
