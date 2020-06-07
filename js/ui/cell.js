@@ -135,6 +135,7 @@ const bind = R.curry((context, point, shapes) => {
       const game = store.getState().game.present
       if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
         store.dispatch(move(game, point))
+        document.body.style.cursor = 'default';
       }
     })
   shapes.bg.on(
