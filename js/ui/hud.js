@@ -7,7 +7,7 @@ import { playerColors, white } from './constants'
 
 const rowLimit = 5
 const wallSymbolWidth = 5
-const wallSymbolHeight = 14
+const wallSymbolHeight = 18
 const wallSymbolMargin = 4
 const hudWidth = (context, numPlayers) => (context.stage.width() / numPlayers)
 
