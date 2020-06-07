@@ -8,7 +8,7 @@ import {
   playerWinLocations,
 } from '../core/game'
 import { point } from '../core/point'
-import { isValidMove } from '../core/logic'
+import { isValidMove, isGameOver, isPlayerInWinLocation } from '../core/logic'
 import { putPlayer } from '../core/board'
 
 import { move } from '../store/actions'
@@ -22,9 +22,9 @@ import { tweenOpacity, tweenFill } from './util'
 // Percentage of the cell allocated for right margin.
 const margin = 0.20
 
-// arrowOpacity :: Number
-// Opacity of the arrows.
-const arrowOpacity = 0.5
+// iconOpacity :: Number
+// Opacity of the player icon overlay.
+const iconOpacity = 0.5
 
 // cellSize, cellMargin :: Context -> Number
 // Calculates the cell's size/margin.
@@ -62,6 +62,7 @@ const arrow = (context, point) => (
     stroke: "#000000",
     width: cellSize(context) * 0.45,
     height: cellSize(context) * 0.225,
+    opacity: iconOpacity,
     sceneFunc: (cx, shape) => {
       const width = shape.getAttr('width') / 2
       const height = shape.getAttr('height')
@@ -73,15 +74,32 @@ const arrow = (context, point) => (
     },
   }))
 
+// star :: Context -> Point -> Konva.Shape
+// Creates an star shape used for the winning player.
+const star = (context, point) => (
+  new Konva.Star({
+    x: cellX(context, point) + cellSize(context) / 2,
+    y: cellY(context, point) + cellSize(context) / 2,
+    stroke: "#000000",
+    fill: "#000000",
+    width: cellSize(context),
+    height: cellSize(context),
+    opacity: iconOpacity,
+    numPoints: 5,
+    innerRadius: 10,
+    outerRadius: 5,
+  }))
+
 // initCell :: Context -> Game -> Point -> [Element]
 // A cell represents a space on the game board.
 export const initCell = R.curry((context, game, point) => {
   const shapes = {
     bg: background(context, point),
-    up: arrow(context, point).listening(false),
-    down: arrow(context, point).rotate(180).listening(false),
-    left: arrow(context, point).rotate(-90).listening(false),
-    right: arrow(context, point).rotate(90).listening(false),
+    up: arrow(context, point).listening(false).hide(),
+    down: arrow(context, point).rotate(180).listening(false).hide(),
+    left: arrow(context, point).rotate(-90).listening(false).hide(),
+    right: arrow(context, point).rotate(90).listening(false).hide(),
+    star: star(context, point).rotate(180).listening(false).hide(),
   }
   bind(context, point, shapes)
 
@@ -97,6 +115,7 @@ const update = R.curry((context, point, shapes, state) => {
   const game = state.game.present
   updateDirection(point, shapes, game)
   updateColor(point, shapes.bg, game)
+  updateWinner(point, shapes, game)
 })
 
 // bind :: Context -> Point -> [Shape] -> ()
@@ -106,7 +125,7 @@ const bind = R.curry((context, point, shapes) => {
     'click',
     () => {
       const game = store.getState().game.present
-      if (isValidMove(game, game.activePlayerId, point)) {
+      if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
         store.dispatch(move(game, point))
       }
     })
@@ -114,7 +133,7 @@ const bind = R.curry((context, point, shapes) => {
     'mouseover',
     () => {
       const game = store.getState().game.present
-      if (isValidMove(game, game.activePlayerId, point)) {
+      if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
         tweenOpacity(shapes.bg, 1, 120)
       }
     })
@@ -122,7 +141,7 @@ const bind = R.curry((context, point, shapes) => {
     'mouseout',
     () => {
       const game = store.getState().game.present
-      if (isValidMove(game, game.activePlayerId, point)) {
+      if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
         tweenOpacity(shapes.bg, 0.3, 240)
       }
     })
@@ -133,7 +152,9 @@ const updateColor = (point, background, game) => {
   if (hasPlayer(game, point)) {
     background.opacity(1)
     background.fill(playerColors[getPlayer(game, point)])
-  } else if (isValidMove(game, game.activePlayerId, point)) {
+  } else if (
+      isValidMove(game, game.activePlayerId, point)
+      && !isGameOver(game)) {
     background.opacity(0.3)
     background.fill(playerColors[game.activePlayerId])
   } else {
@@ -144,18 +165,34 @@ const updateColor = (point, background, game) => {
 
 // updateDirection :: Point -> Shape -> Game -> ()
 const updateDirection = (point, shapes, game) => {
-  shapes.up.opacity(0)
-  shapes.down.opacity(0)
-  shapes.left.opacity(0)
-  shapes.right.opacity(0)
+  resetArrow(shapes)
   if (hasPlayer(game, point)) {
     R.cond([
-      [R.equals('up'), () => shapes.up.opacity(arrowOpacity)],
-      [R.equals('down'), () => shapes.down.opacity(arrowOpacity)],
-      [R.equals('left'), () => shapes.left.opacity(arrowOpacity)],
-      [R.equals('right'), () => shapes.right.opacity(arrowOpacity)],
+      [R.equals('up'), () => shapes.up.show()],
+      [R.equals('down'), () => shapes.down.show()],
+      [R.equals('left'), () => shapes.left.show()],
+      [R.equals('right'), () => shapes.right.show()],
     ])(playerDirection(getPlayer(game, point), game))
   }
+}
+
+// updateWinner :: Point -> Shape -> Game -> ()
+const updateWinner = (point, shapes, game) => {
+  if (
+      hasPlayer(game, point) 
+      && isPlayerInWinLocation(game, getPlayer(game, point))) {
+    resetArrow(shapes)
+    shapes.star.show()
+  } else {
+    shapes.star.hide()
+  }
+}
+
+const resetArrow = (shapes) => {
+  shapes.up.hide()
+  shapes.down.hide()
+  shapes.left.hide()
+  shapes.right.hide()
 }
 
 // playerDirection :: PlayerId -> Game -> Direction

@@ -3,7 +3,7 @@ import * as Konva from 'konva'
 
 import { updateBoard, hasWall, wallsAvailable } from '../core/game'
 import { point } from '../core/point'
-import { isValidWall } from '../core/logic'
+import { isValidWall, isGameOver } from '../core/logic'
 import { putWall } from '../core/board'
 import { hwall, vwall } from '../core/wall'
 
@@ -107,7 +107,7 @@ const bind = R.curry((context, wall, shape) => {
     'click',
     () => {
       const game = store.getState().game.present
-      if (wallsAvailable(game) && isValidWall(game, wall)) {
+      if (wallsAvailable(game) && isValidWall(game, wall) && !isGameOver(game)) {
         store.dispatch(placeWall(game, wall))
       }
     })
@@ -138,7 +138,7 @@ const mouseover = (hoverState, context, wall, shape) => () => {
     return
   }
   const game = store.getState().game.present
-  if (!wallsAvailable(game)) {
+  if (!wallsAvailable(game) || isGameOver(game)) {
     return
   }
   if (isValidWall(game, wall)) {

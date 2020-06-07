@@ -39,7 +39,7 @@ export const winners = (game) =>
 
 // isPlayerInWinLocation :: Game -> PlayerId -> Boolean
 // Checks whether the player is in a win location.
-const isPlayerInWinLocation = R.curry((game, playerId) => {
+export const isPlayerInWinLocation = R.curry((game, playerId) => {
   const start = playerLocation(game, playerId)
   const stop = playerWinLocations(playerId)
   return R.includes(start, stop)
