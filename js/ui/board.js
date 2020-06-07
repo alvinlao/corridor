@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
-import { initCell } from './cell'
+import { initCell, offsetX } from './cell'
 import { initHwall, initVwall } from './wall'
 import { point } from '../core/point'
 import { row, playerIds, playerLocation } from '../core/game'
@@ -24,7 +24,7 @@ export const initBoard = R.curry((context, game) => {
 
 const initLayer = R.curry((context) => {
   const layer = new Konva.Layer({
-    x: 0,
+    x: offsetX(context),
     y: topMargin,
   })
   context.stage.add(layer)

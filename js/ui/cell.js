@@ -28,8 +28,10 @@ const iconOpacity = 0.5
 
 // cellSize, cellMargin :: Context -> Number
 // Calculates the cell's size/margin.
-export const cellSize = (context) => (1 - margin) * (context.stage.width() / 9)
-export const cellMargin = (context) => margin * (context.stage.width() / 9)
+export const cellSize = (context) => (1 - margin) * (context.stage.width() / 9.5)
+export const cellMargin = (context) => margin * (context.stage.width() / 9.5)
+export const offsetX = (context) =>
+  ((cellSize(context) + cellMargin(context))/ 4) + (cellMargin(context) / 2)
 
 // cellX, cellY :: Context -> Point -> Number
 // Calculates the cell's x/y positions.
@@ -50,6 +52,12 @@ const background = (context, point) => (
     strokeWidth: 0,
     cornerRadius: 5,
     opacity: 1,
+    shadowColor: "#000000",
+    shadowOffsetX: 0,
+    shadowOffsetY: 0,
+    shadowOpacity: 0.3,
+    shadowBlur: 10,
+    shadowEnabled: false,
   }))
 
 // arrow :: Context -> Point -> Konva.Shape
@@ -152,14 +160,17 @@ const updateColor = (point, background, game) => {
   if (hasPlayer(game, point)) {
     background.opacity(1)
     background.fill(playerColors[getPlayer(game, point)])
+    background.shadowEnabled(true)
   } else if (
       isValidMove(game, game.activePlayerId, point)
       && !isGameOver(game)) {
     background.opacity(0.3)
     background.fill(playerColors[game.activePlayerId])
+    background.shadowEnabled(false)
   } else {
     background.opacity(1)
     background.fill(cellBackgroundColor)
+    background.shadowEnabled(false)
   }
 }
 

@@ -121,11 +121,12 @@ export const initNewGame4P = R.curry((context, align, index) => {
 })
 
 const x = (context, index, align) => {
+  const offset = 20
   const position = (((buttonRadius * 2) + buttonMargin) * index + buttonRadius)
   if (align === 'left') {
-    return position
+    return position + offset
   } else {
-    return (context.stage.width() + 8 - buttonRadius) - position
+    return context.stage.width() - offset - position
   }
 }
 
