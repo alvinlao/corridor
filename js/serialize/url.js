@@ -7,8 +7,12 @@ export const loadHistory = () => {
   const base64history = new URLSearchParams(window.location.search).get('history')
   if (!base64history) {
     return ''
-  } else {
+  }
+
+  try {
     return atob(base64history)
+  } catch (e) {
+    return ''
   }
 }
 
