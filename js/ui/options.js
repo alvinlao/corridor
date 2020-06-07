@@ -9,9 +9,10 @@ import { store } from '../store/store'
 
 import { addElements, attachLayer, tweenOpacity } from './util'
 import { topMargin } from './constants'
+import { cellSize, cellMargin, offsetX } from './cell'
 
-export const buttonRadius = 20
-const buttonMargin = 10
+const buttonRadius = (context) => (cellSize(context) / 2)
+const buttonMargin = cellMargin
 const buttonFill = "#000000"
 const buttonOpacity = 0.1
 const buttonHoverOpacity = 0.3
@@ -121,8 +122,9 @@ export const initNewGame4P = R.curry((context, align, index) => {
 })
 
 const x = (context, index, align) => {
-  const offset = 20
-  const position = (((buttonRadius * 2) + buttonMargin) * index + buttonRadius)
+  const offset = offsetX(context)
+  const position =
+    (((buttonRadius(context) * 2) + buttonMargin(context)) * index + buttonRadius(context))
   if (align === 'left') {
     return position + offset
   } else {
@@ -136,8 +138,8 @@ const buildButton = R.curry((context, index, params) => {
   const icon = new Konva.Shape({
     x: x(context, index, params.align),
     y: 10,
-    width: (buttonRadius * 2) * 0.5,
-    height: (buttonRadius * 2) * 0.5,
+    width: (buttonRadius(context) * 2) * 0.5,
+    height: (buttonRadius(context) * 2) * 0.5,
     stroke: "#000000",
     strokeWidth: 2,
     opacity: iconUnavailableOpacity,
@@ -202,7 +204,7 @@ const initButton = R.curry((context, info, align) => {
   const button = new Konva.Circle({
     x: x(context, info.index, align),
     y: 10,
-    radius: buttonRadius,
+    radius: buttonRadius(context),
     fill: buttonFill,
     opacity: buttonUnavailableOpacity,
   })

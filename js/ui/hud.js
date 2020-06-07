@@ -4,7 +4,6 @@ import * as Konva from 'konva'
 import { wallsPerPlayer, numWallsAvailable } from '../core/game'
 
 import { playerColors, white } from './constants'
-import { buttonRadius } from './options'
 
 const rowLimit = 5
 const wallSymbolWidth = 5
@@ -22,8 +21,7 @@ const playerWall = R.curry(
         + (wallId % rowLimit) * (wallSymbolMargin + wallSymbolWidth)),
       y: (
         context.stage.width()
-        + (buttonRadius * 3)
-        + 25
+        + 60
         + ((wallSymbolHeight + rowLimit) * Math.floor(wallId / rowLimit))),
       width: wallSymbolWidth,
       height: wallSymbolHeight,

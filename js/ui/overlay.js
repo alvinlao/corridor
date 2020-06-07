@@ -6,7 +6,6 @@ import { ids, turnOrder } from '../core/game'
 import { topMargin } from './constants'
 import { initHud } from './hud'
 import {
-  buttonRadius,
   initUndoButton,
   initRedoButton,
   initNewGame2P,
@@ -33,7 +32,7 @@ export const initOverlay = R.curry((context) => {
 const initLayer = R.curry((context) => {
   const layer = new Konva.Layer({
     x: 0,
-    y: topMargin - (buttonRadius * 3),
+    y: topMargin - 60,
   })
   context.stage.add(layer)
   return layer
