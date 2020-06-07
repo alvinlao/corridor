@@ -10,15 +10,24 @@ const RESET = 0
 const MOVE = 1
 const WALL = 2
 
-// encodeReset :: Point -> Notation
-// Encodes the reset into a binary representation.
-export const encodeReset = (numPlayers) => encodeTurn(RESET, [numPlayers])
+// turnTypeFieldMask :: Number
+// Masks 2 bits.
+const turnTypeFieldMask = 3
 
-// encodeUseMove :: Point -> Notation
+// encodeReset :: Number -> Notation Reset
+// Notation :: String (all ASCII characters)
+// Encodes the reset into a single byte.
+export const encodeReset = (numPlayers) =>
+  String.fromCharCode(RESET | (numPlayers << 2))
+
+// decodeReset :: Notation Reset -> Number
+const decodeReset = (notation) => (notation.charCodeAt() >> 2)
+
+// encodeUseMove :: Point -> Notation Point
 // Encodes the move into a binary representation.
 export const encodeUseMove = (point) => encodeTurn(MOVE, [encodePoint(point)])
 
-// encodeUseWall :: Wall -> Notation
+// encodeUseWall :: Wall -> Notation Wall
 // Encodes the wall into a binary representation.
 export const encodeUseWall = (wall) => encodeTurn(WALL, encodeWall(wall))
 
@@ -57,13 +66,13 @@ const encodeTurn = (type, payload) => String.fromCharCode(type, ...payload)
 // Decodes the binary representation into a function that applies
 // the encoded move to the given Game.
 export const decodeTurn = (notation) => {
-  const type = notation.charCodeAt(0)
+  const turnType = decodeTurnType(notation.charCodeAt(0))
   const payload = notation.charCodeAt(1)
 
   return (currentGame) => {
-    switch (type) {
+    switch (turnType) {
       case RESET:
-        return game(payload)
+        return game(decodeReset(notation))
       case MOVE:
         return useMove(currentGame, decodePoint(payload))
       case WALL:
@@ -77,12 +86,13 @@ export const decodeTurn = (notation) => {
 // decodeChar :: Char -> Number
 export const decodeChar = (char) => char.charCodeAt()
 
-// notationLength :: TurnType -> Number
+// notationLength :: Byte -> Number
 // Given a turn type, returns the length of its corresponding notation.
-export const notationLength = (turnType) => {
+export const notationLength = (byte) => {
+  const turnType = decodeTurnType(byte)
   switch (turnType) {
     case RESET:
-      return 2
+      return 1
     case MOVE:
       return 2
     case WALL:
@@ -91,3 +101,6 @@ export const notationLength = (turnType) => {
       return 1000
   }
 }
+
+// decodeTurnType :: Byte -> TurnType
+const decodeTurnType = (byte) => byte & turnTypeFieldMask

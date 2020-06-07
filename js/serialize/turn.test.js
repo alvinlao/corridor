@@ -22,8 +22,8 @@ test.each(
 )('encodeReset singleCharacter', (numPlayers) => {
   const actual = encodeReset(numPlayers)
 
+  expect(actual.length).toEqual(1)
   expect(actual.charCodeAt(0) <= 127).toEqual(true)
-  expect(actual.charCodeAt(1) <= 127).toEqual(true)
 });
 
 test.each(
@@ -31,6 +31,7 @@ test.each(
 )('encodeUseMove singleCharacter', (testPoint) => {
   const actual = encodeUseMove(testPoint)
 
+  expect(actual.length).toEqual(2)
   expect(actual.charCodeAt(0) <= 127).toEqual(true)
   expect(actual.charCodeAt(1) <= 127).toEqual(true)
 });
@@ -40,8 +41,10 @@ test.each(
 )('encodeUseWall vertical singleCharacter', (testPoint) => {
   const actual = encodeUseWall(vwall(testPoint))
 
+  expect(actual.length).toEqual(3)
   expect(actual.charCodeAt(0) <= 127).toEqual(true)
   expect(actual.charCodeAt(1) <= 127).toEqual(true)
+  expect(actual.charCodeAt(2) <= 127).toEqual(true)
 });
 
 test.each(
@@ -49,13 +52,10 @@ test.each(
 )('encodeUseWall horizontal singleCharacter', (testPoint) => {
   const actual = encodeUseWall(hwall(testPoint))
 
-  if (actual.charCodeAt(1) > 127) {
-    console.log(testPoint)
-    console.log(actual.charCodeAt(1))
-    console.log(decodeWall(actual.charCodeAt(1)))
-  }
+  expect(actual.length).toEqual(3)
   expect(actual.charCodeAt(0) <= 127).toEqual(true)
   expect(actual.charCodeAt(1) <= 127).toEqual(true)
+  expect(actual.charCodeAt(2) <= 127).toEqual(true)
 });
 
 test.each(
