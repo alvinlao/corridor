@@ -7,7 +7,7 @@ import { point } from '../core/point'
 import { store, observeStore } from '../store/store'
 import { reset } from '../store/actions'
 
-import { replaceHistory } from '../serialize/url'
+import { replaceHistory } from '../history/url'
 
 import { cell } from './cell'
 import { stageWidth, stageHeight } from './constants'

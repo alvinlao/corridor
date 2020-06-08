@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 
-import { loadHistory } from '../serialize/url'
-import { historyToGames, historyToNotations } from '../serialize/parse'
+import { loadHistory } from '../history/url'
+import { historyToGames, historyToNotations } from '../history/parse'
 
 // hydrate :: () -> Store
 // Creates an initial store state.
