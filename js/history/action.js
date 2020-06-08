@@ -121,17 +121,3 @@ export const decodeAction = (notation) => {
 
 // decodeChar :: Char -> Number
 export const decodeChar = (char) => char.charCodeAt()
-
-// notationLength :: Byte -> Number
-// Given an action type, returns the length of its corresponding notation.
-export const notationLength = (byte) => {
-  const actionType = decodeActionType(byte)
-  switch (actionType) {
-    case MOVE:
-      return 1
-    case WALL:
-      return 1
-    default:
-      throw "Encountered invalid action type: " + actionType
-  }
-}
