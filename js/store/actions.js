@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import { useMove, useWall } from '../core/turn'
-import { encodeReset, encodeUseMove, encodeUseWall } from '../serialize/turn'
+import { encodeReset, encodeUseMove, encodeUseWall } from '../serialize/action'
 
 import { store } from './store'
 import { RESET } from './timetravel'

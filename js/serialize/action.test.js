@@ -12,9 +12,9 @@ import {
   decodeUseWall,
   encodePoint,
   decodePoint,
-  decodeTurn,
+  decodeAction,
   moveDirection,
-} from './turn'
+} from './action'
 
 
 test.each(
@@ -74,41 +74,41 @@ test.each(
   expect(actualWall).toEqual(testWall)
 });
 
-test('decodeTurn useReset', () => {
+test('decodeAction useReset', () => {
   const testGame = game(2)
   const notation = encodeReset(testGame.numPlayers)
 
-  const actualGame = decodeTurn(notation)(null)
+  const actualGame = decodeAction(notation)(null)
 
   expect(actualGame).toEqual(testGame)
 })
 
-test('decodeTurn useMove', () => {
+test('decodeAction useMove', () => {
   const testGame = game(2)
   const destination = south(playerLocation(testGame, testGame.activePlayerId))
   const notation = encodeUseMove(testGame, destination)
 
-  const actualGame = decodeTurn(notation)(testGame)
+  const actualGame = decodeAction(notation)(testGame)
 
   expect(actualGame).toEqual(useMove(testGame, destination))
 })
 
-test('decodeTurn vertical useWall', () => {
+test('decodeAction vertical useWall', () => {
   const testGame = game(2)
   const wall = vwall(point(8, 8))
   const notation = encodeUseWall(wall)
 
-  const actualGame = decodeTurn(notation)(testGame)
+  const actualGame = decodeAction(notation)(testGame)
 
   expect(actualGame).toEqual(useWall(testGame, wall))
 })
 
-test('decodeTurn horizontal useWall', () => {
+test('decodeAction horizontal useWall', () => {
   const testGame = game(2)
   const wall = hwall(point(8, 8))
   const notation = encodeUseWall(wall)
 
-  const actualGame = decodeTurn(notation)(testGame)
+  const actualGame = decodeAction(notation)(testGame)
 
   expect(actualGame).toEqual(useWall(testGame, wall))
 })

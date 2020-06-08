@@ -4,15 +4,15 @@ import { point, north, south, east, west } from '../core/point'
 import { vwall, hwall, isVertical } from '../core/wall'
 import { useMove, useWall } from '../core/turn'
 
-// RESET, MOVE, WALL :: TurnType
-// TurnType is 2 bits.
+// RESET, MOVE, WALL :: ActionType
+// ActionType is 2 bits.
 const RESET = 0
 const MOVE = 1
 const WALL = 2
 
-// turnTypeFieldMask :: Number
+// actionTypeFieldMask :: Number
 // Masks 2 bits.
-const turnTypeFieldMask = 3
+const actionTypeFieldMask = 3
 
 // encodeReset :: Number -> Notation Reset
 // Notation a :: String (all ASCII characters)
@@ -89,13 +89,13 @@ export const decodePoint = (n) => {
   return point(row, col)
 }
 
-// decodeTurn :: Notation -> (Game -> Game)
+// decodeAction :: Notation -> (Game -> Game)
 // Decodes the binary representation into a function that applies
 // the encoded move to the given Game.
-export const decodeTurn = (notation) => {
-  const turnType = decodeTurnType(notation.charCodeAt())
+export const decodeAction = (notation) => {
+  const actionType = decodeActionType(notation.charCodeAt())
   return (currentGame) => {
-    switch (turnType) {
+    switch (actionType) {
       case RESET:
         return game(decodeReset(notation))
       case MOVE:
@@ -112,10 +112,10 @@ export const decodeTurn = (notation) => {
 export const decodeChar = (char) => char.charCodeAt()
 
 // notationLength :: Byte -> Number
-// Given a turn type, returns the length of its corresponding notation.
+// Given an action type, returns the length of its corresponding notation.
 export const notationLength = (byte) => {
-  const turnType = decodeTurnType(byte)
-  switch (turnType) {
+  const actionType = decodeActionType(byte)
+  switch (actionType) {
     case RESET:
       return 1
     case MOVE:
@@ -123,9 +123,9 @@ export const notationLength = (byte) => {
     case WALL:
       return 2
     default:
-      throw "Encountered invalid turn type: " + turnType
+      throw "Encountered invalid action type: " + actionType
   }
 }
 
-// decodeTurnType :: Byte -> TurnType
-const decodeTurnType = (byte) => byte & turnTypeFieldMask
+// decodeActionType :: Byte -> ActionType
+const decodeActionType = (byte) => byte & actionTypeFieldMask

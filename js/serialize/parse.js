@@ -3,7 +3,7 @@ import * as R from 'ramda'
 import { game } from '../core/game'
 
 import { loadHistory } from './url'
-import { decodeChar, notationLength, decodeTurn } from './turn'
+import { decodeChar, notationLength, decodeAction } from './action'
 
 // historyToGames :: NotationHistory -> [Game]
 // Builds a list of game states that reflects the notation history.
@@ -15,7 +15,7 @@ export const historyToGames = (history) => {
 
     const prevGame = R.last(games)
     const length = notationLength(decodeChar(R.head(history)))
-    const decoder = decodeTurn(R.take(length, history))
+    const decoder = decodeAction(R.take(length, history))
     return _historyToGames(
       R.drop(length, history),
       R.append(decoder(prevGame), games))
