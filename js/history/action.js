@@ -16,6 +16,9 @@ const actionTypeSize = 1
 // decodeActionType :: Byte -> ActionType
 const decodeActionType = (byte) => byte & 1
 
+// decodeChar :: Char -> Number
+export const decodeChar = (char) => char.charCodeAt()
+
 // encodeInit :: Number -> Notation Init
 // Notation a :: [Byte] :: String
 // Encodes the initialize game action into 1 byte.
@@ -23,47 +26,16 @@ export const encodeInit = (numPlayers) =>
   String.fromCharCode(numPlayers)
 
 // decodeInit :: Notation Init -> Number
-export const decodeInit = (notation) => notation.charCodeAt()
+export const decodeInit = decodeChar
 
-// encodeUseMove :: Game -> Point -> Notation Point
+// encodeUseMove :: Point -> Notation Point
 // Encodes the move into 1 byte.
-export const encodeUseMove = (game, point) =>
-  String.fromCharCode(MOVE | moveDirection(game, point) << actionTypeSize)
+export const encodeUseMove = (point) =>
+  String.fromCharCode(MOVE | encodePoint(point) << actionTypeSize)
 
-// moveMap :: {Number: (Point -> Point)}
-// Map of number to direction.
-const moveMap = {
-  0: north,
-  1: south,
-  2: east,
-  3: west,
-  4: R.compose(north, north),
-  5: R.compose(south, south),
-  6: R.compose(east, east),
-  7: R.compose(west, west),
-  8: R.compose(north, west),
-  9: R.compose(north, east),
-  10: R.compose(south, west),
-  11: R.compose(south, east),
-}
-
-// moveDirection :: Game -> Point -> Number
-// Maps the move to a number between 0 and 12.
-export const moveDirection = (game, point) => {
-  const location = playerLocation(game, game.activePlayerId)
-  return R.head(
-    R.reject(
-      R.isNil,
-        R.map(
-          ([k, f]) => R.equals(point, f(location)) ? parseInt(k) : null,
-          R.toPairs(moveMap))))
-}
-
-// decodeUseMove :: Game -> Notation Move -> Point
-export const decodeUseMove = (game, notation) => {
-  const location = playerLocation(game, game.activePlayerId)
-  return moveMap[decodeChar(notation) >> actionTypeSize](location)
-}
+// decodeUseMove :: Notation Move -> Point
+export const decodeUseMove = (notation) =>
+  decodePoint(decodeChar(notation) >> actionTypeSize)
 
 // encodeUseWall :: Wall -> Notation Wall
 // Encodes the wall in 1 byte:
@@ -88,6 +60,18 @@ export const decodeUseWall = (notation) => {
   return isVertical ? vwall(topLeft) : hwall(topLeft)
 }
 
+// encodePoint :: Point -> Number
+// Converts a point to a byte.
+export const encodePoint = (point) => point.col + (point.row * 9)
+
+// decodePoint :: Number -> Point
+// Converts the provided byte to a Point.
+export const decodePoint = (n) => {
+  const row = Math.floor(n / 9)
+  const col = n - (row * 9)
+  return point(row, col)
+}
+
 // encodeWallPoint :: Point -> Number
 // Converts a wall point to a byte.
 // Unlike a normal point, a wall point is bounded 0 <= r, c <= 8
@@ -106,11 +90,11 @@ export const decodeWallPoint = (n) => {
 // Decodes the binary representation into a function that applies
 // the encoded move to the given Game.
 export const decodeAction = (notation) => {
-  const actionType = decodeActionType(notation.charCodeAt())
+  const actionType = decodeActionType(decodeChar(notation))
   return (currentGame) => {
     switch (actionType) {
       case MOVE:
-        return useMove(currentGame, decodeUseMove(currentGame, notation))
+        return useMove(currentGame, decodeUseMove(notation))
       case WALL:
         return useWall(currentGame, decodeUseWall(notation))
       default:
@@ -118,6 +102,3 @@ export const decodeAction = (notation) => {
     }
   }
 }
-
-// decodeChar :: Char -> Number
-export const decodeChar = (char) => char.charCodeAt()

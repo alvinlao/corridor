@@ -12,10 +12,11 @@ import {
   encodeUseMove,
   encodeUseWall,
   decodeUseWall,
+  encodePoint,
+  decodePoint,
   encodeWallPoint,
   decodeWallPoint,
   decodeAction,
-  moveDirection,
 } from './action'
 
 
@@ -26,6 +27,7 @@ test.each(
 
   expect(actual.length).toEqual(1)
   expect(actual.charCodeAt(0)).toBeLessThan(256)
+  expect(actual.charCodeAt(0)).toBeGreaterThanOrEqual(0)
 });
 
 test.each([
@@ -51,6 +53,7 @@ test.each([
 
   expect(actual.length).toEqual(1)
   expect(actual.charCodeAt(0)).toBeLessThan(256)
+  expect(actual.charCodeAt(0)).toBeGreaterThanOrEqual(0)
 });
 
 test.each(
@@ -60,6 +63,7 @@ test.each(
 
   expect(actual.length).toEqual(1)
   expect(actual.charCodeAt(0)).toBeLessThan(256)
+  expect(actual.charCodeAt(0)).toBeGreaterThanOrEqual(0)
 });
 
 test.each(
@@ -69,14 +73,23 @@ test.each(
 
   expect(actual.length).toEqual(1)
   expect(actual.charCodeAt(0)).toBeLessThan(256)
+  expect(actual.charCodeAt(0)).toBeGreaterThanOrEqual(0)
 });
 
 test.each([
   2, 4
-])('lossless encodeWallPoint', (numPlayers) => {
+])('lossless encodeInit', (numPlayers) => {
   const actual = decodeInit(encodeInit(numPlayers))
 
   expect(actual).toEqual(numPlayers)
+});
+
+test.each(
+  R.map(([r, c]) => point(r, c), R.xprod(R.range(0, 9), R.range(0, 9)))
+)('lossless encodePoint', (testPoint) => {
+  const actualPoint = decodePoint(encodePoint(testPoint))
+
+  expect(actualPoint).toEqual(testPoint)
 });
 
 test.each(
@@ -110,7 +123,7 @@ test.each(
 test('decodeAction useMove', () => {
   const testGame = game(2)
   const destination = south(playerLocation(testGame, testGame.activePlayerId))
-  const notation = encodeUseMove(testGame, destination)
+  const notation = encodeUseMove(destination)
 
   const actualGame = decodeAction(notation)(testGame)
 
@@ -135,22 +148,4 @@ test('decodeAction horizontal useWall', () => {
   const actualGame = decodeAction(notation)(testGame)
 
   expect(actualGame).toEqual(useWall(testGame, wall))
-})
-
-test('moveDirection north', () => {
-  const testGame = game(2)
-  const destination = north(playerLocation(testGame, testGame.activePlayerId))
-
-  const actual = moveDirection(testGame, destination)
-
-  expect(actual).toEqual(0)
-})
-
-test('moveDirection east', () => {
-  const testGame = game(2)
-  const destination = east(playerLocation(testGame, testGame.activePlayerId))
-
-  const actual = moveDirection(testGame, destination)
-
-  expect(actual).toEqual(2)
 })
