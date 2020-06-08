@@ -10,7 +10,7 @@ export const loadHistory = () => {
   }
 
   try {
-    return atob(base64history)
+    return urlDecode(base64history)
   } catch (e) {
     return ''
   }
@@ -23,5 +23,21 @@ export const replaceHistory = (state) => {
     R.concat(state.notation.past, [state.notation.present]),
     state.notation.future)
   const n = R.join('', R.map(R.prop('notation'), notations))
-  history.replaceState({}, '', '?history=' + btoa(n))
+  history.replaceState({}, '', '?history=' + urlEncode(n))
 }
+
+// urlEncode :: Binary -> String
+// Binary :: String
+// Converts binary data to a base64 url friendly string.
+const urlEncode = (unencoded) =>
+  btoa(unencoded).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/g, '')
+
+// urlDecode :: String -> Binary
+// Binary :: String
+// Converts a base64 url friendly string to binary data.
+const urlDecode = (encoded) => {
+  var encoded = encoded.replace('-', '+').replace('_', '/');
+  while (encoded.length % 4)
+    encoded += '=';
+  return atob(encoded);
+};

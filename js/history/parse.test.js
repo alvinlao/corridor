@@ -16,7 +16,7 @@ test('historyToGames empty history', () => {
 })
 
 test('historyToGames reset and move', () => {
-  const history = atob('AgQ=')
+  const history = atob('AgI')
   const testGame = game(2)
   const destination = south(playerLocation(testGame, testGame.activePlayerId))
 
@@ -26,7 +26,7 @@ test('historyToGames reset and move', () => {
 })
 
 test('historyToGames reset and horizontal wall', () => {
-  const history = atob('AgEo')
+  const history = atob('ApE')
   const testGame = game(2)
   const wall = hwall(point(4, 4))
 
@@ -36,7 +36,7 @@ test('historyToGames reset and horizontal wall', () => {
 })
 
 test('historyToGames reset and vertical wall', () => {
-  const history = atob('AgUo')
+  const history = atob('Am8')
   const testGame = game(2)
   const wall = vwall(point(4, 4))
 

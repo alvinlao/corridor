@@ -9,6 +9,10 @@ import { useMove, useWall } from '../core/turn'
 const MOVE = 0
 const WALL = 1
 
+// actionTypeSize :: Number
+// The number of bits the action type data requires.
+const actionTypeSize = 1
+
 // decodeActionType :: Byte -> ActionType
 const decodeActionType = (byte) => byte & 1
 
@@ -24,7 +28,7 @@ export const decodeInit = (notation) => notation.charCodeAt()
 // encodeUseMove :: Game -> Point -> Notation Point
 // Encodes the move into 1 byte.
 export const encodeUseMove = (game, point) =>
-  String.fromCharCode(MOVE | moveDirection(game, point) << 2)
+  String.fromCharCode(MOVE | moveDirection(game, point) << actionTypeSize)
 
 // moveMap :: {Number: (Point -> Point)}
 // Map of number to direction.
@@ -58,32 +62,43 @@ export const moveDirection = (game, point) => {
 // decodeUseMove :: Game -> Notation Move -> Point
 export const decodeUseMove = (game, notation) => {
   const location = playerLocation(game, game.activePlayerId)
-  return moveMap[notation.charCodeAt() >> 2](location)
+  return moveMap[decodeChar(notation) >> actionTypeSize](location)
 }
 
 // encodeUseWall :: Wall -> Notation Wall
-// Encodes the wall into 2 bytes.
-export const encodeUseWall = (wall) =>
-  String.fromCharCode(
-    WALL | (isVertical(wall) ? 1 : 0) << 2,
-    encodePoint(R.head(wall.points)))
+// Encodes the wall in 1 byte:
+// * The action type (1 bit).
+// * A wall can only be placed at 64 (8 x 8) locations (6 bits).
+// * A wall can be vertical or horizontal (1 bit).
+export const encodeUseWall = (wall) => {
+  const topLeft = R.head(wall.points)
+  const p = encodeWallPoint(isVertical(wall) ? south(west(topLeft)) : topLeft)
+  return String.fromCharCode(
+    WALL |
+    (isVertical(wall) ? 1 : 0) << actionTypeSize |
+    p << (actionTypeSize + 1))
+}
 
 // decodeUseWall :: Notation Wall -> Wall
 export const decodeUseWall = (notation) => {
-  const isVertical = notation.charCodeAt() >> 2
-  const topLeft = decodePoint(notation.charCodeAt(1))
+  const byte = decodeChar(notation)
+  const isVertical = (byte >> actionTypeSize) & 1
+  const rawPoint = decodeWallPoint(byte >> (actionTypeSize + 1))
+  const topLeft = isVertical ? north(east(rawPoint)) : rawPoint
   return isVertical ? vwall(topLeft) : hwall(topLeft)
 }
 
-// encodePoint :: Point -> Number
-// Converts a point to a byte.
-export const encodePoint = (point) => point.col + (point.row * 9)
+// encodeWallPoint :: Point -> Number
+// Converts a wall point to a byte.
+// Unlike a normal point, a wall point is bounded 0 <= r, c <= 8
+export const encodeWallPoint = (point) => point.col + (point.row * 8)
 
-// decodePoint :: Number -> Point
+// decodeWallPoint :: Number -> Point
 // Converts the provided byte to a Point.
-export const decodePoint = (n) => {
-  const row = Math.floor(n / 9)
-  const col = n - (row * 9)
+// Unlike a normal point, a wall point is bounded 0 <= r, c <= 8
+export const decodeWallPoint = (n) => {
+  const row = Math.floor(n / 8)
+  const col = n - (row * 8)
   return point(row, col)
 }
 
@@ -115,7 +130,7 @@ export const notationLength = (byte) => {
     case MOVE:
       return 1
     case WALL:
-      return 2
+      return 1
     default:
       throw "Encountered invalid action type: " + actionType
   }
