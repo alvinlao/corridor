@@ -1,8 +1,9 @@
 import * as R from 'ramda'
 
+import { putPlayer } from '../core/board'
 import { point, north, south, east, west } from '../core/point'
 import { vwall, hwall } from '../core/wall'
-import { game, playerLocation } from '../core/game'
+import { game, playerLocation, updateBoard } from '../core/game'
 import { useMove, useWall } from '../core/turn'
 
 import {
@@ -19,31 +20,56 @@ import {
 
 test.each(
   [0, 1, 2, 3]
-)('encodeReset encoded as ASCII', (numPlayers) => {
+)('encodeReset encoded as bytes', (numPlayers) => {
   const actual = encodeReset(numPlayers)
 
   expect(actual.length).toEqual(1)
-  expect(actual.charCodeAt(0) <= 127).toEqual(true)
+  expect(actual.charCodeAt(0) <= 255).toEqual(true)
+});
+
+test.each([
+  north,
+  south,
+  east,
+  west,
+  R.compose(north, north),
+  R.compose(south, south),
+  R.compose(east, east),
+  R.compose(west, west),
+  R.compose(north, east),
+  R.compose(north, west),
+  R.compose(south, east),
+  R.compose(south, west),
+])('encodeUseMove encoded as bytes', (direction) => {
+  const location = point(4, 4)
+  const initGame = game(4)
+  const testGame =
+    updateBoard(putPlayer(initGame.activePlayerId, location), initGame)
+
+  const actual = encodeUseMove(direction(location))
+
+  expect(actual.length).toEqual(1)
+  expect(actual.charCodeAt(0) <= 255).toEqual(true)
 });
 
 test.each(
   R.map(([r, c]) => point(r, c), R.xprod(R.range(0, 9), R.range(0, 9)))
-)('encodeUseWall vertical encoded as ASCII', (testPoint) => {
+)('encodeUseWall vertical encoded as bytes', (testPoint) => {
   const actual = encodeUseWall(vwall(testPoint))
 
   expect(actual.length).toEqual(2)
-  expect(actual.charCodeAt(0) <= 127).toEqual(true)
-  expect(actual.charCodeAt(1) <= 127).toEqual(true)
+  expect(actual.charCodeAt(0) <= 255).toEqual(true)
+  expect(actual.charCodeAt(1) <= 255).toEqual(true)
 });
 
 test.each(
   R.map(([r, c]) => point(r, c), R.xprod(R.range(0, 9), R.range(0, 9)))
-)('encodeUseWall horizontal encoded as ASCII', (testPoint) => {
+)('encodeUseWall horizontal encoded as bytes', (testPoint) => {
   const actual = encodeUseWall(hwall(testPoint))
 
   expect(actual.length).toEqual(2)
-  expect(actual.charCodeAt(0) <= 127).toEqual(true)
-  expect(actual.charCodeAt(1) <= 127).toEqual(true)
+  expect(actual.charCodeAt(0) <= 255).toEqual(true)
+  expect(actual.charCodeAt(1) <= 255).toEqual(true)
 });
 
 test.each(
