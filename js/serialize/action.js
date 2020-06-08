@@ -4,24 +4,22 @@ import { point, north, south, east, west } from '../core/point'
 import { vwall, hwall, isVertical } from '../core/wall'
 import { useMove, useWall } from '../core/turn'
 
-// RESET, MOVE, WALL :: ActionType
-// ActionType is 2 bits.
-const RESET = 0
-const MOVE = 1
-const WALL = 2
+// MOVE, WALL :: ActionType
+// ActionType is 1 bit.
+const MOVE = 0
+const WALL = 1
 
-// actionTypeFieldMask :: Number
-// Masks 2 bits.
-const actionTypeFieldMask = 3
+// decodeActionType :: Byte -> ActionType
+const decodeActionType = (byte) => byte & 1
 
-// encodeReset :: Number -> Notation Reset
-// Notation a :: String (all ASCII characters)
-// Encodes the reset into 1 byte.
-export const encodeReset = (numPlayers) =>
-  String.fromCharCode(RESET | (numPlayers << 2))
+// encodeInit :: Number -> Notation Init
+// Notation a :: [Byte] :: String
+// Encodes the initialize game action into 1 byte.
+export const encodeInit = (numPlayers) =>
+  String.fromCharCode(numPlayers)
 
-// decodeReset :: Notation Reset -> Number
-const decodeReset = (notation) => (notation.charCodeAt() >> 2)
+// decodeInit :: Notation Init -> Number
+export const decodeInit = (notation) => notation.charCodeAt()
 
 // encodeUseMove :: Game -> Point -> Notation Point
 // Encodes the move into 1 byte.
@@ -96,8 +94,6 @@ export const decodeAction = (notation) => {
   const actionType = decodeActionType(notation.charCodeAt())
   return (currentGame) => {
     switch (actionType) {
-      case RESET:
-        return game(decodeReset(notation))
       case MOVE:
         return useMove(currentGame, decodeUseMove(currentGame, notation))
       case WALL:
@@ -116,8 +112,6 @@ export const decodeChar = (char) => char.charCodeAt()
 export const notationLength = (byte) => {
   const actionType = decodeActionType(byte)
   switch (actionType) {
-    case RESET:
-      return 1
     case MOVE:
       return 1
     case WALL:
@@ -126,6 +120,3 @@ export const notationLength = (byte) => {
       throw "Encountered invalid action type: " + actionType
   }
 }
-
-// decodeActionType :: Byte -> ActionType
-const decodeActionType = (byte) => byte & actionTypeFieldMask

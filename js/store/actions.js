@@ -1,6 +1,6 @@
 import * as R from 'ramda'
 import { useMove, useWall } from '../core/turn'
-import { encodeReset, encodeUseMove, encodeUseWall } from '../serialize/action'
+import { encodeInit, encodeUseMove, encodeUseWall } from '../serialize/action'
 
 import { store } from './store'
 import { RESET } from './timetravel'
@@ -16,7 +16,7 @@ export const WALL = 'WALL'
 export const reset = (game) => ({
   type: RESET,
   game,
-  notation: encodeReset(game.numPlayers),
+  notation: encodeInit(game.numPlayers),
 })
 
 // move :: Game -> Point -> Action

@@ -7,7 +7,8 @@ import { game, playerLocation, updateBoard } from '../core/game'
 import { useMove, useWall } from '../core/turn'
 
 import {
-  encodeReset,
+  encodeInit,
+  decodeInit,
   encodeUseMove,
   encodeUseWall,
   decodeUseWall,
@@ -20,8 +21,8 @@ import {
 
 test.each(
   [0, 1, 2, 3]
-)('encodeReset encoded as bytes', (numPlayers) => {
-  const actual = encodeReset(numPlayers)
+)('encodeInit encoded as bytes', (numPlayers) => {
+  const actual = encodeInit(numPlayers)
 
   expect(actual.length).toEqual(1)
   expect(actual.charCodeAt(0) <= 255).toEqual(true)
@@ -72,6 +73,14 @@ test.each(
   expect(actual.charCodeAt(1) <= 255).toEqual(true)
 });
 
+test.each([
+  2, 4
+])('lossless encodePoint', (numPlayers) => {
+  const actual = decodeInit(encodeInit(numPlayers))
+
+  expect(actual).toEqual(numPlayers)
+});
+
 test.each(
   R.map(([r, c]) => point(r, c), R.xprod(R.range(0, 9), R.range(0, 9)))
 )('lossless encodePoint', (testPoint) => {
@@ -99,15 +108,6 @@ test.each(
 
   expect(actualWall).toEqual(testWall)
 });
-
-test('decodeAction useReset', () => {
-  const testGame = game(2)
-  const notation = encodeReset(testGame.numPlayers)
-
-  const actualGame = decodeAction(notation)(null)
-
-  expect(actualGame).toEqual(testGame)
-})
 
 test('decodeAction useMove', () => {
   const testGame = game(2)
