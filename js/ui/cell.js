@@ -4,7 +4,7 @@ import * as Konva from 'konva'
 import {
   updateBoard,
   hasPlayer,
-  getPlayer,
+  getPlayerIdOn,
   playerWinLocations,
 } from '../core/game'
 import { point } from '../core/point'
@@ -162,7 +162,7 @@ const bind = R.curry((context, point, shapes) => {
 const updateColor = (point, background, game) => {
   if (hasPlayer(game, point)) {
     background.opacity(1)
-    background.fill(playerColors[getPlayer(game, point)])
+    background.fill(playerColors[getPlayerIdOn(game, point)])
     background.shadowEnabled(true)
   } else if (
       isValidMove(game, game.activePlayerId, point)
@@ -186,7 +186,7 @@ const updateDirection = (point, shapes, game) => {
       [R.equals('down'), () => shapes.down.show()],
       [R.equals('left'), () => shapes.left.show()],
       [R.equals('right'), () => shapes.right.show()],
-    ])(playerDirection(getPlayer(game, point), game))
+    ])(playerDirection(getPlayerIdOn(game, point), game))
   }
 }
 
@@ -194,7 +194,7 @@ const updateDirection = (point, shapes, game) => {
 const updateWinner = (point, shapes, game) => {
   if (
       hasPlayer(game, point) 
-      && isPlayerInWinLocation(game, getPlayer(game, point))) {
+      && isPlayerInWinLocation(game, getPlayerIdOn(game, point))) {
     resetArrow(shapes)
     shapes.star.show()
   } else {

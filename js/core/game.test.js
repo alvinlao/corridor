@@ -1,5 +1,11 @@
 import * as R from 'ramda'
-import { game, nextPlayersTurn, wallsAvailable, consumeWall } from './game'
+import {
+  game,
+  nextPlayersTurn,
+  wallsAvailable,
+  consumeWall,
+  getPlayerIdOn,
+} from './game'
 import { player } from './player'
 import { point } from './point'
 
@@ -93,3 +99,21 @@ test('consumeWall 1 wall consumed', () => {
 
   expect(actual).toEqual(4)
 });
+
+test('getPlayerIdOn player on point', () => {
+  const testGame = game(4)
+  const location = point(0, 4)
+
+  const actual = getPlayerIdOn(testGame, location)
+
+  expect(actual).toEqual(0)
+})
+
+test('getPlayerIdOn no player on point', () => {
+  const testGame = game(4)
+  const location = point(4, 4)
+
+  const actual = getPlayerIdOn(testGame, location)
+
+  expect(actual).toBeUndefined()
+})

@@ -23,14 +23,6 @@ const winLocations = {
   3: col(0),
 }
 
-// initializePlayers :: [(Board -> Board)]
-const initializePlayers = [
-  putPlayer(0, point(0, 4)),
-  putPlayer(1, point(8, 4)),
-  putPlayer(2, point(4, 0)),
-  putPlayer(3, point(4, 8)),
-]
-
 // _playerIds :: [PlayerId]
 const _playerIds = [0, 1, 2, 3]
 
@@ -57,6 +49,14 @@ export const game = (numPlayers) => ({
 // Returns the number of walls each player starts with.
 export const wallsPerPlayer = (numPlayers) => numPlayers == 2 ? 10 : 5
 
+// initializePlayers :: [(Board -> Board)]
+const initializePlayers = [
+  putPlayer(0, point(0, 4)),
+  putPlayer(1, point(8, 4)),
+  putPlayer(2, point(4, 0)),
+  putPlayer(3, point(4, 8)),
+]
+
 // setupPlayers :: Number -> Board -> Board
 // Places all the players on the board in their staring positions.
 const setupPlayers = (numPlayers, board) => 
@@ -67,24 +67,16 @@ const setupPlayers = (numPlayers, board) =>
 
 // setupInventory :: Number -> Inventory
 // Gives each player a preset number of walls.
-const setupInventory = (numPlayers) => {
-  const numWalls = wallsPerPlayer(numPlayers)
-  return R.pipe(
-    R.map((playerId) => [playerId, numWalls]),
-    R.fromPairs)
-  (R.range(0, numPlayers))
-}
+const setupInventory = (numPlayers) =>
+  R.zipObj(ids(numPlayers), R.repeat(wallsPerPlayer(numPlayers), numPlayers))
 
 // isPointInbounds :: Game -> Point -> Boolean
 // Checks whether the point is on the game.
-export const isPointInbounds =
-  R.curry((game, point) =>
-    (
-      point.row >= 0 &&
-      point.row < game.rows &&
-      point.col >= 0 &&
-      point.col < game.cols
-    ))
+export const isPointInbounds = R.curry((game, point) => (
+  point.row >= 0 &&
+  point.row < game.rows &&
+  point.col >= 0 &&
+  point.col < game.cols))
 
 // updateBoard :: (Board -> Board) -> Game -> Game
 // Updates the board in the game.
@@ -105,13 +97,22 @@ export const playerLocation = R.curry((game, playerId) =>
     R.lensPath(['board', 'players', playerId, 'location']),
     game))
 
-// getPlayer :: Game -> Point -> PlayerId
-// Gets the player id that is on this point.
-export const getPlayer = R.curry((game, point) =>
-  R.head(
-    R.filter(
-      (playerId) => R.equals(point, playerLocation(game, playerId)),
-      playerIds(game))))
+// getPlayerIdOn :: Game -> Point -> PlayerId
+// Gets the player id that is on this point. Returns undefined if no player is
+// on the point.
+export const getPlayerIdOn = R.curry((game, point) =>
+  R.pipe(
+    playerLocations,
+    R.pickBy(R.equals(point)),
+    R.keys,
+    R.map(parseInt),
+    R.head)
+  (game))
+
+// playerLocations :: Game -> {PlayerId: Point}
+// Returns an object with each player's location.
+const playerLocations = (game) =>
+  R.zipObj(playerIds(game), R.map(playerLocation(game), playerIds(game)))
 
 // hasPlayer :: Game -> Point -> Boolean
 // Checks whether the space is occupied by a player.
