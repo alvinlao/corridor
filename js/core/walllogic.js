@@ -26,7 +26,7 @@ import { middle } from '../util/iterables'
 // isWallInbounds :: Game -> Wall -> Boolean
 // Checks whether the entire wall is on the board.
 export const isWallInbounds = R.curry((game, wall) =>
-  R.all(isPointInbounds(game), R.init(points(wall))))
+  R.all(isPointInbounds, R.init(points(wall))))
 
 // isWallSpaceOccupied :: Game -> Wall -> Boolean
 // Checks if another wall already occupies the desired space.
@@ -84,7 +84,7 @@ const isReachable = R.curry((game, start, stops, playerId) => {
 const unvisitedNeighbours = R.curry((game, point, visitedPoints) =>
   R.filter(
     R.allPass([
-      isPointInbounds(game),
+      isPointInbounds,
       R.complement(R.includes(R.__, visitedPoints)),
     ]),
     unblockedNeighbours(game, point)))

@@ -12,9 +12,8 @@ import { ncompass, scompass, ecompass, wcompass } from './point'
 export const moves =
   R.memoizeWith(
     (game, playerId) => R.toString(game) + R.toString(playerId),
-    ((game, playerId) => {
-      const point = playerLocation(game, playerId)
-      return R.pipe(
+    (game, playerId) =>
+      R.pipe(
         R.juxt([
           movesInFront(ncompass),
           movesInFront(scompass),
@@ -23,8 +22,7 @@ export const moves =
         ]),
         R.unnest,
         R.uniq)
-      (game, point)
-    }))
+      (game, playerLocation(game, playerId)))
 
 // movesInFront :: Compass -> Game -> Point -> [Point]
 // Returns a list of locations in front of the player they can move to.
@@ -41,14 +39,14 @@ const movesInFront = R.curry((compass, game, point) =>
       R.when(canJumpLeft(compass, game), R.compose(compass.up, compass.left)),
       R.when(canJumpRight(compass, game), R.compose(compass.up, compass.right)),
     ]),
-    R.reject(R.equals(point)),
-  )(point))
+    R.reject(R.equals(point)))
+  (point))
 
 // canMoveUp :: Compass -> Game -> Point -> Boolean
 // Checks whether a player can move into the space above them.
 const canMoveUp = R.curry((compass, game, point) =>
   R.allPass([
-    R.compose(isPointInbounds(game), compass.up),
+    R.compose(isPointInbounds, compass.up),
     unblocked(game, compass.upedge), 
     R.complement(R.compose(hasPlayer(game), compass.up)),
   ])(point))
@@ -57,27 +55,27 @@ const canMoveUp = R.curry((compass, game, point) =>
 // Checks whether a player can jump into the space 2 above them.
 const canJumpUp = R.curry((compass, game, point) =>
   R.allPass([
-    R.compose(isPointInbounds(game), R.compose(compass.up, compass.up)),
-    unblocked(game, compass.upedge), 
-    R.compose(unblocked(game, compass.upedge), compass.up),
     R.compose(hasPlayer(game), compass.up),
     R.complement(R.compose(hasPlayer(game), compass.up, compass.up)),
+    R.compose(isPointInbounds, R.compose(compass.up, compass.up)),
+    unblocked(game, compass.upedge), 
+    R.compose(unblocked(game, compass.upedge), compass.up),
   ])(point))
 
 // canJumpLeft :: Compass -> Game -> Point -> Boolean
 // Checks whether a player can jump into the left diagonal space above them.
 const canJumpLeft = R.curry((compass, game, point) =>
   R.allPass([
-    R.compose(isPointInbounds(game), R.compose(compass.up, compass.left)),
-    unblocked(game, compass.upedge), 
-    R.compose(unblocked(game, compass.leftedge), compass.up),
     R.compose(hasPlayer(game), compass.up),
+    R.compose(unblocked(game, compass.leftedge), compass.up),
     R.complement(R.compose(hasPlayer(game), compass.up, compass.left)),
+    R.compose(isPointInbounds, R.compose(compass.up, compass.left)),
+    unblocked(game, compass.upedge), 
     R.anyPass([
       R.compose(hasPlayer(game), R.compose(compass.up, compass.up)),
       R.complement(R.compose(unblocked(game, compass.upedge), compass.up)),
       R.compose(
-        R.complement(isPointInbounds(game)),
+        R.complement(isPointInbounds),
         R.compose(compass.up, compass.up)),
     ]),
   ])(point))
@@ -86,16 +84,16 @@ const canJumpLeft = R.curry((compass, game, point) =>
 // Checks whether a player can jump into the right diagonal space above them.
 const canJumpRight = R.curry((compass, game, point) =>
   R.allPass([
-    R.compose(isPointInbounds(game), R.compose(compass.up, compass.right)),
-    unblocked(game, compass.upedge), 
-    R.compose(unblocked(game, compass.rightedge), compass.up),
     R.compose(hasPlayer(game), compass.up),
+    R.compose(unblocked(game, compass.rightedge), compass.up),
     R.complement(R.compose(hasPlayer(game), compass.up, compass.right)),
+    R.compose(isPointInbounds, R.compose(compass.up, compass.right)),
+    unblocked(game, compass.upedge), 
     R.anyPass([
       R.compose(hasPlayer(game), R.compose(compass.up, compass.up)),
       R.complement(R.compose(unblocked(game, compass.upedge), compass.up)),
       R.compose(
-        R.complement(isPointInbounds(game)),
+        R.complement(isPointInbounds),
         R.compose(compass.up, compass.up)),
     ]),
   ])(point))

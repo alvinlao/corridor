@@ -7,6 +7,7 @@ import {
   wallsAvailable,
   consumeWall,
   getPlayerIdOn,
+  hasPlayer,
 } from './game'
 import { player } from './player'
 import { point } from './point'
@@ -47,46 +48,41 @@ test('game 4 player', () => {
 });
 
 test('isPointInbounds yes', () => {
-  const testGame = game(2)
   const p = point(1, 1)
 
-  const actual = isPointInbounds(testGame, p)
+  const actual = isPointInbounds(p)
 
   expect(actual).toEqual(true)
 })
 
 test('isPointInbounds row bottom out of bounds', () => {
-  const testGame = game(2)
   const p = point(-1, 1)
 
-  const actual = isPointInbounds(testGame, p)
+  const actual = isPointInbounds(p)
 
   expect(actual).toEqual(false)
 })
 
 test('isPointInbounds row top out of bounds', () => {
-  const testGame = game(2)
   const p = point(10, 1)
 
-  const actual = isPointInbounds(testGame, p)
+  const actual = isPointInbounds(p)
 
   expect(actual).toEqual(false)
 })
 
 test('isPointInbounds col left out of bounds', () => {
-  const testGame = game(2)
   const p = point(1, -1)
 
-  const actual = isPointInbounds(testGame, p)
+  const actual = isPointInbounds(p)
 
   expect(actual).toEqual(false)
 })
 
 test('isPointInbounds col right out of bounds', () => {
-  const testGame = game(2)
   const p = point(1, 10)
 
-  const actual = isPointInbounds(testGame, p)
+  const actual = isPointInbounds(p)
 
   expect(actual).toEqual(false)
 })
@@ -179,4 +175,22 @@ test('getPlayerIdOn no player on point', () => {
   const actual = getPlayerIdOn(testGame, location)
 
   expect(actual).toBeUndefined()
+})
+
+test('hasPlayer yes', () => {
+  const testGame = game(4)
+  const location = point(0, 4)
+
+  const actual = hasPlayer(testGame, location)
+
+  expect(actual).toEqual(true)
+})
+
+test('hasPlayer no', () => {
+  const testGame = game(4)
+  const location = point(0, 0)
+
+  const actual = hasPlayer(testGame, location)
+
+  expect(actual).toEqual(false)
 })
