@@ -118,9 +118,10 @@ const playerLocations = (game) =>
 // Checks whether the space is occupied by a player.
 export const hasPlayer = R.curry((game, point) =>
   R.pipe(
+    playerIds,
     R.map(playerLocation(game)),
     R.includes(point))
-  (playerIds(game)))
+  (game))
 
 // hasWall :: Game -> Wall -> Boolean
 // Checks whether the wall exists in the game.

@@ -1,6 +1,8 @@
 import * as R from 'ramda'
 import {
   game,
+  isPointInbounds,
+  playerIds,
   nextPlayersTurn,
   wallsAvailable,
   consumeWall,
@@ -43,6 +45,67 @@ test('game 4 player', () => {
   })
   expect(actualGame.activePlayerId).toEqual(1)
 });
+
+test('isPointInbounds yes', () => {
+  const testGame = game(2)
+  const p = point(1, 1)
+
+  const actual = isPointInbounds(testGame, p)
+
+  expect(actual).toEqual(true)
+})
+
+test('isPointInbounds row bottom out of bounds', () => {
+  const testGame = game(2)
+  const p = point(-1, 1)
+
+  const actual = isPointInbounds(testGame, p)
+
+  expect(actual).toEqual(false)
+})
+
+test('isPointInbounds row top out of bounds', () => {
+  const testGame = game(2)
+  const p = point(10, 1)
+
+  const actual = isPointInbounds(testGame, p)
+
+  expect(actual).toEqual(false)
+})
+
+test('isPointInbounds col left out of bounds', () => {
+  const testGame = game(2)
+  const p = point(1, -1)
+
+  const actual = isPointInbounds(testGame, p)
+
+  expect(actual).toEqual(false)
+})
+
+test('isPointInbounds col right out of bounds', () => {
+  const testGame = game(2)
+  const p = point(1, 10)
+
+  const actual = isPointInbounds(testGame, p)
+
+  expect(actual).toEqual(false)
+})
+
+test('playerIds 2 player game', () => {
+  const testGame = game(2)
+
+  const actual = playerIds(testGame)
+
+  expect(actual).toEqual([0, 1])
+})
+
+test('playerIds 4 player game', () => {
+  const testGame = game(4)
+
+  const actual = playerIds(testGame)
+
+  expect(actual).toEqual([0, 1, 2, 3])
+})
 
 test('nextPlayersTurn next player', () => {
   const testGame = game(4)
