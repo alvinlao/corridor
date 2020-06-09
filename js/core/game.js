@@ -2,6 +2,7 @@
 import { board, putPlayer } from './board'
 import { point } from './point'
 import { edges, edgeKey, wallKey } from './wall'
+import { cycle } from '../util/iterables'
 
 
 const rows = 9
@@ -26,9 +27,6 @@ const winLocations = {
 // _playerIds :: [PlayerId]
 const _playerIds = [0, 1, 2, 3]
 
-// turnOrder :: [PlayerId]
-export const turnOrder = [1, 3, 0, 2]
-
 // ids :: Number -> [PlayerId]
 // Returns a list of player ids for the given number of players.
 export const ids = (numPlayers) => R.take(numPlayers, _playerIds)
@@ -44,6 +42,17 @@ export const game = (numPlayers) => ({
   activePlayerId: firstPlayerId(numPlayers),
   wallsPerPlayer: wallsPerPlayer(numPlayers),
 })
+
+
+// turnOrder :: [PlayerId] -> [PlayerId]
+// Given a list of player ids, returns them in turn order.
+export const turnOrder = (playerIds) =>
+  R.filter(R.includes(R.__, playerIds), [1, 3, 0, 2])
+
+// firstPlayerId :: Number -> PlayerId
+// Returns the player id that goes first.
+const firstPlayerId = (numPlayers) =>
+  R.head(turnOrder(ids(numPlayers)))
 
 // wallsPerPlayer :: Number -> Number
 // Returns the number of walls each player starts with.
@@ -143,12 +152,14 @@ export const unblocked = R.curry((game, pointToEdge, point) =>
 export const nextPlayersTurn = (game) =>
   R.over(
     R.lensProp('activePlayerId'),
-    (playerId) => {
-      const order = R.filter(R.includes(R.__, playerIds(game)), turnOrder)
-      const nextPlayerIndex =
-        R.inc(R.indexOf(playerId, order)) % game.numPlayers
-      return R.nth(nextPlayerIndex, order)
-    },
+    (playerId) =>
+      R.pipe(
+        playerIds,
+        turnOrder,
+        cycle(2),
+        R.dropWhile(R.complement(R.equals(playerId))),
+        R.nth(1))
+      (game),
     game)
 
 // numWallsAvailable :: Game -> PlayerId -> Number
@@ -178,6 +189,3 @@ const gameWallEdges = R.memoizeWith(
         R.unnest,
         R.map(edgeKey))
       (game)))
-
-const firstPlayerId = (numPlayers) =>
-  R.head(R.filter(R.includes(R.__, R.take(numPlayers, _playerIds)), turnOrder))

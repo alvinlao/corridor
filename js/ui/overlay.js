@@ -43,7 +43,7 @@ const initLayer = R.curry((context) => {
 const initHuds = R.curry((context, numPlayers) =>
   R.addIndex(R.map)(
     initHud(context, numPlayers),
-    R.filter(R.includes(R.__, ids(numPlayers)), turnOrder)))
+    turnOrder(ids(numPlayers))))
 
 const initOptions = (context) => [
   initUndoButton(context, 'right', 1),
