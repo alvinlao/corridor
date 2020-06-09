@@ -24,7 +24,7 @@ export const useWall = R.curry((game, wall) =>
 // Moves the active player to the destination.
 export const useMove = R.curry((game, destination) =>
   R.when(
-    isValidMove(R.__, game.activePlayerId, destination),
+    isValidMove(R.__, destination),
     R.pipe(
       updateBoard(putPlayer(game.activePlayerId, destination)),
       nextPlayersTurn))

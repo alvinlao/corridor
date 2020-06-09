@@ -133,7 +133,7 @@ const bind = R.curry((context, point, shapes) => {
     'click',
     () => {
       const game = store.getState().game.present
-      if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
+      if (isValidMove(game, point) && !isGameOver(game)) {
         store.dispatch(move(game, point))
         document.body.style.cursor = 'default';
       }
@@ -142,7 +142,7 @@ const bind = R.curry((context, point, shapes) => {
     'mouseover',
     () => {
       const game = store.getState().game.present
-      if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
+      if (isValidMove(game, point) && !isGameOver(game)) {
         document.body.style.cursor = 'pointer';
         tweenOpacity(shapes.bg, 1, 120)
       }
@@ -151,7 +151,7 @@ const bind = R.curry((context, point, shapes) => {
     'mouseout',
     () => {
       const game = store.getState().game.present
-      if (isValidMove(game, game.activePlayerId, point) && !isGameOver(game)) {
+      if (isValidMove(game, point) && !isGameOver(game)) {
         document.body.style.cursor = 'default';
         tweenOpacity(shapes.bg, 0.3, 240)
       }
@@ -165,7 +165,7 @@ const updateColor = (point, background, game) => {
     background.fill(playerColors[getPlayerIdOn(game, point)])
     background.shadowEnabled(true)
   } else if (
-      isValidMove(game, game.activePlayerId, point)
+      isValidMove(game, point)
       && !isGameOver(game)) {
     background.opacity(0.3)
     background.fill(playerColors[game.activePlayerId])

@@ -105,11 +105,7 @@ export const getPlayerIdOn = R.curry((game, point) =>
 // hasPlayer :: Game -> Point -> Boolean
 // Checks whether the space is occupied by a player.
 export const hasPlayer = R.curry((game, point) =>
-  R.pipe(
-    playerLocations,
-    R.pickBy(R.equals(point)),
-    R.complement(R.isEmpty))
-  (game))
+  R.not(R.isNil(getPlayerIdOn(game, point))))
 
 // playerLocations :: Game -> {PlayerId: Point}
 // Returns an object with each player's location.
@@ -135,13 +131,12 @@ export const edgeOccupied = R.curry((game, edge) =>
 // Returns a list of wall edges in the game.
 const gameWallEdges = R.memoizeWith(
   (game) => R.map(wallKey, game.board.walls),
-  (game) =>
-    new Set(R.pipe(R.chain(edges), R.map(edgeKey))(game.board.walls)))
+  (game) => new Set(R.pipe(R.chain(edges), R.map(edgeKey))(game.board.walls)))
 
 // wallsAvailable :: Game -> Boolean
 // Checks if the active player has walls available.
 export const wallsAvailable = (game) =>
-  R.gt(numWallsAvailable(game, game.activePlayerId), 0)
+  numWallsAvailable(game, game.activePlayerId) > 0
 
 // numWallsAvailable :: Game -> PlayerId -> Number
 // Returns the number of walls the player has available.

@@ -14,10 +14,10 @@ import {
 } from './walllogic'
 
 
-// isValidMove :: Game -> PlayerId -> Point -> Boolean
-// Checks whether the provided move is valid for the player.
-export const isValidMove = R.curry((game, playerId, location) =>
-  R.includes(location, moves(game, playerId)))
+// isValidMove :: Game -> Point -> Boolean
+// Checks whether the provided move is valid for the active player.
+export const isValidMove = R.curry((game, location) =>
+  R.includes(location, moves(game, game.activePlayerId)))
 
 // isValidWall :: Game -> Wall -> Boolean
 // Checks whether the provided wall can be placed.

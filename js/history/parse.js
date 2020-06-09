@@ -6,30 +6,30 @@ import { loadHistory } from './url'
 import { decodeChar, decodeAction, decodeInit } from './action'
 
 // historyToGames :: NotationHistory -> [Game]
-// Builds a list of game states that reflects the notation history.
+// Decodes the history into a list of Games.
 export const historyToGames = (history) => {
+  if (!history) {
+    return []
+  }
+
   const _historyToGames = (history, games) => {
     if (!history) {
       return games
     }
 
     const prevGame = R.last(games)
-    const decoder = decodeAction(R.take(1, history))
-    return _historyToGames(
-      R.drop(1, history),
-      R.append(decoder(prevGame), games))
+    const action = decodeAction(R.head(history))
+    return _historyToGames(R.tail(history), R.append(action(prevGame), games))
   }
 
-  if (!history) {
-    return []
-  }
+  // The first byte always contains the initialization data.
   const initialGame = game(decodeInit(R.head(history)))
   return _historyToGames(R.tail(history), [initialGame])
 }
 
 
 // historyToNotations :: NotationHistory -> [Notation]
-// Builds a list of notations that reflects the notation history.
+// Decodes the history into a list of notations.
 export const historyToNotations = (history) => {
   const _historyToNotations = (history, notations) => {
     if (!history) {
@@ -37,8 +37,7 @@ export const historyToNotations = (history) => {
     }
 
     return _historyToNotations(
-      R.drop(1, history),
-      R.append({ notation: R.take(1, history) }, notations))
+      R.tail(history), R.append({ notation: R.head(history) }, notations))
   }
 
   return _historyToNotations(history, [])
