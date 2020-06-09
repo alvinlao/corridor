@@ -1,7 +1,6 @@
 import * as R from 'ramda'
 import {
   playerWinLocations,
-  players,
   playerLocation,
   isPointInbounds,
   unblocked,
@@ -16,10 +15,6 @@ import {
   sedge,
   eedge,
   wedge,
-  ncoord,
-  scoord,
-  ecoord,
-  wcoord,
 } from './point'
 import { middle } from '../util/iterables'
 
