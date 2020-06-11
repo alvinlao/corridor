@@ -7,7 +7,7 @@ import { undo, redo } from '../store/timetravel'
 import { reset } from '../store/actions'
 import { store } from '../store/store'
 
-import { addElements, attachLayer, tweenOpacity } from './util'
+import { tweenOpacity } from './animation'
 import { topMargin } from './constants'
 import { cellSize, cellMargin, offsetX } from './cell'
 

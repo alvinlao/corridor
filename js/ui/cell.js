@@ -15,7 +15,7 @@ import { move } from '../store/actions'
 import { store } from '../store/store'
 
 import { cellBackgroundColor, playerColors, white } from './constants'
-import { tweenOpacity, tweenFill } from './util'
+import { tweenOpacity, tweenFill } from './animation'
 
 
 // margin :: Number

@@ -5,38 +5,28 @@ import { initHwall, initVwall } from './wall'
 import { point } from '../core/point'
 import { row, playerIds, playerLocation } from '../core/game'
 
-import { addElements, attachLayer } from './util'
+import { initLayer } from './layer'
 import { topMargin } from './constants'
 
 // initBoard :: Context -> Game -> [Element]
-// Initializes a board ui element.
-export const initBoard = R.curry((context, game) => {
-  const boardLayer = initLayer(context)
+// Initializes board ui elements.
+export const initBoard = R.curry((context, game) =>
+  initLayer(
+    context,
+    boardLayer(context),
+    R.concat(initCells(context, game), initWalls(context, game))))
 
-  const cells = initCells(attachLayer(boardLayer, context), game)
-  addElements(cells, boardLayer)
-
-  const walls = initWalls(attachLayer(boardLayer, context), game)
-  addElements(walls, boardLayer)
-
-  return R.concat(cells, walls)
-})
-
-const initLayer = R.curry((context) => {
-  const layer = new Konva.Layer({
+// boardLayer :: Context -> Konva.Layer
+const boardLayer = (context) => (
+  new Konva.Layer({
     x: offsetX(context),
     y: topMargin,
-  })
-  context.stage.add(layer)
-  return layer
-})
+  }))
 
 // initCells :: Context -> Game -> [Element]
 // Initializes cell ui elements.
 const initCells = R.curry((context, game) =>
-  R.map(
-    initCell(context, game),
-    flatMatrix(9, 9, 0)))
+  R.map(initCell(context, game), flatMatrix(9, 9, 0)))
 
 // initWalls :: Context -> Game -> [Element]
 // Initializes wall ui elements.

@@ -11,32 +11,25 @@ import {
   initNewGame2P,
   initNewGame4P,
 } from './options'
-import { addElements, attachLayer } from './util'
+import { initLayer } from './layer'
 
 // initOverlay :: Context -> [Element]
 // Initializes overlay ui elements.
-export const initOverlay = R.curry((context) => {
-  const overlayLayer = initLayer(context)
-  
-  const hud2Player = initHuds(attachLayer(overlayLayer, context), 2)
-  const hud4Player = initHuds(attachLayer(overlayLayer, context), 4)
-  addElements(hud2Player, overlayLayer)
-  addElements(hud4Player, overlayLayer)
+export const initOverlay = (context) =>
+  initLayer(
+    context,
+    overlayLayer(context),
+    R.unnest([
+      initHuds(context, 2),
+      initHuds(context, 4),
+      initOptions(context),
+    ]))
 
-  const options = initOptions(attachLayer(overlayLayer, context))
-  addElements(options, overlayLayer)
-
-  return R.unnest([hud2Player, hud4Player, options])
-})
-
-const initLayer = R.curry((context) => {
-  const layer = new Konva.Layer({
+const overlayLayer = (context) => (
+  new Konva.Layer({
     x: 0,
     y: topMargin - 60,
-  })
-  context.stage.add(layer)
-  return layer
-})
+  }))
 
 // initHuds :: Context -> Number -> [Element]
 // Initializes hud ui elements.

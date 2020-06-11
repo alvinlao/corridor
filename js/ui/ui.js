@@ -11,8 +11,8 @@ import { replaceHistory } from '../history/url'
 
 import { cell } from './cell'
 import { stageWidth, stageHeight } from './constants'
-import { initBoard } from './board'
-import { initOverlay } from './overlay'
+import { initBoard } from './boardlayer'
+import { initOverlay } from './overlaylayer'
 import { initOptions } from './options'
 
 // render :: Game -> ()

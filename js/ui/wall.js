@@ -12,7 +12,7 @@ import { store } from '../store/store'
 
 import { cellSize, cellMargin, cellX, cellY } from './cell'
 import { wallColor } from './constants'
-import { tweenOpacity, tweenFill } from './util'
+import { tweenOpacity, tweenFill } from './animation'
 
 
 const invalidWallColor = "#FB3640"
@@ -148,6 +148,6 @@ const mouseover = (hoverState, context, wall, shape) => () => {
     tweenOpacity(shape, 1, tweenDuration)
   } else {
     shape.opacity(0.5).fill(invalidWallColor).zIndex(127)
-    context.layer.draw()
+    shape.getParent().draw()
   }
 }
