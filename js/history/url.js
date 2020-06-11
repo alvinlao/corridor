@@ -19,9 +19,11 @@ export const loadHistory = () => {
 // replaceHistory :: State -> ()
 // Adds the current game history into the browser history.
 export const replaceHistory = (state) => {
-  const notations = R.concat(
-    R.concat(state.notation.past, [state.notation.present]),
-    state.notation.future)
+  const notations = R.unnest([
+    state.notation.past,
+    [state.notation.present],
+    state.notation.future,
+  ])
   const n = R.join('', R.map(R.prop('notation'), notations))
   history.replaceState({}, '', '?history=' + urlEncode(n))
 }
