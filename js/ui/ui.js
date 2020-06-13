@@ -6,6 +6,7 @@ import { point } from '../core/point'
 
 import { store, observeStore } from '../store/store'
 import { reset } from '../store/actions'
+import { present } from '../store/undoable'
 
 import { replaceHistory } from '../history/url'
 
@@ -36,7 +37,7 @@ const initUi = R.curry((context, game) => {
     initOverlay(context),
   ])
 
-  if (R.isNil(store.getState().game.present)) {
+  if (R.isNil(present(store.getState().game))) {
     // Start a new game.
     store.dispatch(reset(game))
   }

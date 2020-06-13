@@ -9,6 +9,7 @@ import { hwall, vwall } from '../core/wall'
 
 import { placeWall } from '../store/actions'
 import { store } from '../store/store'
+import { present } from '../store/undoable'
 
 import { cellSize, cellMargin, cellX, cellY } from './cell'
 import { wallColor } from './constants'
@@ -95,7 +96,7 @@ export const initVwall = R.curry((context, game, point) => {
 
 const update =
   R.curry((context, wall, shape, state) => {
-    const game = state.game.present
+    const game = present(state.game)
     updateOpacity(wall, shape, game)
     tweenFill(shape, wallColor, tweenDuration)
   })
@@ -105,7 +106,7 @@ const bind = R.curry((context, wall, shape) => {
   shape.on(
     'click',
     () => {
-      const game = store.getState().game.present
+      const game = present(store.getState().game)
       if (wallsAvailable(game) && isValidWall(game, wall) && !isGameOver(game)) {
         store.dispatch(placeWall(game, wall))
       }
@@ -137,7 +138,7 @@ const mouseover = (hoverState, context, wall, shape) => () => {
   if (!hoverState.isHover) {
     return
   }
-  const game = store.getState().game.present
+  const game = present(store.getState().game)
   if (!wallsAvailable(game) || isGameOver(game)) {
     return
   }

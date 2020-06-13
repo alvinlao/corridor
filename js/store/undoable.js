@@ -1,49 +1,51 @@
+import * as R from 'ramda'
 import { RESET, UNDO, REDO } from './timetravel'
 
+import { decUntil, incUntil } from '../util/math'
 
-export const undoable = (reducer) => {
-  const initialState = {
-    past: [],
-    present: reducer(undefined, {}),
-    future: []
-  }
 
-  return (state=initialState, action) => {
-    const { past, present, future } = state
+// undoableState :: [State a] -> UndoableState a
+export const undoableState = (states) => ({ history: states, index: 0 })
 
+// index, history :: Lens UndoableState a
+const index = R.lensProp('index')
+const history = R.lensProp('history')
+
+// undoable :: Reducer -> UndoableState a -> Action -> UndoableState a
+export const undoable = (reducer) => (
+  (state=undoableState([reducer(undefined, {})]), action) => {
     switch(action.type) {
       case RESET:
-        return {
-          past: [],
-          present: reducer(present, action),
-          future: [],
-        }
+        return undoableState([reducer(undefined, action)])
       case UNDO:
-        const previous = past[past.length - 1]
-        const newPast = past.slice(0, past.length - 1)
-        return {
-          past: newPast,
-          present: previous,
-          future: [present, ...future],
-        }
+        return R.over(index, decUntil(0), state)
       case REDO:
-        const next = future[0]
-        const newFuture = future.slice(1)
-        return {
-          past: [...past, present],
-          present: next,
-          future: newFuture,
-        }
+        return R.over(index, incUntil(state.history.length - 1), state)
       default:
-        const newPresent = reducer(present, action)
-        if (present === newPresent) {
+        const newPresent = reducer(present(state), action)
+        if (present(state) === newPresent) {
           return state
         }
-        return {
-          past: present === undefined ? [...past] : [...past, present],
-          present: newPresent,
-          future: [],
-        }
+        return R.pipe(
+          R.set(history, rewrite(newPresent, state)),
+          R.over(index, R.inc))
+        (state)
     }
-  }
-}
+  })
+
+// present :: UndoableState a -> State a | undefined
+// Returns the latest state.
+export const present = (state) => R.nth(state.index, state.history)
+
+// past :: UndoableState a -> [State a]
+// Returns the past states.
+export const past = (state) => state.history.slice(0, state.index)
+
+// future :: UndoableState a -> [State a]
+// Returns the future states.
+export const future = (state) => state.history.slice(state.index + 1)
+
+// rewrite :: State a -> UndoableState a -> [State a]
+// Creates a new history with the new present.
+const rewrite = (newPresent, state) =>
+  R.concat(past(state), [present(state), newPresent])

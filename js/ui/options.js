@@ -6,6 +6,7 @@ import { game } from '../core/game'
 import { undo, redo } from '../store/timetravel'
 import { reset } from '../store/actions'
 import { store } from '../store/store'
+import { past, present, future } from '../store/undoable'
 
 import { tweenOpacity } from './animation'
 import { topMargin } from './constants'
@@ -38,7 +39,7 @@ export const initUndoButton = R.curry((context, align, index) => {
     },
     align,
     fill: null,
-    isAvailable: (state) => state.game.past.length >= 1,
+    isAvailable: (state) => past(state.game).length >= 1,
     onClick: () => store.dispatch(undo()),
   }
   return buildButton(context, index, params)
@@ -61,7 +62,7 @@ export const initRedoButton = R.curry((context, align, index) => {
     },
     align,
     fill: null,
-    isAvailable: (state) => state.game.future.length >= 1,
+    isAvailable: (state) => future(state.game).length >= 1,
     onClick: () => store.dispatch(redo()),
   }
   return buildButton(context, index, params)
@@ -85,7 +86,7 @@ export const initNewGame2P = R.curry((context, align, index) => {
     align,
     fill: "#000000",
     isAvailable: (state) =>
-      state.game.past.length >= 1 || state.game.present.numPlayers != 2,
+      past(state.game).length >= 1 || present(state.game).numPlayers != 2,
     onClick: () => store.dispatch(reset(game(2))),
   }
   return buildButton(context, index, params)
@@ -115,7 +116,7 @@ export const initNewGame4P = R.curry((context, align, index) => {
     align,
     fill: "#000000",
     isAvailable: (state) =>
-      state.game.past.length >= 1 || state.game.present.numPlayers != 4,
+      past(state.game).length >= 1 || present(state.game).numPlayers != 4,
     onClick: () => store.dispatch(reset(game(4))),
   }
   return buildButton(context, index, params)

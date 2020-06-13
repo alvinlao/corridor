@@ -1,5 +1,6 @@
 import * as R from 'ramda'
 
+import { undoableState } from './undoable'
 import { loadHistory } from '../history/url'
 import { historyToGames, historyToNotations } from '../history/parse'
 
@@ -12,13 +13,7 @@ export const hydrate = () => {
   }
 
   return {
-    game: hydrateUndoable(historyToGames(history)),
-    notation: hydrateUndoable(historyToNotations(history)),
+    game: undoableState(historyToGames(history)),
+    notation: undoableState(historyToNotations(history)),
   }
 }
-
-const hydrateUndoable = (states) => ({
-  past: [],
-  present: R.head(states),
-  future: R.tail(states),
-})

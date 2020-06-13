@@ -13,6 +13,7 @@ import { putPlayer } from '../core/board'
 
 import { move } from '../store/actions'
 import { store } from '../store/store'
+import { present } from '../store/undoable'
 
 import { cellBackgroundColor, playerColors, white } from './constants'
 import { tweenOpacity, tweenFill } from './animation'
@@ -120,7 +121,7 @@ export const initCell = R.curry((context, game, point) => {
 // update :: Context -> Point -> [Shape] -> State -> ()
 // Updates the provided shapes to reflect the given state.
 const update = R.curry((context, point, shapes, state) => {
-  const game = state.game.present
+  const game = present(state.game)
   updateDirection(point, shapes, game)
   updateColor(point, shapes.bg, game)
   updateWinner(point, shapes, game)
@@ -132,7 +133,7 @@ const bind = R.curry((context, point, shapes) => {
   shapes.bg.on(
     'click',
     () => {
-      const game = store.getState().game.present
+      const game = present(store.getState().game)
       if (isValidMove(game, point) && !isGameOver(game)) {
         store.dispatch(move(game, point))
         document.body.style.cursor = 'default';
@@ -141,7 +142,7 @@ const bind = R.curry((context, point, shapes) => {
   shapes.bg.on(
     'mouseover',
     () => {
-      const game = store.getState().game.present
+      const game = present(store.getState().game)
       if (isValidMove(game, point) && !isGameOver(game)) {
         document.body.style.cursor = 'pointer';
         tweenOpacity(shapes.bg, 1, 120)
@@ -150,7 +151,7 @@ const bind = R.curry((context, point, shapes) => {
   shapes.bg.on(
     'mouseout',
     () => {
-      const game = store.getState().game.present
+      const game = present(store.getState().game)
       if (isValidMove(game, point) && !isGameOver(game)) {
         document.body.style.cursor = 'default';
         tweenOpacity(shapes.bg, 0.3, 240)

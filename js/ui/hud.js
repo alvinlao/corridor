@@ -4,6 +4,8 @@ import * as Konva from 'konva'
 import { wallsPerPlayer, numWallsAvailable } from '../core/game'
 import { isGameOver } from '../core/logic'
 
+import { present } from '../store/undoable'
+
 import { playerColors, white } from './constants'
 
 const rowLimit = 5
@@ -74,7 +76,7 @@ export const initHud = R.curry((context, numPlayers, playerId, index) => {
 
 const update = R.curry(
   (context, numPlayers, playerId, shapes, state) => {
-    const game = state.game.present
+    const game = present(state.game)
     const gameOver = isGameOver(game)
     R.addIndex(R.map)(
       (shape, index) => {
