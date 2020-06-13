@@ -42,15 +42,18 @@ const initUi = R.curry((context, game) => {
   }
 
   // Set up store listener that triggers ui redraws.
-  observeStore(store, R.lensPath([]), update(context, elements))
+  observeStore(store, R.lensPath([]), onStoreChange(context, elements))
 })
 
-// update :: Context -> [Element] -> State -> ()
-// Calls each element's update function.
-const update = R.curry((context, elements, state) => {
-  R.forEach(
-    (f) => f(state),
-    R.map(R.prop('update'), elements))
+// onStoreChange :: Context -> [Element] -> State -> ()
+// Updates the ui upon the store changing.
+const onStoreChange = R.curry((context, elements, state) => {
+  // Call each element's update function.
+  R.forEach((f) => f(state), R.map(R.prop('update'), elements))
+
+  // Re-draw.
   context.stage.batchDraw()
+
+  // Update the url history parameter.
   replaceHistory(state)
 })
