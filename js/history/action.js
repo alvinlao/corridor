@@ -89,16 +89,18 @@ export const decodeWallPoint = (n) => {
 // decodeAction :: Notation -> (Game -> Game)
 // Decodes the binary representation into a function that applies
 // the encoded move to the given Game.
-export const decodeAction = (notation) => {
-  const actionType = decodeActionType(decodeChar(notation))
-  return (currentGame) => {
-    switch (actionType) {
-      case MOVE:
-        return useMove(currentGame, decodeUseMove(notation))
-      case WALL:
-        return useWall(currentGame, decodeUseWall(notation))
-      default:
-        return currentGame
-    }
+export const decodeAction = (notation) => 
+  applyAction(notation, decodeActionType(decodeChar(notation)))
+
+// applyAction :: Notation -> ActionType -> Game -> Game
+// Applies the encoded action to the provided game.
+const applyAction = R.curry((notation, actionType, game) => {
+  switch (actionType) {
+    case MOVE:
+      return useMove(game, decodeUseMove(notation))
+    case WALL:
+      return useWall(game, decodeUseWall(notation))
+    default:
+      return game
   }
-}
+})
