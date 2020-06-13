@@ -20,7 +20,7 @@ import { tweenOpacity, tweenFill } from './animation'
 
 // margin :: Number
 // Percentage of the cell allocated for right margin.
-const margin = 0.20
+const margin = 0.22
 
 // iconOpacity :: Number
 // Opacity of the player icon overlay.

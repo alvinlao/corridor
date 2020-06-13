@@ -20,7 +20,7 @@ const margin = 0.15
 const wallMargin = (context) => margin * (2 * cellSize(context))
 const wallLength = (context) =>
   (1 - margin) * (2 * cellSize(context)) + cellMargin(context)
-const tweenDuration = 120
+const tweenDuration = 60
 
 const hwallShape = (context, point) => {
   const r = new Konva.Rect({
@@ -36,9 +36,9 @@ const hwallShape = (context, point) => {
   r.hitFunc((cx) => {
     cx.beginPath()
     cx.rect(
+      -(wallMargin(context) * 0.5),
       0,
-      0,
-      (wallLength(context) / 2) - (cellMargin(context) / 2),
+      (cellSize(context) + wallMargin(context) * 0.25),
       cellMargin(context))
     cx.closePath()
     cx.fillStrokeShape(r)
@@ -61,9 +61,9 @@ const vwallShape = (context, point) => {
     cx.beginPath()
     cx.rect(
       0,
-      0,
+      -(wallMargin(context) * 0.5),
       cellMargin(context),
-      (wallLength(context) / 2) - (cellMargin(context) / 2))
+      (cellSize(context) + wallMargin(context) * 0.25))
     cx.closePath()
     cx.fillStrokeShape(r)
   })
@@ -98,7 +98,6 @@ const update =
     const game = state.game.present
     updateOpacity(wall, shape, game)
     tweenFill(shape, wallColor, tweenDuration)
-    shape.zIndex(0)
   })
 
 const bind = R.curry((context, wall, shape) => {
@@ -115,7 +114,7 @@ const bind = R.curry((context, wall, shape) => {
     'mouseover',
     () => {
       hoverState.isHover = true
-      setTimeout(mouseover(hoverState, context, wall, shape), 15)
+      setTimeout(mouseover(hoverState, context, wall, shape), 0)
     })
   shape.on(
     'mouseout',
@@ -147,7 +146,7 @@ const mouseover = (hoverState, context, wall, shape) => () => {
   if (isValidWall(game, wall)) {
     tweenOpacity(shape, 1, tweenDuration)
   } else {
-    shape.opacity(0.5).fill(invalidWallColor).zIndex(127)
+    shape.opacity(0.5).fill(invalidWallColor).moveToTop()
     shape.getParent().draw()
   }
 }
