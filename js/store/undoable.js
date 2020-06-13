@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import { RESET, UNDO, REDO } from './timetravel'
+import { RESET, UNDO, REDO, GOTO } from './timetravel'
 
 import { decUntil, incUntil } from '../util/math'
 
@@ -20,6 +20,11 @@ export const undoable = (reducer) => (
     switch(action.type) {
       case RESET:
         return undoableState([reducer(undefined, action)])
+      case GOTO:
+        return R.set(
+          index,
+          R.clamp(0, state.history.length - 1, action.index),
+          state)
       case UNDO:
         return R.over(index, decUntil(0), state)
       case REDO:

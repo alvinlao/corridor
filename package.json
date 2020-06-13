@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "konva": "^6.0.0",
+    "lodash.debounce": "^4.0.8",
     "ramda": "^0.27.0",
     "redux": "^4.0.5"
   },
