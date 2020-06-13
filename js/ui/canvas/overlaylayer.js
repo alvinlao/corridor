@@ -5,6 +5,7 @@ import { ids, turnOrder } from '/js/core/game'
 
 import { topMargin } from './constants'
 import { initHud } from './hud'
+import { initSidebar } from './sidebar'
 import {
   initUndoButton,
   initRedoButton,
@@ -23,6 +24,7 @@ export const initOverlay = (context) =>
       initHuds(context, 2),
       initHuds(context, 4),
       initOptions(context),
+      initSidebar(context),
     ]))
 
 const overlayLayer = (context) => (
