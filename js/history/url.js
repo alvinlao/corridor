@@ -16,12 +16,25 @@ export const loadHistory = () => {
   }
 }
 
-// replaceHistory :: State -> ()
+// loadMove :: () -> Number
+// Gets the move number from the url query param, if available.
+export const loadMove = () => {
+  const move = new URLSearchParams(window.location.search).get('move')
+  if (!move) {
+    return 0
+  } else {
+    return parseInt(move)
+  }
+}
+
+// replaceUrl :: State -> ()
 // Adds the current game history into the browser history.
-export const replaceHistory = (state) => {
+export const replaceUrl = (state) => {
+  const move = state.notation.index
   const notations = state.notation.history
-  const n = R.join('', R.map(R.prop('notation'), notations))
-  history.replaceState({}, '', '?history=' + urlEncode(n))
+  const history = urlEncode(R.join('', R.pluck('notation', notations)))
+  const params = new URLSearchParams({ move, history })
+  window.history.replaceState({}, '', '?' + params.toString())
 }
 
 // urlEncode :: Binary -> String

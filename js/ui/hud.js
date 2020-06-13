@@ -2,7 +2,7 @@ import * as R from 'ramda'
 import * as Konva from 'konva'
 
 import { wallsPerPlayer, numWallsAvailable } from '../core/game'
-import { isGameOver } from '../core/logic'
+import { isGameOver, winners } from '../core/logic'
 
 import { present } from '../store/undoable'
 
@@ -82,21 +82,23 @@ const update = R.curry(
       (shape, index) => {
         if (numPlayers != game.numPlayers) {
           hide(shape)
-        } else if (gameOver) {
-          fade(shape)
         } else {
           updateVisibility(shape, index, numWallsAvailable(game, playerId))
+          if (gameOver) {
+            fade(shape)
+          }
         }
       },
       shapes.walls)
     if (numPlayers != game.numPlayers) {
       hide(shapes.activePlayer)
-    } else if (gameOver) {
-      fade(shapes.activePlayer)
     } else {
       show(shapes.activePlayer)
-      shapes.activePlayer.fillEnabled(
-        game.activePlayerId == playerId && !gameOver)
+      shapes.activePlayer.fillEnabled(game.activePlayerId == playerId)
+      if (gameOver) {
+        fade(shapes.activePlayer)
+        shapes.activePlayer.fillEnabled(R.includes(playerId, winners(game)))
+      }
     }
   })
 

@@ -5,7 +5,10 @@ import { decUntil, incUntil } from '../util/math'
 
 
 // undoableState :: [State a] -> UndoableState a
-export const undoableState = (states) => ({ history: states, index: 0 })
+export const undoableState = (states, index=0) => ({
+  history: states,
+  index: R.min(index, states.length - 1),
+})
 
 // index, history :: Lens UndoableState a
 const index = R.lensProp('index')

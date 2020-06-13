@@ -8,7 +8,7 @@ import { store, observeStore } from '../store/store'
 import { reset } from '../store/actions'
 import { present } from '../store/undoable'
 
-import { replaceHistory } from '../history/url'
+import { replaceUrl } from '../history/url'
 
 import { cell } from './cell'
 import { stageWidth, stageHeight } from './constants'
@@ -50,11 +50,11 @@ const initUi = R.curry((context, game) => {
 // Updates the ui upon the store changing.
 const onStoreChange = R.curry((context, elements, state) => {
   // Call each element's update function.
-  R.forEach((f) => f(state), R.map(R.prop('update'), elements))
+  R.forEach((f) => f(state), R.pluck('update', elements))
 
   // Re-draw.
   context.stage.batchDraw()
 
   // Update the url history parameter.
-  replaceHistory(state)
+  replaceUrl(state)
 })
