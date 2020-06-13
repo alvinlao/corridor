@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
 
-import { ids, turnOrder } from '../core/game'
+import { ids, turnOrder } from '/js/core/game'
 
 import { topMargin } from './constants'
 import { initHud } from './hud'

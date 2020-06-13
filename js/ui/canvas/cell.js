@@ -6,14 +6,14 @@ import {
   hasPlayer,
   getPlayerIdOn,
   playerWinLocations,
-} from '../core/game'
-import { point } from '../core/point'
-import { isValidMove, isGameOver, isPlayerInWinLocation } from '../core/logic'
-import { putPlayer } from '../core/board'
+} from '/js/core/game'
+import { point } from '/js/core/point'
+import { isValidMove, isGameOver, isPlayerInWinLocation } from '/js/core/logic'
+import { putPlayer } from '/js/core/board'
 
-import { move } from '../store/actions'
-import { store } from '../store/store'
-import { present } from '../store/undoable'
+import { move } from '/js/store/actions'
+import { store } from '/js/store/store'
+import { present } from '/js/store/undoable'
 
 import { cellBackgroundColor, playerColors, white } from './constants'
 import { tweenOpacity, tweenFill } from './animation'

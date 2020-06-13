@@ -1,12 +1,13 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
-import { initCell, offsetX } from './cell'
-import { initHwall, initVwall } from './wall'
-import { point } from '../core/point'
-import { row, playerIds, playerLocation } from '../core/game'
+
+import { point } from '/js/core/point'
+import { row, playerIds, playerLocation } from '/js/core/game'
 
 import { initLayer } from './layer'
 import { topMargin } from './constants'
+import { initCell, offsetX } from './cell'
+import { initHwall, initVwall } from './wall'
 
 // initBoard :: Context -> Game -> [Element]
 // Initializes board ui elements.

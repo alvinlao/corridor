@@ -1,10 +1,10 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
 
-import { wallsPerPlayer, numWallsAvailable } from '../core/game'
-import { isGameOver, winners } from '../core/logic'
+import { wallsPerPlayer, numWallsAvailable } from '/js/core/game'
+import { isGameOver, winners } from '/js/core/logic'
 
-import { present } from '../store/undoable'
+import { present } from '/js/store/undoable'
 
 import { playerColors, white } from './constants'
 
