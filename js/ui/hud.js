@@ -2,14 +2,35 @@ import * as R from 'ramda'
 import * as Konva from 'konva'
 
 import { wallsPerPlayer, numWallsAvailable } from '../core/game'
+import { isGameOver } from '../core/logic'
 
 import { playerColors, white } from './constants'
 
 const rowLimit = 5
+const activePlayerSymbolRadius = 5;
 const wallSymbolWidth = 5
 const wallSymbolHeight = 18
 const wallSymbolMargin = 4
 const hudWidth = (context, numPlayers) => (context.stage.width() / numPlayers)
+
+const activePlayerSymbol = R.curry(
+  (context, numPlayers, index, totalWalls, playerId) => (
+    new Konva.Circle({
+      x: (
+        (hudWidth(context, numPlayers) * index)
+        + (hudWidth(context, numPlayers) / 2)
+        - wallSymbolMargin / 2),
+      y: (
+        context.stage.width()
+        + 60
+        + ((wallSymbolHeight + rowLimit) * Math.floor(totalWalls / rowLimit))
+        + (wallSymbolHeight / 2)),
+      radius: 5,
+      strokeWidth: 2,
+      stroke: playerColors[playerId],
+      fill: playerColors[playerId],
+      opacity: 1,
+    })))
 
 const playerWall = R.curry(
   (context, numPlayers, index, playerId, totalWalls, wallId) => (
@@ -34,28 +55,47 @@ const playerWall = R.curry(
 // Initializes a hud ui element.
 export const initHud = R.curry((context, numPlayers, playerId, index) => {
   const totalWalls = wallsPerPlayer(numPlayers)
-  const walls = R.map(
-    playerWall(context, numPlayers, index, playerId, totalWalls),
-    R.range(0, totalWalls))
+  const walls =
+    R.times(
+      playerWall(context, numPlayers, index, playerId, totalWalls),
+      totalWalls)
+  const activePlayer =
+    activePlayerSymbol(context, numPlayers, index, totalWalls, playerId)
 
   return {
-    shapes: walls,
-    update: update(context, numPlayers, playerId, { walls }),
+    shapes: R.concat(walls, [activePlayer]),
+    update: update(
+      context,
+      numPlayers,
+      playerId,
+      { walls, activePlayer, }),
   }
 })
 
 const update = R.curry(
   (context, numPlayers, playerId, shapes, state) => {
     const game = state.game.present
+    const gameOver = isGameOver(game)
     R.addIndex(R.map)(
       (shape, index) => {
         if (numPlayers != game.numPlayers) {
           hide(shape)
+        } else if (gameOver) {
+          fade(shape)
         } else {
           updateVisibility(shape, index, numWallsAvailable(game, playerId))
         }
       },
       shapes.walls)
+    if (numPlayers != game.numPlayers) {
+      hide(shapes.activePlayer)
+    } else if (gameOver) {
+      fade(shapes.activePlayer)
+    } else {
+      show(shapes.activePlayer)
+      shapes.activePlayer.fillEnabled(
+        game.activePlayerId == playerId && !gameOver)
+    }
   })
 
 const updateVisibility = (shape, index, wallsAvailable) => {
@@ -68,4 +108,12 @@ const updateVisibility = (shape, index, wallsAvailable) => {
 
 const hide = (shape) => {
   shape.opacity(0)
+}
+
+const show = (shape) => {
+  shape.opacity(1)
+}
+
+const fade = (shape) => {
+  shape.opacity(shape.opacity() * 0.5)
 }
