@@ -26,7 +26,7 @@ const activePlayerSymbol = R.curry(
         + ((wallSymbolHeight + rowLimit) * Math.floor(totalWalls / rowLimit))
         + (wallSymbolHeight / 2)),
       radius: 5,
-      strokeWidth: 2,
+      strokeWidth: 1.5,
       stroke: playerColors[playerId],
       fill: playerColors[playerId],
       opacity: 1,
