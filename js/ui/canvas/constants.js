@@ -1,5 +1,6 @@
-export const stageWidth = 500;
+export const stageWidth = 550;
 export const stageHeight = 750;
+export const boardWidth = 500;
 export const topMargin = 150;
 
 export const cellBackgroundColor = "#E8E3E1"

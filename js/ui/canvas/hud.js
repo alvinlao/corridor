@@ -6,24 +6,25 @@ import { isGameOver, winners } from '/js/core/logic'
 
 import { present } from '/js/store/undoable'
 
-import { playerColors, white } from './constants'
+import { boardWidth, playerColors, white } from './constants'
 
 const rowLimit = 5
 const activePlayerSymbolRadius = 5;
 const wallSymbolWidth = 5
 const wallSymbolHeight = 18
 const wallSymbolMargin = 4
-const hudWidth = (context, numPlayers) => (context.stage.width() / numPlayers)
+const hudWidth = (context, numPlayers) => (boardWidth / numPlayers)
 
 const activePlayerSymbol = R.curry(
   (context, numPlayers, index, totalWalls, playerId) => (
     new Konva.Circle({
       x: (
-        (hudWidth(context, numPlayers) * index)
+        (context.stage.width() - boardWidth) / 2
+        + (hudWidth(context, numPlayers) * index)
         + (hudWidth(context, numPlayers) / 2)
         - wallSymbolMargin / 2),
       y: (
-        context.stage.width()
+        boardWidth
         + 60
         + ((wallSymbolHeight + rowLimit) * Math.floor(totalWalls / rowLimit))
         + (wallSymbolHeight / 2)),
@@ -38,12 +39,13 @@ const playerWall = R.curry(
   (context, numPlayers, index, playerId, totalWalls, wallId) => (
     new Konva.Rect({
       x: (
-        (hudWidth(context, numPlayers) * index)
+        (context.stage.width() - boardWidth) / 2
+        + (hudWidth(context, numPlayers) * index)
         + (hudWidth(context, numPlayers) / 2)
         - ((rowLimit * (wallSymbolWidth + wallSymbolMargin)) / 2)
         + (wallId % rowLimit) * (wallSymbolMargin + wallSymbolWidth)),
       y: (
-        context.stage.width()
+        boardWidth
         + 60
         + ((wallSymbolHeight + rowLimit) * Math.floor(wallId / rowLimit))),
       width: wallSymbolWidth,

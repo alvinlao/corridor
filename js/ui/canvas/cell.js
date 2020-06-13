@@ -15,7 +15,12 @@ import { move } from '/js/store/actions'
 import { store } from '/js/store/store'
 import { present } from '/js/store/undoable'
 
-import { cellBackgroundColor, playerColors, white } from './constants'
+import {
+  boardWidth,
+  cellBackgroundColor,
+  playerColors,
+  white,
+} from './constants'
 import { tweenOpacity, tweenFill } from './animation'
 
 
@@ -29,10 +34,11 @@ const iconOpacity = 0.5
 
 // cellSize, cellMargin :: Context -> Number
 // Calculates the cell's size/margin.
-export const cellSize = (context) => (1 - margin) * (context.stage.width() / 9.5)
-export const cellMargin = (context) => margin * (context.stage.width() / 9.5)
+export const cellSize = (context) => (1 - margin) * (boardWidth / 9.5)
+export const cellMargin = (context) => margin * (boardWidth / 9.5)
 export const offsetX = (context) =>
   ((cellSize(context) + cellMargin(context))/ 4) + (cellMargin(context) / 2)
+    + ((context.stage.width() - boardWidth) / 2)
 
 // cellX, cellY :: Context -> Point -> Number
 // Calculates the cell's x/y positions.
