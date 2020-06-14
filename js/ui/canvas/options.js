@@ -1,12 +1,12 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
 
-import { game } from '/js/core/game'
+import { game } from '../../core/game'
 
-import { undo, redo } from '/js/store/timetravel'
-import { reset } from '/js/store/actions'
-import { store } from '/js/store/store'
-import { past, present, future } from '/js/store/undoable'
+import { undo, redo } from '../../store/timetravel'
+import { reset } from '../../store/actions'
+import { store } from '../../store/store'
+import { past, present, future } from '../../store/undoable'
 
 import { tweenOpacity } from './animation'
 import { topMargin } from './constants'

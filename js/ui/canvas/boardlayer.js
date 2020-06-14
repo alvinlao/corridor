@@ -1,8 +1,8 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
 
-import { point } from '/js/core/point'
-import { row, playerIds, playerLocation } from '/js/core/game'
+import { point } from '../../core/point'
+import { row, playerIds, playerLocation } from '../../core/game'
 
 import { initLayer } from './layer'
 import { topMargin } from './constants'

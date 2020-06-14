@@ -1,15 +1,15 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
 
-import { updateBoard, hasWall, wallsAvailable } from '/js/core/game'
-import { point } from '/js/core/point'
-import { isValidWall, isGameOver } from '/js/core/logic'
-import { putWall } from '/js/core/board'
-import { hwall, vwall } from '/js/core/wall'
+import { updateBoard, hasWall, wallsAvailable } from '../../core/game'
+import { point } from '../../core/point'
+import { isValidWall, isGameOver } from '../../core/logic'
+import { putWall } from '../../core/board'
+import { hwall, vwall } from '../../core/wall'
 
-import { placeWall } from '/js/store/actions'
-import { store } from '/js/store/store'
-import { present } from '/js/store/undoable'
+import { placeWall } from '../../store/actions'
+import { store } from '../../store/store'
+import { present } from '../../store/undoable'
 
 import { cellSize, cellMargin, cellX, cellY } from './cell'
 import { wallColor } from './constants'

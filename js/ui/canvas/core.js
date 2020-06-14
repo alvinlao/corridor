@@ -1,14 +1,14 @@
 import * as R from 'ramda'
 import * as Konva from 'konva'
 
-import { row, col } from '/js/core/game'
-import { point } from '/js/core/point'
+import { row, col } from '../../core/game'
+import { point } from '../../core/point'
 
-import { store, observeStore } from '/js/store/store'
-import { reset } from '/js/store/actions'
-import { present } from '/js/store/undoable'
+import { store, observeStore } from '../../store/store'
+import { reset } from '../../store/actions'
+import { present } from '../../store/undoable'
 
-import { replaceUrl } from '/js/history/url'
+import { replaceUrl } from '../../history/url'
 
 import { cell } from './cell'
 import { stageWidth, stageHeight } from './constants'

@@ -2,8 +2,8 @@ import * as R from 'ramda'
 import * as Konva from 'konva'
 import debounce from 'lodash.debounce'
 
-import { store } from '/js/store/store'
-import { goto } from '/js/store/timetravel'
+import { store } from '../../store/store'
+import { goto } from '../../store/timetravel'
 
 import { topMargin, cellBackgroundColor } from './constants'
 import { cellSize, cellMargin } from './cell'
@@ -61,7 +61,14 @@ export const initSidebar = R.curry((context) => {
 })
 
 const bind = R.curry((context, shapes) => {
-  shapes.handle.on('mouseover', () => document.body.style.cursor = 'pointer')
+  shapes.handle.on(
+    'mouseover',
+    () => {
+      const numStates = store.getState().game.history.length
+      if (numStates > 1) {
+        document.body.style.cursor = 'pointer'
+      }
+    })
   shapes.handle.on('mouseout', () => document.body.style.cursor = 'default')
 
   // _dispatchGoto :: Number -> ()
@@ -87,9 +94,11 @@ const update = R.curry((context, shapes, state) => {
   const numStates = state.game.history.length
   const index = state.game.index
   if (numStates <= 1) {
-    shapes.handle.hide()
+    shapes.handle.draggable(false)
+    shapes.handle.fill(cellBackgroundColor)
   } else {
-    shapes.handle.show()
+    shapes.handle.draggable(true)
+    shapes.handle.fill('#000000')
     shapes.handle.y(handleYPosition(context, numStates, index))
   }
 })
