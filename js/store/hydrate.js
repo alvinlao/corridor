@@ -1,6 +1,7 @@
 import * as R from 'ramda'
 
 import { undoableState } from './undoable'
+import { idState } from './id'
 import { loadHistory, loadMove } from '../history/url'
 import { historyToGames, historyToNotations } from '../history/parse'
 
@@ -14,7 +15,9 @@ export const hydrate = () => {
   }
 
   return {
-    game: undoableState(historyToGames(history), move),
+    game: undoableState(idStates(historyToGames(history)), move),
     notation: undoableState(historyToNotations(history), move),
   }
 }
+
+const idStates = R.lift(idState)
