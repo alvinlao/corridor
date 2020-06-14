@@ -63,27 +63,53 @@ export const initSidebar = R.curry((context) => {
 const bind = R.curry((context, shapes) => {
   shapes.handle.on('mouseover', () => document.body.style.cursor = 'pointer')
   shapes.handle.on('mouseout', () => document.body.style.cursor = 'default')
+
+  // _dispatchGoto :: Number -> ()
+  // Dispatches a goto action.
+  const _dispatchGoto = debounce((index) => store.dispatch(goto(index)), 100)
+
   shapes.handle.on(
     'dragmove',
-    debounce(
     () => {
-      const y = shapes.handle.y() - offsetY
-      const h = height(context)
-      const ratio = (y / h)
-      const index = Math.round(
-          ratio * (store.getState().game.history.length - 1))
-      store.dispatch(goto(index))
-    }, 50))
+      const numStates = store.getState().game.history.length
+      const ratio = handleRatio(context, shapes.handle.y())
+      const index = Math.round(ratio * (numStates - 1))
+
+      // Snap handle.
+      shapes.handle.y(handleYPosition(context, numStates, index))
+
+      // Jump to the requested index.
+      _dispatchGoto(index)
+    })
 })
 
 const update = R.curry((context, shapes, state) => {
-  const numStates = state.game.history.length - 1
+  const numStates = state.game.history.length
   const index = state.game.index
-  if (numStates < 1) {
+  if (numStates <= 1) {
     shapes.handle.hide()
   } else {
     shapes.handle.show()
-    const ratio = numStates == 0 ? 0 : (index / numStates)
-    shapes.handle.y((height(context) * ratio) + offsetY)
+    shapes.handle.y(handleYPosition(context, numStates, index))
   }
 })
+
+// guide :: Context -> Number -> Number -> Number
+// Returns the closest absolute y position that maps to a state.
+const guide = R.curry((context, y, numStates) =>
+  R.reduce(
+    R.minBy(yPosition => Math.abs(y - yPosition)),
+    Infinity,
+    R.times(handleYPosition(context, numStates), numStates)))
+
+// handleYPosition :: Context -> Number -> Number -> Number
+// Given a state index, returns the handle's absolute y position on the
+// timeline.
+const handleYPosition = R.curry((context, numStates, index) => {
+  const ratio = numStates <= 1 ? 0 : (index / (numStates - 1))
+  return (height(context) * ratio) + offsetY
+})
+
+// handleRatio :: Context -> Number -> Number
+// Given a handle position, returns the position to height ratio.
+const handleRatio = R.curry((context, y) => (y - offsetY) / height(context))
