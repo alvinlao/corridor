@@ -73,7 +73,7 @@ const bind = R.curry((context, shapes) => {
 
   // _dispatchGoto :: Number -> ()
   // Dispatches a goto action.
-  const _dispatchGoto = debounce((index) => store.dispatch(goto(index)), 100)
+  const _dispatchGoto = debounce((index) => store.dispatch(goto(index)), 10)
 
   shapes.handle.on(
     'dragmove',
