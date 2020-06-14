@@ -96,6 +96,7 @@ const update = R.curry((context, shapes, state) => {
   if (numStates <= 1) {
     shapes.handle.draggable(false)
     shapes.handle.fill(cellBackgroundColor)
+    shapes.handle.y(handleYPosition(context, 0, 0))
   } else {
     shapes.handle.draggable(true)
     shapes.handle.fill('#000000')
@@ -115,7 +116,7 @@ const guide = R.curry((context, y, numStates) =>
 // Given a state index, returns the handle's absolute y position on the
 // timeline.
 const handleYPosition = R.curry((context, numStates, index) => {
-  const ratio = numStates <= 1 ? 0 : (index / (numStates - 1))
+  const ratio = numStates <= 1 ? 1 : (index / (numStates - 1))
   return (height(context) * ratio) + offsetY
 })
 
