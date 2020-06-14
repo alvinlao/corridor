@@ -8,7 +8,8 @@ import {
   playerWinLocations,
 } from '../../core/game'
 import { point } from '../../core/point'
-import { isValidMove, isGameOver, isPlayerInWinLocation } from '../../core/logic'
+import { isGameOver, isPlayerInWinLocation } from '../../core/logic'
+import { memoIsValidMove } from '../../core/memo'
 import { putPlayer } from '../../core/board'
 
 import { move } from '../../store/actions'
@@ -140,7 +141,7 @@ const bind = R.curry((context, point, shapes) => {
     'click',
     () => {
       const game = present(store.getState().game)
-      if (isValidMove(game, point) && !isGameOver(game)) {
+      if (memoIsValidMove(game, point, game.id) && !isGameOver(game)) {
         store.dispatch(move(game, point))
         document.body.style.cursor = 'default';
       }
@@ -149,7 +150,7 @@ const bind = R.curry((context, point, shapes) => {
     'mouseover',
     () => {
       const game = present(store.getState().game)
-      if (isValidMove(game, point) && !isGameOver(game)) {
+      if (memoIsValidMove(game, point, game.id) && !isGameOver(game)) {
         document.body.style.cursor = 'pointer';
         tweenOpacity(shapes.bg, 1, 120)
       }
@@ -158,7 +159,7 @@ const bind = R.curry((context, point, shapes) => {
     'mouseout',
     () => {
       const game = present(store.getState().game)
-      if (isValidMove(game, point) && !isGameOver(game)) {
+      if (memoIsValidMove(game, point, game.id) && !isGameOver(game)) {
         document.body.style.cursor = 'default';
         tweenOpacity(shapes.bg, 0.3, 240)
       }
@@ -172,7 +173,7 @@ const updateColor = (point, background, game) => {
     background.fill(playerColors[getPlayerIdOn(game, point)])
     background.shadowEnabled(true)
   } else if (
-      isValidMove(game, point)
+      memoIsValidMove(game, point, game.id)
       && !isGameOver(game)) {
     background.opacity(0.3)
     background.fill(playerColors[game.activePlayerId])
