@@ -8,12 +8,13 @@ import { goto } from '../../store/timetravel'
 import { topMargin, cellBackgroundColor } from './constants'
 import { cellSize, cellMargin } from './cell'
 
+const handleRadius = 8
 const x = (context) => context.stage.width() - 10
+const offsetY = 60 + handleRadius
 const height = (context) => (
   ((cellSize(context) + cellMargin(context)) * 9)
-  - cellMargin(context))
-const offsetY = 60
-const handleRadius = 8
+  - cellMargin(context)
+  - handleRadius * 2)
 
 const timeline = (context) => (
   new Konva.Line({
@@ -40,7 +41,10 @@ const handle = R.curry(
       draggable: true,
       dragBoundFunc: (pos) => ({
         x: x(context),
-        y: R.clamp(topMargin, height(context) + topMargin, pos.y),
+        y: R.clamp(
+          topMargin + handleRadius,
+          height(context) + topMargin + handleRadius,
+          pos.y),
       }),
     })))
 
