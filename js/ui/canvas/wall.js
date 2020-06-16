@@ -21,7 +21,7 @@ const margin = 0.15
 const wallMargin = (context) => margin * (2 * cellSize(context))
 const wallLength = (context) =>
   (1 - margin) * (2 * cellSize(context)) + cellMargin(context)
-const tweenDuration = 60
+const tweenDuration = 0
 
 const hwallShape = (context, point) => {
   const r = new Konva.Rect({
