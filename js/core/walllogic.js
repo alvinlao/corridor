@@ -86,15 +86,13 @@ const unvisitedNeighbours = R.curry((game, point, visitedPoints) =>
 
 // unblockedNeighbours :: Game -> Point -> [Point]
 // Returns the neighbouring points that are not blocked by a wall.
-const unblockedNeighbours = R.curry((game, point) => {
-  const _unblocked = unblocked(game)
-  return R.pipe(
+const unblockedNeighbours = R.curry((game, point) =>
+  R.pipe(
     R.juxt([
-      R.when(_unblocked(nedge), north),
-      R.when(_unblocked(sedge), south),
-      R.when(_unblocked(eedge), east),
-      R.when(_unblocked(wedge), west),
+      R.when(unblocked(game, nedge), north),
+      R.when(unblocked(game, sedge), south),
+      R.when(unblocked(game, eedge), east),
+      R.when(unblocked(game, wedge), west),
     ]),
     R.reject(R.equals(point)),
-  )(point)
-})
+  )(point))

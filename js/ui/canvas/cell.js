@@ -201,7 +201,7 @@ const updateDirection = (point, shapes, game) => {
 // updateWinner :: Point -> Shape -> Game -> ()
 const updateWinner = (point, shapes, game) => {
   if (
-      hasPlayer(game, point) 
+      hasPlayer(game, point)
       && isPlayerInWinLocation(game, getPlayerIdOn(game, point))) {
     resetArrow(shapes)
     shapes.star.show()
@@ -219,11 +219,10 @@ const resetArrow = (shapes) => {
 
 // playerDirection :: PlayerId -> Game -> Direction
 // Direction :: String
-const playerDirection = (playerId, game) => {
-  return R.cond([
+const playerDirection = (playerId, game) =>
+  R.cond([
     [R.includes(point(8, 4)), R.always('up')],
     [R.includes(point(0, 4)), R.always('down')],
     [R.includes(point(4, 0)), R.always('left')],
     [R.includes(point(4, 8)), R.always('right')],
   ])(playerWinLocations(playerId))
-}
