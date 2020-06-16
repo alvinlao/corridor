@@ -47,7 +47,7 @@ const urlEncode = (unencoded) =>
 // Binary :: String
 // Converts a base64 url friendly string to binary data.
 const urlDecode = (encoded) => {
-  var encoded = encoded.replace('-', '+').replace('_', '/');
+  var encoded = encoded.replace(/-/g, '+').replace(/_/g, '/');
   while (encoded.length % 4)
     encoded += '=';
   return atob(encoded);
