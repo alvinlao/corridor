@@ -15,7 +15,8 @@ import { cellSize, cellMargin, offsetX } from './cell'
 const buttonRadius = (context) => (cellSize(context) / 2)
 const buttonMargin = cellMargin
 const buttonFill = "#000000"
-const buttonOpacity = 0.1
+const buttonSelectedOpacity = 0.08
+const buttonAvailableOpacity = 0.2
 const buttonHoverOpacity = 0.3
 const buttonClickOpacity = 0.5
 const buttonUnavailableOpacity = 0.0
@@ -40,6 +41,7 @@ export const initUndoButton = R.curry((context, align, index) => {
     align,
     fill: null,
     isAvailable: (state) => past(state.game).length >= 1,
+    isSelected: R.F,
     onClick: () => store.dispatch(undo()),
   }
   return buildButton(context, index, params)
@@ -63,6 +65,7 @@ export const initRedoButton = R.curry((context, align, index) => {
     align,
     fill: null,
     isAvailable: (state) => future(state.game).length >= 1,
+    isSelected: R.F,
     onClick: () => store.dispatch(redo()),
   }
   return buildButton(context, index, params)
@@ -85,8 +88,12 @@ export const initNewGame2P = R.curry((context, align, index) => {
     },
     align,
     fill: "#000000",
-    isAvailable: (state) =>
-      past(state.game).length >= 1 || present(state.game).numPlayers != 2,
+    isAvailable: (state) => (
+        future(state.game).length >= 1
+        || past(state.game).length >= 1
+        || present(state.game).numPlayers != 2
+      ),
+    isSelected: (state) => present(state.game).numPlayers == 2,
     onClick: () => store.dispatch(reset(game(2))),
   }
   return buildButton(context, index, params)
@@ -115,8 +122,12 @@ export const initNewGame4P = R.curry((context, align, index) => {
     },
     align,
     fill: "#000000",
-    isAvailable: (state) =>
-      past(state.game).length >= 1 || present(state.game).numPlayers != 4,
+    isAvailable: (state) => (
+        future(state.game).length >= 1 ||
+        past(state.game).length >= 1 ||
+        present(state.game).numPlayers != 4
+      ),
+    isSelected: (state) => present(state.game).numPlayers == 4,
     onClick: () => store.dispatch(reset(game(4))),
   }
   return buildButton(context, index, params)
@@ -151,12 +162,20 @@ const buildButton = R.curry((context, index, params) => {
 
   let isHover = false
   const updateAvailability = (button, state) => {
-    if (!params.isAvailable(state)) {
+    const isSelected = params.isSelected(state)
+    const isAvailable = params.isAvailable(state)
+    if (isSelected && isAvailable) {
+      tweenOpacity(icon, iconOpacity, 240)
+      tweenOpacity(button, buttonSelectedOpacity, 240)
+    } else if (isSelected && !isAvailable) {
+      tweenOpacity(icon, iconUnavailableOpacity, 240)
+      tweenOpacity(button, buttonSelectedOpacity, 240)
+    } else if (!isSelected && isAvailable) {
+      isHover ? null : tweenOpacity(icon, iconOpacity, 240)
+      isHover ? null : tweenOpacity(button, 0, 240)
+    } else {
       tweenOpacity(icon, iconUnavailableOpacity, 240)
       tweenOpacity(button, buttonUnavailableOpacity, 240)
-    } else {
-      isHover ? null : tweenOpacity(icon, iconOpacity, 240)
-      isHover ? null : tweenOpacity(button, buttonOpacity, 240)
     }
   }
 
