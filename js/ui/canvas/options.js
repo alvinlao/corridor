@@ -14,12 +14,11 @@ import { cellSize, cellMargin, offsetX } from './cell'
 
 const buttonRadius = (context) => (cellSize(context) / 2)
 const buttonMargin = cellMargin
-const buttonFill = "#000000"
-const buttonSelectedOpacity = 0.08
-const buttonAvailableOpacity = 0.2
-const buttonHoverOpacity = 0.3
-const buttonClickOpacity = 0.5
-const buttonUnavailableOpacity = 0.0
+const bgFill = "#000000"
+const bgSelectedOpacity = 0.08
+const bgHoverOpacity = 0.3
+const bgClickOpacity = 0.5
+const bgUnavailableOpacity = 0.0
 const iconUnavailableOpacity = 0.2
 const iconOpacity = 0.8
 
@@ -39,7 +38,7 @@ export const initUndoButton = R.curry((context, align, index) => {
       cx.fillStrokeShape(shape)
     },
     align,
-    fill: null,
+    iconFill: null,
     isAvailable: (state) => past(state.game).length >= 1,
     isSelected: R.F,
     onClick: () => store.dispatch(undo()),
@@ -87,7 +86,7 @@ export const initNewGame2P = R.curry((context, align, index) => {
       cx.fillStrokeShape(shape)
     },
     align,
-    fill: "#000000",
+    iconFill: "#000000",
     isAvailable: (state) => (
         future(state.game).length >= 1
         || past(state.game).length >= 1
@@ -121,7 +120,7 @@ export const initNewGame4P = R.curry((context, align, index) => {
       cx.fillStrokeShape(shape)
     },
     align,
-    fill: "#000000",
+    iconFill: "#000000",
     isAvailable: (state) => (
         future(state.game).length >= 1 ||
         past(state.game).length >= 1 ||
@@ -133,10 +132,16 @@ export const initNewGame4P = R.curry((context, align, index) => {
   return buildButton(context, index, params)
 })
 
+// x :: Context -> Number -> Align -> Number
+// Calculates a button's x position.
 const x = (context, index, align) => {
   const offset = offsetX(context)
   const position =
-    (((buttonRadius(context) * 2) + buttonMargin(context)) * index + buttonRadius(context))
+    (
+      ((buttonRadius(context) * 2) + buttonMargin(context))
+      * index
+      + buttonRadius(context)
+    )
   if (align === 'left') {
     return position + offset
   } else {
@@ -155,59 +160,59 @@ const buildButton = R.curry((context, index, params) => {
     stroke: "#000000",
     strokeWidth: 2,
     opacity: iconUnavailableOpacity,
-    fill: params.fill,
+    fill: params.iconFill,
     sceneFunc: params.iconSceneFunc,
   })
   icon.listening(false)
 
   let isHover = false
-  const updateAvailability = (button, state) => {
+  const updateAvailability = (bg, state) => {
     const isSelected = params.isSelected(state)
     const isAvailable = params.isAvailable(state)
     if (isSelected && isAvailable) {
       tweenOpacity(icon, iconOpacity, 240)
-      tweenOpacity(button, buttonSelectedOpacity, 240)
+      tweenOpacity(bg, bgSelectedOpacity, 240)
     } else if (isSelected && !isAvailable) {
       tweenOpacity(icon, iconUnavailableOpacity, 240)
-      tweenOpacity(button, buttonSelectedOpacity, 240)
+      tweenOpacity(bg, bgSelectedOpacity, 240)
     } else if (!isSelected && isAvailable) {
       isHover ? null : tweenOpacity(icon, iconOpacity, 240)
-      isHover ? null : tweenOpacity(button, 0, 240)
+      isHover ? null : tweenOpacity(bg, 0, 240)
     } else {
       tweenOpacity(icon, iconUnavailableOpacity, 240)
-      tweenOpacity(button, buttonUnavailableOpacity, 240)
+      tweenOpacity(bg, bgUnavailableOpacity, 240)
     }
   }
 
-  const update = R.curry((context, button, state) => {
-    updateAvailability(button, state)
+  const update = R.curry((context, bg, state) => {
+    updateAvailability(bg, state)
   })
 
-  const bind = R.curry((context, button) => {
-    button.on('mouseover', () => {
+  const bind = R.curry((context, bg) => {
+    bg.on('mouseover', () => {
       isHover = true
       if (params.isAvailable(store.getState())) {
         document.body.style.cursor = 'pointer';
         tweenOpacity(icon, iconOpacity, 240)
-        tweenOpacity(button, buttonHoverOpacity, 240)
+        tweenOpacity(bg, bgHoverOpacity, 240)
       }
     })
-    button.on('mouseout', () => {
+    bg.on('mouseout', () => {
       isHover = false
       document.body.style.cursor = 'default';
-      updateAvailability(button, store.getState())
+      updateAvailability(bg, store.getState())
     })
-    button.on('mousedown', () => {
+    bg.on('mousedown', () => {
       if (params.isAvailable(store.getState())) {
-        tweenOpacity(button, buttonClickOpacity, 0)
+        tweenOpacity(bg, bgClickOpacity, 0)
       }
     })
-    button.on('mouseup', () => {
+    bg.on('mouseup', () => {
       if (params.isAvailable(store.getState())) {
         params.onClick()
 
         if (params.isAvailable(store.getState())) {
-          tweenOpacity(button, buttonHoverOpacity, 0)
+          tweenOpacity(bg, bgHoverOpacity, 0)
         } else {
           document.body.style.cursor = 'default';
         }
@@ -221,17 +226,17 @@ const buildButton = R.curry((context, index, params) => {
 // initButton :: Context -> ButtonInfo -> Align -> [Element]
 // Initializes a button ui.
 const initButton = R.curry((context, info, align) => {
-  const button = new Konva.Circle({
+  const bg = new Konva.Circle({
     x: x(context, info.index, align),
     y: 10,
     radius: buttonRadius(context),
-    fill: buttonFill,
-    opacity: buttonUnavailableOpacity,
+    fill: bgFill,
+    opacity: bgUnavailableOpacity,
   })
-  info.bind(context, button)
+  info.bind(context, bg)
 
   return {
-    shapes: [button, info.icon],
-    update: info.update(context, button),
+    shapes: [bg, info.icon],
+    update: info.update(context, bg),
   }
 })
