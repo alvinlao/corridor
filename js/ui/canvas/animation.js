@@ -1,4 +1,5 @@
 import * as R from 'ramda'
+import Konva from 'konva/lib/Core'
 
 // tweenOpacity :: Konva.Shape -> Number -> Number -> Boolean -> ()
 // Animates a shape, changing its opacity to the target value (between 0 - 1),

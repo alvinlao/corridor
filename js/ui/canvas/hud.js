@@ -1,5 +1,7 @@
 import * as R from 'ramda'
-import * as Konva from 'konva'
+import Konva from 'konva/lib/Core'
+import { Circle } from 'konva/lib/shapes/Circle'
+import { Rect } from 'konva/lib/shapes/Rect'
 
 import { wallsPerPlayer, numWallsAvailable } from '../../core/game'
 import { isGameOver, winners } from '../../core/logic'

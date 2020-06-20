@@ -1,6 +1,8 @@
 import * as R from 'ramda'
-import * as Konva from 'konva'
 import debounce from 'lodash.debounce'
+import Konva from 'konva/lib/Core'
+import { Circle } from 'konva/lib/shapes/Circle'
+import { Line } from 'konva/lib/shapes/Line'
 
 import { store } from '../../store/store'
 import { goto } from '../../store/timetravel'

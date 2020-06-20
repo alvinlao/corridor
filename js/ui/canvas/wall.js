@@ -1,5 +1,6 @@
 import * as R from 'ramda'
-import * as Konva from 'konva'
+import Konva from 'konva/lib/Core'
+import { Rect } from 'konva/lib/shapes/Rect'
 
 import { updateBoard, hasWall, wallsAvailable } from '../../core/game'
 import { point } from '../../core/point'

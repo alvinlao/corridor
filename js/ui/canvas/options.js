@@ -1,5 +1,6 @@
 import * as R from 'ramda'
-import * as Konva from 'konva'
+import Konva from 'konva/lib/Core'
+import { Circle } from 'konva/lib/shapes/Circle'
 
 import { game } from '../../core/game'
 
@@ -9,12 +10,11 @@ import { store } from '../../store/store'
 import { past, present, future } from '../../store/undoable'
 
 import { tweenOpacity } from './animation'
-import { topMargin } from './constants'
 import { cellSize, cellMargin, offsetX } from './cell'
+import { black } from './constants'
 
 const buttonRadius = (context) => (cellSize(context) / 2)
 const buttonMargin = cellMargin
-const bgFill = "#000000"
 const bgSelectedOpacity = 0.08
 const bgHoverOpacity = 0.3
 const bgClickOpacity = 0.5
@@ -38,7 +38,6 @@ export const initUndoButton = R.curry((context, align, index) => {
       cx.fillStrokeShape(shape)
     },
     align,
-    iconFill: null,
     isAvailable: (state) => past(state.game).length >= 1,
     isSelected: R.F,
     onClick: () => store.dispatch(undo()),
@@ -62,7 +61,6 @@ export const initRedoButton = R.curry((context, align, index) => {
       cx.fillStrokeShape(shape)
     },
     align,
-    fill: null,
     isAvailable: (state) => future(state.game).length >= 1,
     isSelected: R.F,
     onClick: () => store.dispatch(redo()),
@@ -86,7 +84,7 @@ export const initNewGame2P = R.curry((context, align, index) => {
       cx.fillStrokeShape(shape)
     },
     align,
-    iconFill: "#000000",
+    iconFill: black,
     isAvailable: (state) => (
         future(state.game).length >= 1
         || past(state.game).length >= 1
@@ -120,7 +118,7 @@ export const initNewGame4P = R.curry((context, align, index) => {
       cx.fillStrokeShape(shape)
     },
     align,
-    iconFill: "#000000",
+    iconFill: black,
     isAvailable: (state) => (
         future(state.game).length >= 1 ||
         past(state.game).length >= 1 ||
@@ -157,7 +155,7 @@ const buildButton = R.curry((context, index, params) => {
     y: 10,
     width: (buttonRadius(context) * 2) * 0.5,
     height: (buttonRadius(context) * 2) * 0.5,
-    stroke: "#000000",
+    stroke: black,
     strokeWidth: 2,
     opacity: iconUnavailableOpacity,
     fill: params.iconFill,

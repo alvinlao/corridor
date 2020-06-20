@@ -1,5 +1,5 @@
 import * as R from 'ramda'
-import * as Konva from 'konva'
+import Konva from 'konva/lib/Core'
 
 import { point } from '../../core/point'
 import { row, playerIds, playerLocation } from '../../core/game'

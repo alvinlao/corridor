@@ -12,4 +12,5 @@ export const playerColors = {
 }
 
 export const white = "#FFFFFF"
+export const black = "#000000"
 export const wallColor = "#2C363F"
