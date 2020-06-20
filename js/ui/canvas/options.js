@@ -228,7 +228,7 @@ const initButton = R.curry((context, info, align) => {
     x: x(context, info.index, align),
     y: 10,
     radius: buttonRadius(context),
-    fill: bgFill,
+    fill: black,
     opacity: bgUnavailableOpacity,
   })
   info.bind(context, bg)
