@@ -1,8 +1,9 @@
 import * as R from 'ramda'
-import { game, playerLocation } from './game'
+import { putWall, putPlayer } from './board'
+import { game, playerLocation, updateBoard } from './game'
 import { point, north, south } from './point'
 import { useWall, useMove, nextPlayersTurn } from './turn'
-import { vwall } from './wall'
+import { hwall, vwall } from './wall'
 
 
 test('useWall yes', () => {
@@ -86,4 +87,50 @@ test('nextPlayersTurn back to player 1', () => {
     )(testGame)
 
   expect(actualGame.activePlayerId).toEqual(initialPlayerId)
+});
+
+
+// The game is set up as:
+// * Player 1 has no walls.
+// * Player 3 has no walls.
+// * Player 1 is at (7, 0).
+// * Player 3 is at (7, 1).
+// * Player 0 is at (7, 2).
+// * Player 2 is at (7, 3).
+// * Horizontal wall at (7, 0).
+// * Horizontal wall at (7, 2).
+// * Horizontal wall at (6, 0).
+// * Horizontal wall at (6, 2).
+//
+// Diagram:
+//    0 1 2 3
+//    ======
+// 8 |
+//   |- - - -
+// 7 |1 3 0 2
+//   |- - - -
+//
+// The next player after Player 2 would normally be Player 1, but since Player 1
+// and Player 3 have no valid moves, the next player is Player 0.
+test('nextPlayersTurn skip player with no moves', () => {
+  const testGame = game(4)
+
+  const actualGame = R.pipe(
+      // Set Player 1's walls to 0.
+      R.over(R.lensPath(['inventory', '1']), () => 0),
+      // Set Player 3's walls to 0.
+      R.over(R.lensPath(['inventory', '3']), () => 0),
+      updateBoard(putPlayer(1, point(7, 0))),
+      updateBoard(putPlayer(3, point(7, 1))),
+      updateBoard(putPlayer(0, point(7, 2))),
+      updateBoard(putPlayer(2, point(7, 3))),
+      updateBoard(putWall(hwall(point(7, 0)))),
+      updateBoard(putWall(hwall(point(7, 2)))),
+      updateBoard(putWall(hwall(point(6, 0)))),
+      updateBoard(putWall(hwall(point(6, 2)))),
+      R.over(R.lensProp('activePlayerId'), () => 2),
+      nextPlayersTurn,
+    )(testGame)
+
+  expect(actualGame.activePlayerId).toEqual(0)
 });
