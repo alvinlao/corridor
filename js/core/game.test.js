@@ -3,7 +3,6 @@ import {
   game,
   isPointInbounds,
   playerIds,
-  nextPlayersTurn,
   wallsAvailable,
   consumeWall,
   getPlayerIdOn,
@@ -102,30 +101,6 @@ test('playerIds 4 player game', () => {
 
   expect(actual).toEqual([0, 1, 2, 3])
 })
-
-test('nextPlayersTurn next player', () => {
-  const testGame = game(4)
-
-  const actualGame = R.pipe(
-      nextPlayersTurn,
-    )(testGame)
-
-  expect(actualGame.activePlayerId).toEqual(3)
-});
-
-test('nextPlayersTurn back to player 1', () => {
-  const testGame = game(4)
-  const initialPlayerId = testGame.activePlayerId
-
-  const actualGame = R.pipe(
-      nextPlayersTurn,
-      nextPlayersTurn,
-      nextPlayersTurn,
-      nextPlayersTurn,
-    )(testGame)
-
-  expect(actualGame.activePlayerId).toEqual(initialPlayerId)
-});
 
 test('wallsAvailable yes', () => {
   const testGame = game(4)

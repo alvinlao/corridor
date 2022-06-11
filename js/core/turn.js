@@ -3,10 +3,13 @@ import { putWall, putPlayer } from './board'
 import {
   updateBoard,
   wallsAvailable,
+  numWallsAvailable,
   consumeWall,
-  nextPlayersTurn,
+  playerIds,
+  turnOrder,
 } from './game'
 import { isValidWall, isValidMove } from './logic'
+import { cycle } from '../util/iterables'
 
 
 // useWall :: Game -> Wall -> Game
@@ -29,3 +32,19 @@ export const useMove = R.curry((game, destination) =>
       updateBoard(putPlayer(game.activePlayerId, destination)),
       nextPlayersTurn))
   (game))
+
+// nextPlayersTurn :: Game -> Game
+// Updates the game to be the next player's turn.
+export const nextPlayersTurn = (game) =>
+  R.over(
+    R.lensProp('activePlayerId'),
+    (playerId) =>
+      R.pipe(
+        playerIds,
+        turnOrder,
+        cycle(2),
+        R.dropWhile(R.complement(R.equals(playerId))),
+        R.drop(1),
+        R.head)
+      (game),
+    game)

@@ -2,7 +2,6 @@
 import { board, putPlayer } from './board'
 import { point } from './point'
 import { edges, edgeKey, wallKey } from './wall'
-import { cycle } from '../util/iterables'
 
 
 // rows, cols :: Number
@@ -147,21 +146,6 @@ export const numWallsAvailable = R.curry((game, playerId) =>
 // Removes a wall from the active player's inventory.
 export const consumeWall = (game) =>
   R.over(R.lensPath(['inventory', game.activePlayerId]), R.dec, game)
-
-// nextPlayersTurn :: Game -> Game
-// Updates the game to be the next player's turn.
-export const nextPlayersTurn = (game) =>
-  R.over(
-    R.lensProp('activePlayerId'),
-    (playerId) =>
-      R.pipe(
-        playerIds,
-        turnOrder,
-        cycle(2),
-        R.dropWhile(R.complement(R.equals(playerId))),
-        R.nth(1))
-      (game),
-    game)
 
 // updateBoard :: (Board -> Board) -> Game -> Game
 // Updates the board in the game.

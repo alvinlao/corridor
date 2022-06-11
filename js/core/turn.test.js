@@ -1,7 +1,7 @@
 import * as R from 'ramda'
 import { game, playerLocation } from './game'
 import { point, north, south } from './point'
-import { useWall, useMove } from './turn'
+import { useWall, useMove, nextPlayersTurn } from './turn'
 import { vwall } from './wall'
 
 
@@ -63,3 +63,27 @@ test('useMove invalid move', () => {
   expect(actualGame.activePlayerId).toEqual(playerId)
   expect(playerLocation(actualGame, playerId)).toEqual(location)
 })
+
+test('nextPlayersTurn next player', () => {
+  const testGame = game(4)
+
+  const actualGame = R.pipe(
+      nextPlayersTurn,
+    )(testGame)
+
+  expect(actualGame.activePlayerId).toEqual(3)
+});
+
+test('nextPlayersTurn back to player 1', () => {
+  const testGame = game(4)
+  const initialPlayerId = testGame.activePlayerId
+
+  const actualGame = R.pipe(
+      nextPlayersTurn,
+      nextPlayersTurn,
+      nextPlayersTurn,
+      nextPlayersTurn,
+    )(testGame)
+
+  expect(actualGame.activePlayerId).toEqual(initialPlayerId)
+});
